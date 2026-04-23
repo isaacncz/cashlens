@@ -562,7 +562,7 @@ export default function MoneyMirror() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_300px] gap-4 items-start">
+                <div className="space-y-3">
                   <div className="rounded-2xl border border-navy-light bg-[#0B1830] p-4">
                     <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow breakdown</p>
                     <div className="md:hidden flex flex-wrap gap-2 mb-3">
@@ -586,7 +586,7 @@ export default function MoneyMirror() {
                         <div key={`stack-${item.key}`} style={{ width: `${Math.max(2, item.percent)}%`, backgroundColor: item.color }} />
                       ))}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="space-y-2">
                       {flowItems.map((item) => {
                         const width = Math.max(item.key === 'net' ? 18 : 6, Math.min(100, item.percent));
                         const isHighlighted = highlightedFlow === item.key;
@@ -597,12 +597,16 @@ export default function MoneyMirror() {
                             onMouseEnter={() => handleFlowHover(item.key)}
                             onFocus={() => handleFlowSelect(item.key)}
                             onClick={() => handleFlowSelect(item.key)}
-                            className={`w-full text-left rounded-lg border px-3 py-2 transition-all duration-200 ${
-                              isHighlighted ? 'border-gold/40 bg-navy-surface' : 'border-navy-light/80 bg-navy md:hover:border-gold/20'
+                            className={`w-full text-left rounded-lg border px-3 py-3 transition-all duration-200 ${
+                              isHighlighted ? 'border-gold/40 bg-[#10264a]' : 'border-navy-light/80 bg-[#0B1E3C] md:hover:border-gold/20'
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-3 mb-1">
-                              <p className={`text-sm font-semibold ${item.key === 'net' ? 'text-emerald' : 'text-white'}`}>{item.label}</p>
+                            <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 mb-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                                <p className={`text-sm font-semibold truncate ${item.key === 'net' ? 'text-emerald' : 'text-white'}`}>{item.label}</p>
+                              </div>
+                              <span className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</span>
                               <span className="text-white font-mono-data text-sm font-bold">{item.percent.toFixed(1)}%</span>
                             </div>
                             <div className="h-2 rounded-full bg-navy-light overflow-hidden">
@@ -611,17 +615,15 @@ export default function MoneyMirror() {
                                 style={{ width: `${width}%`, backgroundColor: item.color }}
                               />
                             </div>
-                            <div className="mt-1 flex items-center justify-between">
-                              <p className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</p>
-                              <p className="text-slate text-[11px]">{item.key === 'net' ? 'kept' : 'out'}</p>
+                            <div className="mt-1 flex items-center justify-end">
+                              <p className="text-slate text-[11px]">{item.key === 'net' ? 'kept' : 'deduction'}</p>
                             </div>
                           </button>
                         );
                       })}
                     </div>
                   </div>
-
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="rounded-xl border border-gold/25 bg-navy-surface p-4">
                       <p className="text-slate text-xs uppercase mb-1">Focused explanation</p>
                       <p className={`text-base font-bold mb-1 ${highlightedItem.accent}`}>{highlightedItem.label} — {highlightedItem.percent.toFixed(1)}%</p>
