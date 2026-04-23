@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 type Quadrant = 'E' | 'S' | 'B' | 'I';
-const TAX_BLUE = '#4DA3FF';
+const TAX_OUT = '#DC2626';
 
 interface QuadrantData {
   key: Quadrant;
@@ -38,11 +38,11 @@ const quadrants: QuadrantData[] = [
     epfAmount: 880,
     timeHours: 160,
     netTakeHome: 6140,
-    accent: 'text-malaysian-blue',
-    borderColor: 'border-malaysian-blue',
+    accent: 'text-crimson',
+    borderColor: 'border-crimson',
     tagline: "Your salary makes your boss rich. Who makes you rich?",
     details: ['LHDN progressive tax up to 24%', 'EPF: 11% employee + 12% employer (locked)', '9-to-6 + MRT commute', 'Highest tax burden, zero time freedom'],
-    pipeColors: { tax: TAX_BLUE, epf: '#DAA520', time: '#DC2626', income: '#FFD700' },
+    pipeColors: { tax: TAX_OUT, epf: '#DAA520', time: '#DC2626', income: '#FFD700' },
     pipeWidths: { tax: 28, epf: 23, time: 45, income: 35 },
   },
   {
@@ -60,7 +60,7 @@ const quadrants: QuadrantData[] = [
     borderColor: 'border-slate',
     tagline: "Sarah earns more than Ahmad. But she has no safety net.",
     details: ['No employer EPF contribution', 'Higher effective tax rate', 'No work = No income', 'Time pipe is WIDEST'],
-    pipeColors: { tax: TAX_BLUE, epf: '#64748B', time: '#DC2626', income: '#FFD700' },
+    pipeColors: { tax: TAX_OUT, epf: '#64748B', time: '#DC2626', income: '#FFD700' },
     pipeWidths: { tax: 35, epf: 0, time: 55, income: 42 },
   },
   {
@@ -78,7 +78,7 @@ const quadrants: QuadrantData[] = [
     borderColor: 'border-emerald',
     tagline: "Raj's company pays his lifestyle. These are expenses, not liabilities.",
     details: ['Company pays car, phone, travel', 'Dividends: tax-exempt up to RM 100K', 'Leverage through business structure', 'Thin time pipe'],
-    pipeColors: { tax: TAX_BLUE, epf: '#DAA520', time: '#10B981', income: '#10B981' },
+    pipeColors: { tax: TAX_OUT, epf: '#DAA520', time: '#10B981', income: '#10B981' },
     pipeWidths: { tax: 15, epf: 10, time: 8, income: 50 },
   },
   {
@@ -96,7 +96,7 @@ const quadrants: QuadrantData[] = [
     borderColor: 'border-gold',
     tagline: "Aminah stopped working at 42. Her income never did.",
     details: ['ASB dividends + rental + dividend stocks', 'Tax: Minimal (dividends exempt)', 'Time pipe: GONE', 'Multiple income streams'],
-    pipeColors: { tax: TAX_BLUE, epf: '#DAA520', time: '#10B981', income: '#FFD700' },
+    pipeColors: { tax: TAX_OUT, epf: '#DAA520', time: '#10B981', income: '#FFD700' },
     pipeWidths: { tax: 5, epf: 5, time: 0, income: 60 },
   },
 ];
@@ -108,7 +108,6 @@ function formatRinggit(amount: number) {
 export default function CashflowQuadrant() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Quadrant | null>(null);
-  const [sliderValue, setSliderValue] = useState(0);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -118,8 +117,6 @@ export default function CashflowQuadrant() {
       scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
     });
   }, []);
-
-  const activeQuadrant = quadrants[Math.min(Math.floor(sliderValue), 3)];
 
   return (
     <section id="cashflow-quadrant" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
@@ -201,8 +198,8 @@ export default function CashflowQuadrant() {
                         <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">Step 1 → Income in</p>
                         <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.monthlyIncome)}</p>
                       </div>
-                      <div className="rounded-xl border p-4" style={{ backgroundColor: 'rgba(77,163,255,0.14)', borderColor: 'rgba(77,163,255,0.45)' }}>
-                        <p className="text-xs uppercase tracking-[0.12em] mb-1" style={{ color: TAX_BLUE }}>Step 2 → Tax out</p>
+                      <div className="rounded-xl border p-4" style={{ backgroundColor: 'rgba(220,38,38,0.12)', borderColor: 'rgba(220,38,38,0.35)' }}>
+                        <p className="text-xs uppercase tracking-[0.12em] mb-1" style={{ color: TAX_OUT }}>Step 2 → Tax out</p>
                         <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.taxAmount)}</p>
                       </div>
                       <div className="bg-gold/10 border border-gold/25 rounded-xl p-4">
@@ -233,7 +230,7 @@ export default function CashflowQuadrant() {
                     <div className="flex flex-wrap gap-2 mb-4">
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald/10 text-emerald border border-emerald/25" title="Income entering the system">Green = income in</span>
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-crimson/10 text-crimson border border-crimson/25" title="Time and lifestyle drain">Red = deduction / time out</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: 'rgba(77,163,255,0.14)', color: TAX_BLUE, borderColor: 'rgba(77,163,255,0.45)' }} title="Tax flow">Blue = tax out</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: 'rgba(220,38,38,0.12)', color: TAX_OUT, borderColor: 'rgba(220,38,38,0.35)' }} title="Tax flow">Red = tax out</span>
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gold/10 text-gold border border-gold/25" title="Locked or retained wealth">Gold = savings / net</span>
                     </div>
                     <svg width="100%" height="260" viewBox="0 0 300 260">
@@ -303,70 +300,13 @@ export default function CashflowQuadrant() {
           </div>
         )}
 
-        {/* Switch Quadrants Slider */}
-        <div data-reveal className="bg-navy-surface border border-navy-light rounded-2xl p-6">
-          <p className="text-slate text-sm mb-4">Drag to see how your quadrant changes your money flow:</p>
-          <div className="relative">
-            <input
-              type="range"
-              min="0"
-              max="3"
-              step="0.01"
-              value={sliderValue}
-              onChange={e => setSliderValue(parseFloat(e.target.value))}
-              className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, #DC2626 0%, #FFD700 50%, #10B981 100%)`,
-              }}
-            />
-            <div className="flex justify-between mt-2 text-xs text-slate">
-              <span className={sliderValue < 1 ? 'text-crimson font-bold' : ''}>E — Employee</span>
-              <span className={sliderValue >= 1 && sliderValue < 2 ? 'text-slate-light font-bold' : ''}>S — Self-employed</span>
-              <span className={sliderValue >= 2 && sliderValue < 3 ? 'text-emerald font-bold' : ''}>B — Business</span>
-              <span className={sliderValue >= 3 ? 'text-gold font-bold' : ''}>I — Investor</span>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold" style={{ backgroundColor: activeQuadrant.pipeColors.income + '30', color: activeQuadrant.pipeColors.income }}>
-              {activeQuadrant.key}
-            </div>
-            <div>
-              <p className="text-white text-sm font-medium">{activeQuadrant.name} — {activeQuadrant.persona}</p>
-              <p className="text-slate text-xs">{activeQuadrant.tagline}</p>
-            </div>
-          </div>
-        </div>
-
         {/* Key Insight */}
-        <div data-reveal className="mt-10 text-center">
+        <div data-reveal className="mt-8 text-center">
           <p className="text-slate text-lg italic max-w-2xl mx-auto">
             "{quadrants[0].name} and {quadrants[3].name} both 'make' RM 8,000. But {quadrants[0].name} trades 160 hours. {quadrants[3].name} trades <span className="text-emerald font-bold">zero.</span>"
           </p>
         </div>
       </div>
-
-      <style>{`
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: #FFD700;
-          border: 3px solid #0A192F;
-          cursor: pointer;
-          box-shadow: 0 0 10px rgba(255,215,0,0.5);
-        }
-        input[type="range"]::-moz-range-thumb {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: #FFD700;
-          border: 3px solid #0A192F;
-          cursor: pointer;
-          box-shadow: 0 0 10px rgba(255,215,0,0.5);
-        }
-      `}</style>
     </section>
   );
 }

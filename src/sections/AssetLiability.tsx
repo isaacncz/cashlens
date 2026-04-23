@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -33,11 +34,12 @@ export default function AssetLiability() {
   const [available, setAvailable] = useState(items);
   const [assets, setAssets] = useState<DraggableItem[]>([]);
   const [liabilities, setLiabilities] = useState<DraggableItem[]>([]);
-  const [dragging, setDragging] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ id: string; correct: boolean } | null>(null);
   const [showHouseTrap, setShowHouseTrap] = useState(false);
   const [assetFlow, setAssetFlow] = useState(0);
   const [liabilityLeak, setLiabilityLeak] = useState(0);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const pointerStartX = useRef<number | null>(null);
   const assetParticles = useMemo(
     () =>
       Array.from({ length: 12 }, (_, i) => ({
@@ -73,38 +75,61 @@ export default function AssetLiability() {
     return () => window.clearTimeout(timeoutId);
   }, [completed]);
 
-  const handleDragStart = (id: string) => {
-    setDragging(id);
-  };
+  const currentItem = available[0] ?? null;
 
-  const handleDrop = (target: 'asset' | 'liability', itemId = dragging) => {
-    if (!itemId) return;
-    const item = items.find(i => i.id === itemId);
-    if (!item) return;
+  const classifyCurrentCard = (target: 'asset' | 'liability') => {
+    if (!currentItem) return;
 
-    const correct = item.category === target;
-    setFeedback({ id: itemId, correct });
+    const correct = currentItem.category === target;
+    setFeedback({ id: currentItem.id, correct });
 
-    if (item.special === 'house-trap' && target === 'asset') {
+    if (currentItem.special === 'house-trap' && target === 'asset') {
       setShowHouseTrap(true);
       setTimeout(() => setShowHouseTrap(false), 4000);
     }
 
     if (correct) {
-      setAvailable(prev => prev.filter(i => i.id !== itemId));
+      setAvailable(prev => prev.slice(1));
       if (target === 'asset') {
-        setAssets(prev => [...prev, item]);
+        setAssets(prev => [...prev, currentItem]);
         setAssetFlow(prev => Math.min(prev + 1, 6));
       } else {
-        setLiabilities(prev => [...prev, item]);
+        setLiabilities(prev => [...prev, currentItem]);
         setLiabilityLeak(prev => prev + 1);
       }
     }
 
+    setDragOffsetX(0);
     setTimeout(() => {
-      setDragging(null);
       setFeedback(null);
-    }, 600);
+    }, correct ? 420 : 600);
+  };
+
+  const handleCardPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    pointerStartX.current = event.clientX;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleCardPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerStartX.current === null) return;
+    const delta = event.clientX - pointerStartX.current;
+    const bounded = Math.max(-140, Math.min(140, delta));
+    setDragOffsetX(bounded);
+  };
+
+  const handleCardPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerStartX.current === null) return;
+
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    const threshold = 90;
+    if (dragOffsetX <= -threshold) {
+      classifyCurrentCard('asset');
+    } else if (dragOffsetX >= threshold) {
+      classifyCurrentCard('liability');
+    } else {
+      setDragOffsetX(0);
+    }
+    pointerStartX.current = null;
   };
 
   const getCardStyle = (item: DraggableItem) => {
@@ -118,6 +143,8 @@ export default function AssetLiability() {
 
   const riverWidth = 40 + assetFlow * 12;
   const leakGaps = liabilityLeak > 0;
+  const progressDone = items.length - available.length;
+  const swipeHint = dragOffsetX < -30 ? 'Asset' : dragOffsetX > 30 ? 'Liability' : null;
 
   return (
     <section id="asset-liability" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
@@ -132,58 +159,71 @@ export default function AssetLiability() {
           <span className="text-crimson">Out.</span>
         </h2>
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
-          Drag each item into the right bucket. Watch the river respond.
+          One card at a time. Swipe <span className="text-emerald">left for Asset</span>, <span className="text-crimson">right for Liability</span>.
         </p>
         <div data-reveal className="mb-6 bg-navy-surface/50 border border-navy-light rounded-2xl p-4">
-          <p className="text-white text-sm font-medium mb-1">Mobile-friendly option</p>
-          <p className="text-slate text-sm">You can still drag items, but every card now also includes single-tap buttons for <span className="text-emerald font-semibold">Asset</span> and <span className="text-crimson font-semibold">Liability</span>.</p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-white text-sm font-medium">Card classifier mode</p>
+            <p className="text-slate text-xs">{progressDone}/{items.length} classified</p>
+          </div>
+          <div className="mt-3 h-2 bg-navy rounded-full overflow-hidden">
+            <div className="h-full bg-emerald transition-all duration-300" style={{ width: `${(progressDone / items.length) * 100}%` }} />
+          </div>
         </div>
 
         {/* Available Items */}
         {available.length > 0 && (
           <div data-reveal className="mb-8">
-            <p className="text-slate text-xs uppercase tracking-wider mb-4">Drag these items into a bucket</p>
-            <div className="flex flex-wrap gap-3">
-              {available.map(item => (
+            <p className="text-slate text-xs uppercase tracking-wider mb-4">Current card</p>
+            {currentItem && (
+              <>
                 <div
-                  key={item.id}
-                  className={`bg-navy-surface border rounded-xl p-3 transition-all duration-200 hover:scale-[1.02] hover:shadow-card ${getCardStyle(item)} ${dragging === item.id ? 'opacity-70 rotate-2' : ''}`}
+                  onPointerDown={handleCardPointerDown}
+                  onPointerMove={handleCardPointerMove}
+                  onPointerUp={handleCardPointerUp}
+                  onPointerCancel={() => {
+                    pointerStartX.current = null;
+                    setDragOffsetX(0);
+                  }}
+                  className={`max-w-xl mx-auto bg-navy-surface border rounded-2xl p-5 transition-all duration-200 select-none touch-none ${getCardStyle(currentItem)}`}
+                  style={{ transform: `translateX(${dragOffsetX}px) rotate(${dragOffsetX / 18}deg)` }}
                 >
-                  <button
-                    draggable
-                    onDragStart={() => handleDragStart(item.id)}
-                    onDragEnd={() => setDragging(null)}
-                    className="flex items-center gap-3 text-left w-full cursor-grab active:cursor-grabbing"
-                  >
-                    <span className="text-2xl">{item.icon}</span>
+                  <div className="flex items-center gap-3 text-left">
+                    <span className="text-3xl">{currentItem.icon}</span>
                     <div className="text-left">
-                      <p className="text-white text-sm font-medium">{item.label}</p>
-                      <p className="text-slate text-xs">{item.description}</p>
+                      <p className="text-white text-lg font-semibold">{currentItem.label}</p>
+                      <p className="text-slate text-sm mt-1">{currentItem.description}</p>
                     </div>
-                  </button>
-                  <div className="grid grid-cols-2 gap-2 mt-3">
+                  </div>
+                  <div className="mt-5 grid grid-cols-2 gap-3">
                     <button
-                      onClick={() => {
-                        setDragging(item.id);
-                        handleDrop('asset', item.id);
-                      }}
+                      onClick={() => classifyCurrentCard('asset')}
                       className="px-3 py-2 rounded-lg border border-emerald/40 bg-emerald/10 text-emerald text-xs font-semibold hover:bg-emerald/20 transition-colors"
                     >
-                      Put in Asset
+                      Swipe Left / Asset
                     </button>
                     <button
-                      onClick={() => {
-                        setDragging(item.id);
-                        handleDrop('liability', item.id);
-                      }}
+                      onClick={() => classifyCurrentCard('liability')}
                       className="px-3 py-2 rounded-lg border border-crimson/40 bg-crimson/10 text-crimson text-xs font-semibold hover:bg-crimson/20 transition-colors"
                     >
-                      Put in Liability
+                      Swipe Right / Liability
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="mt-4 text-center">
+                  <p className="text-slate text-xs">
+                    {swipeHint ? (
+                      <>
+                        Current direction: {swipeHint === 'Asset' ? <span className="text-emerald font-semibold">Asset</span> : <span className="text-crimson font-semibold">Liability</span>}
+                      </>
+                    ) : (
+                      <>Drag horizontally or tap a button to classify.</>
+                    )}
+                  </p>
+                  <p className="text-slate text-xs mt-1">{available.length - 1} cards remaining after this one.</p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -198,8 +238,6 @@ export default function AssetLiability() {
         {/* Two Buckets */}
         <div data-reveal className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div
-            onDragOver={e => e.preventDefault()}
-            onDrop={e => { e.preventDefault(); handleDrop('asset'); }}
             className="min-h-[280px] bg-navy-surface/50 border-2 border-emerald/40 rounded-2xl p-6 transition-all duration-300"
             style={{ boxShadow: assets.length > 0 ? '0 0 30px rgba(16,185,129,0.15)' : 'none' }}
           >
@@ -246,8 +284,6 @@ export default function AssetLiability() {
           </div>
 
           <div
-            onDragOver={e => e.preventDefault()}
-            onDrop={e => { e.preventDefault(); handleDrop('liability'); }}
             className="min-h-[280px] bg-navy-surface/50 border-2 border-crimson/40 rounded-2xl p-6 transition-all duration-300"
             style={{ boxShadow: liabilities.length > 0 ? '0 0 30px rgba(220,38,38,0.15)' : 'none' }}
           >

@@ -138,6 +138,7 @@ export default function MoneyMirror() {
   const [calculated, setCalculated] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [highlightedFlow, setHighlightedFlow] = useState<FlowKey>('net');
+  const [supportsHover, setSupportsHover] = useState(false);
   const [results, setResults] = useState<MoneyMirrorResult>({
     trueHourly: 0,
     annualHours: 0,
@@ -162,6 +163,14 @@ export default function MoneyMirror() {
       stagger: 0.1,
       scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
     });
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const updateHoverSupport = () => setSupportsHover(mediaQuery.matches);
+    updateHoverSupport();
+    mediaQuery.addEventListener('change', updateHoverSupport);
+    return () => mediaQuery.removeEventListener('change', updateHoverSupport);
   }, []);
 
   const inputClass = 'w-full bg-navy-surface border border-navy-light rounded-lg px-4 py-3 text-white font-mono-data text-sm focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(255,215,0,0.15)] transition-all placeholder:text-slate';
@@ -289,28 +298,12 @@ export default function MoneyMirror() {
 
   const highlightedItem = flowItems.find((item) => item.key === highlightedFlow) ?? flowItems[flowItems.length - 1];
   const takeHomePercent = Math.max(0, highlightedItem.key === 'net' ? highlightedItem.percent : flowItems.find((item) => item.key === 'net')?.percent ?? 0);
-
-  const mainDroplets = useMemo(
-    () => Array.from({ length: 8 }, (_, index) => ({ begin: `${index * 0.45}s`, dur: `${2.8 + (index % 3) * 0.25}s` })),
-    [],
-  );
-
-  const branchDroplets = useMemo(
-    () => ({
-      tax: Array.from({ length: 2 }, (_, index) => ({ begin: `${0.6 + index * 1.1}s`, dur: `${2 + index * 0.2}s` })),
-      epf: Array.from({ length: 2 }, (_, index) => ({ begin: `${1.1 + index * 1.2}s`, dur: `${2.1 + index * 0.15}s` })),
-      sst: Array.from({ length: 1 }, (_, index) => ({ begin: `${1.7 + index * 1.1}s`, dur: '2.2s' })),
-      expense: Array.from({ length: 2 }, (_, index) => ({ begin: `${2.1 + index * 1.1}s`, dur: `${2.4 + index * 0.2}s` })),
-    }),
-    [],
-  );
-
-  const branchPaths = {
-    tax: 'M210 110 C170 110 156 110 128 110',
-    epf: 'M210 165 C172 165 158 165 128 165',
-    sst: 'M210 220 C248 220 262 220 292 220',
-    expense: 'M210 275 C248 275 262 275 292 275',
-  } as const;
+  const netItem = flowItems.find((item) => item.key === 'net') ?? flowItems[flowItems.length - 1];
+  const totalOutflow = Math.max(0, results.grossMonthly - netItem.amount);
+  const handleFlowHover = (key: FlowKey) => {
+    if (supportsHover) setHighlightedFlow(key);
+  };
+  const handleFlowSelect = (key: FlowKey) => setHighlightedFlow(key);
 
   return (
     <section id="money-mirror" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
@@ -481,86 +474,95 @@ export default function MoneyMirror() {
             </div>
 
             {calculated ? (
-              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_280px] gap-6 items-start">
-                <div className="rounded-2xl border border-navy-light bg-[#0B1830] p-4">
-                  <svg viewBox="0 0 420 360" className="w-full max-w-[520px] mx-auto">
-                    <defs>
-                      <linearGradient id="mainFunnelFill" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#FFD700" stopOpacity="0.26" />
-                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.12" />
-                      </linearGradient>
-                      <linearGradient id="mainFlowStroke" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#FFD700" />
-                        <stop offset="100%" stopColor="#10B981" />
-                      </linearGradient>
-                    </defs>
-
-                    <path d="M145 28 L275 28 L244 320 L176 320 Z" fill="url(#mainFunnelFill)" stroke="#233554" strokeWidth="2" />
-                    <path d="M210 32 C210 98 210 140 210 192 C210 242 210 284 210 314" stroke="url(#mainFlowStroke)" strokeWidth="52" strokeLinecap="round" fill="none" opacity="0.35" />
-                    <path d="M210 32 C210 98 210 140 210 192 C210 242 210 284 210 314" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.85" />
-
-                    <text x="210" y="18" textAnchor="middle" fill="#E6F1FF" fontSize="12" fontWeight="700">Gross Income</text>
-                    <text x="210" y="43" textAnchor="middle" fill="#FFD700" fontSize="16" fontWeight="700">RM {results.grossMonthly.toFixed(0)}</text>
-
-                    {mainDroplets.map((droplet, index) => (
-                      <circle key={index} r={index % 3 === 0 ? '4' : '3'} fill="#FFD700" opacity="0.9">
-                        <animateMotion dur={droplet.dur} begin={droplet.begin} repeatCount="indefinite" path="M210 36 C210 98 210 140 210 192 C210 242 210 284 210 314" />
-                        <animate attributeName="opacity" values="0;0.95;0.75;0" dur={droplet.dur} begin={droplet.begin} repeatCount="indefinite" />
-                      </circle>
-                    ))}
-
-                    {flowItems.filter((item) => item.key !== 'net').map((item) => (
-                      <g key={item.key} opacity={highlightedFlow === item.key || highlightedFlow === 'net' ? 1 : 0.42}>
-                        <path
-                          d={branchPaths[item.key as keyof typeof branchPaths]}
-                          stroke={item.color}
-                          strokeWidth={Math.max(8, item.percent * 1.6)}
-                          fill="none"
-                          strokeLinecap="round"
-                          opacity="0.55"
-                        />
-                        <path
-                          d={branchPaths[item.key as keyof typeof branchPaths]}
-                          stroke={item.color}
-                          strokeWidth="2"
-                          fill="none"
-                          strokeLinecap="round"
-                        />
-                        {branchDroplets[item.key as keyof typeof branchDroplets].map((droplet, dropletIndex) => (
-                          <circle key={`${item.key}-${dropletIndex}`} r="3" fill={item.color} opacity="0.9">
-                            <animateMotion dur={droplet.dur} begin={droplet.begin} repeatCount="indefinite" path={branchPaths[item.key as keyof typeof branchPaths]} />
-                            <animate attributeName="opacity" values="0;0.9;0" dur={droplet.dur} begin={droplet.begin} repeatCount="indefinite" />
-                          </circle>
-                        ))}
-                      </g>
-                    ))}
-
-                    <g opacity={highlightedFlow === 'net' ? 1 : 0.72}>
-                      <rect x="160" y="322" width="100" height="28" rx="14" fill="#10B981" opacity="0.16" />
-                      <text x="210" y="339" textAnchor="middle" fill="#10B981" fontSize="13" fontWeight="700">Net left in pocket</text>
-                    </g>
-                  </svg>
-
-                  <div className="mt-4 rounded-xl bg-navy border border-navy-light p-4">
-                    <p className="text-slate text-xs uppercase mb-1">Focused explanation</p>
-                    <p className={`text-base font-bold mb-1 ${highlightedItem.accent}`}>{highlightedItem.label} — {highlightedItem.percent.toFixed(1)}%</p>
-                    <p className="text-slate text-sm leading-relaxed">{highlightedItem.description}</p>
-                    <p className="text-white font-mono-data text-sm mt-3">RM {highlightedItem.amount.toFixed(0)} / month</p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-xl border border-gold/25 bg-gold/10 p-4">
+                    <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Gross</p>
+                    <p className="text-white font-mono-data text-xl font-bold">RM {results.grossMonthly.toFixed(0)}</p>
+                  </div>
+                  <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
+                    <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Total outflow</p>
+                    <p className="text-white font-mono-data text-xl font-bold">RM {totalOutflow.toFixed(0)}</p>
+                  </div>
+                  <div className="rounded-xl border border-emerald/25 bg-emerald/10 p-4">
+                    <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">You keep</p>
+                    <p className="text-white font-mono-data text-xl font-bold">{netItem.percent.toFixed(1)}%</p>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
+                  <div className="rounded-2xl border border-navy-light bg-[#0B1830] p-4">
+                    <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow breakdown</p>
+                    <div className="md:hidden flex flex-wrap gap-2 mb-3">
+                      {flowItems.map((item) => (
+                        <button
+                          key={`chip-${item.key}`}
+                          type="button"
+                          onClick={() => handleFlowSelect(item.key)}
+                          className={`min-h-10 px-3 rounded-full border text-xs font-semibold transition-all ${
+                            highlightedFlow === item.key
+                              ? 'border-gold/45 bg-navy-surface text-white'
+                              : 'border-navy-light bg-navy text-slate'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="space-y-3">
+                      {flowItems.map((item) => {
+                        const width = Math.max(item.key === 'net' ? 18 : 10, Math.min(100, item.percent));
+                        const isHighlighted = highlightedFlow === item.key;
+                        return (
+                          <button
+                            key={`bar-${item.key}`}
+                            type="button"
+                            onMouseEnter={() => handleFlowHover(item.key)}
+                            onFocus={() => handleFlowSelect(item.key)}
+                            onClick={() => handleFlowSelect(item.key)}
+                            className={`w-full text-left rounded-xl border px-4 py-4 transition-all duration-200 min-h-[84px] ${
+                              isHighlighted ? 'border-gold/40 bg-navy-surface' : 'border-navy-light/80 bg-navy md:hover:border-gold/20'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-3 mb-2">
+                              <p className={`text-sm font-semibold ${item.key === 'net' ? 'text-emerald' : 'text-white'}`}>{item.label}</p>
+                              <span className="text-white font-mono-data text-sm font-bold">{item.percent.toFixed(1)}%</span>
+                            </div>
+                            <div className="h-2.5 rounded-full bg-navy-light overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{ width: `${width}%`, backgroundColor: item.color }}
+                              />
+                            </div>
+                            <div className="mt-2 flex items-center justify-between">
+                              <p className={`font-mono-data text-sm font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</p>
+                              <p className="text-slate text-xs">{item.key === 'net' ? 'kept' : 'leaves your pay'}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="hidden md:block space-y-3">
+                    <div className="rounded-2xl border border-gold/25 bg-navy-surface p-4">
+                      <p className="text-slate text-xs uppercase mb-1">Focused explanation</p>
+                      <p className={`text-base font-bold mb-1 ${highlightedItem.accent}`}>{highlightedItem.label} — {highlightedItem.percent.toFixed(1)}%</p>
+                      <p className="text-slate text-sm leading-relaxed">{highlightedItem.description}</p>
+                      <p className="text-white font-mono-data text-sm mt-3">RM {highlightedItem.amount.toFixed(0)} / month</p>
+                    </div>
+
                   {flowItems.map((item) => (
                     <button
                       key={item.key}
                       type="button"
-                      onMouseEnter={() => setHighlightedFlow(item.key)}
-                      onFocus={() => setHighlightedFlow(item.key)}
-                      onClick={() => setHighlightedFlow(item.key)}
+                      onMouseEnter={() => handleFlowHover(item.key)}
+                      onFocus={() => handleFlowSelect(item.key)}
+                      onClick={() => handleFlowSelect(item.key)}
                       className={`w-full text-left rounded-2xl border p-4 transition-all duration-200 ${
                         highlightedFlow === item.key
                           ? 'border-gold/40 bg-navy-surface shadow-[0_0_20px_rgba(255,215,0,0.08)]'
-                          : 'border-navy-light bg-navy-surface/60 hover:border-gold/20'
+                          : 'border-navy-light bg-navy-surface/60 md:hover:border-gold/20'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -581,6 +583,7 @@ export default function MoneyMirror() {
                       </div>
                     </button>
                   ))}
+                  </div>
                 </div>
               </div>
             ) : (

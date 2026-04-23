@@ -449,37 +449,127 @@ export default function RatRace() {
               {/* Wheel Visualization */}
               <div className="bg-navy-surface border border-navy-light rounded-2xl p-6 mb-6 flex justify-center">
                 <svg width="280" height="280" viewBox="0 0 280 280">
+                  <defs>
+                    <radialGradient id="wheelSurface" cx="50%" cy="40%" r="65%">
+                      <stop offset="0%" stopColor="#1E467C" />
+                      <stop offset="55%" stopColor="#12365F" />
+                      <stop offset="100%" stopColor="#0A2446" />
+                    </radialGradient>
+                    <linearGradient id="wheelRim" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#FB7185" />
+                      <stop offset="45%" stopColor="#F43F5E" />
+                      <stop offset="100%" stopColor="#9F1239" />
+                    </linearGradient>
+                    <linearGradient id="wheelSpoke" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#FB7185" stopOpacity="0.95" />
+                      <stop offset="100%" stopColor="#881337" stopOpacity="0.35" />
+                    </linearGradient>
+                    <filter id="wheelGlow" x="-40%" y="-40%" width="180%" height="180%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <filter id="spokeGlow" x="-60%" y="-60%" width="220%" height="220%">
+                      <feGaussianBlur stdDeviation="1.2" result="soft" />
+                      <feMerge>
+                        <feMergeNode in="soft" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <linearGradient id="ratBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#FFD54F" />
+                      <stop offset="100%" stopColor="#F59E0B" />
+                    </linearGradient>
+                  </defs>
+
+                  <circle cx="140" cy="140" r="120" fill="none" stroke="#F43F5E" strokeWidth="2" opacity="0.4" filter="url(#wheelGlow)" />
+                  <circle cx="140" cy="140" r="114" fill="none" stroke="#FB7185" strokeWidth="1.2" opacity="0.45" />
+
                   {/* Wheel */}
                   <g style={{ animation: game.completed && game.won ? 'none' : `wheelSpin ${wheelSpinDuration} linear infinite`, transformOrigin: '140px 140px' }}>
-                    <circle cx="140" cy="140" r="110" fill="none" stroke="#DC2626" strokeWidth="2.5" opacity="0.6" />
-                    {/* Spokes */}
+                    <circle cx="140" cy="140" r="110" fill="url(#wheelSurface)" stroke="url(#wheelRim)" strokeWidth="4" filter="url(#wheelGlow)" />
+                    <circle cx="140" cy="140" r="100" fill="none" stroke="#FB7185" strokeWidth="1.6" opacity="0.42" />
+                    {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, index) => {
+                      const start = (deg * Math.PI) / 180;
+                      const end = ((deg + 45) * Math.PI) / 180;
+                      const x1 = 140 + Math.cos(start) * 106;
+                      const y1 = 140 + Math.sin(start) * 106;
+                      const x2 = 140 + Math.cos(end) * 106;
+                      const y2 = 140 + Math.sin(end) * 106;
+                      return (
+                        <path
+                          key={`slice-${deg}`}
+                          d={`M140 140 L${x1} ${y1} A106 106 0 0 1 ${x2} ${y2} Z`}
+                          fill={index % 2 === 0 ? '#183A63' : '#102F54'}
+                          opacity="0.58"
+                        />
+                      );
+                    })}
                     {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
                       const rad = (deg * Math.PI) / 180;
                       return (
-                        <line key={deg} x1="140" y1="140" x2={140 + Math.cos(rad) * 110} y2={140 + Math.sin(rad) * 110}
-                          stroke="#DC2626" strokeWidth="1" opacity="0.3" />
+                        <line
+                          key={deg}
+                          x1="140"
+                          y1="140"
+                          x2={140 + Math.cos(rad) * 104}
+                          y2={140 + Math.sin(rad) * 104}
+                          stroke="url(#wheelSpoke)"
+                          strokeWidth="2"
+                          filter="url(#spokeGlow)"
+                        />
                       );
                     })}
-                    {/* Age ticks */}
-                    {Array.from({ length: 44 }).map((_, i) => {
-                      const deg = (i / 44) * 360;
+                    {Array.from({ length: 48 }).map((_, i) => {
+                      const deg = (i / 48) * 360;
                       const rad = (deg * Math.PI) / 180;
-                      const isMajor = i % 5 === 0;
+                      const isMajor = i % 6 === 0;
                       return (
-                        <line key={i} x1={140 + Math.cos(rad) * (isMajor ? 105 : 108)}
-                          y1={140 + Math.sin(rad) * (isMajor ? 105 : 108)}
-                          x2={140 + Math.cos(rad) * 110} y2={140 + Math.sin(rad) * 110}
-                          stroke="#DC2626" strokeWidth={isMajor ? 1.5 : 0.5} opacity={0.4} />
+                        <line
+                          key={`tick-${i}`}
+                          x1={140 + Math.cos(rad) * (isMajor ? 101 : 105)}
+                          y1={140 + Math.sin(rad) * (isMajor ? 101 : 105)}
+                          x2={140 + Math.cos(rad) * 110}
+                          y2={140 + Math.sin(rad) * 110}
+                          stroke="#FB7185"
+                          strokeWidth={isMajor ? 1.8 : 0.8}
+                          opacity={isMajor ? 0.95 : 0.65}
+                        />
                       );
                     })}
                   </g>
-                  {/* Avatar */}
-                  <circle cx="140" cy="55" r="8" fill="#FFD700" opacity={game.completed && game.won ? 0.3 : 1}>
-                    {!game.completed && <animateTransform attributeName="transform" type="translate" values="0,0; 0,3; 0,0" dur="1s" repeatCount="indefinite" />}
-                  </circle>
-                  <rect x="134" y="63" width="12" height="16" rx="3" fill="#FFD700" opacity={game.completed && game.won ? 0.3 : 1} />
+
+                  <path d="M140 16 L148 32 L132 32 Z" fill="#FB7185" opacity="0.95" filter="url(#wheelGlow)" />
+
+                  {/* Rat runner */}
+                  <g
+                    opacity={game.completed && game.won ? 0.35 : 1}
+                    style={{ animation: game.completed && game.won ? 'none' : 'ratRunBob 0.75s ease-in-out infinite', transformOrigin: '140px 56px' }}
+                  >
+                    <ellipse cx="140" cy="63" rx="14" ry="8" fill="#0F172A" opacity="0.45" />
+                    <ellipse cx="140" cy="54" rx="9.5" ry="7" fill="url(#ratBody)" />
+                    <ellipse cx="150" cy="53" rx="4.8" ry="4" fill="url(#ratBody)" />
+                    <circle cx="147.2" cy="48.8" r="2.4" fill="#FCD34D" />
+                    <circle cx="143.2" cy="49.3" r="2.1" fill="#FCD34D" />
+                    <circle cx="151.8" cy="52.6" r="0.9" fill="#1E293B" />
+                    <line x1="154.3" y1="53.1" x2="158.8" y2="52.5" stroke="#FCD34D" strokeWidth="0.9" />
+                    <line x1="154.3" y1="53.8" x2="158.8" y2="54.1" stroke="#FCD34D" strokeWidth="0.9" />
+                    <path d="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" fill="none" stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round">
+                      {!game.completed && <animate attributeName="d" values="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62;M132 57 Q123 61 120 67 Q119 70 122 70 Q126 68 128 65 Q132 61 136 62;M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" dur="0.65s" repeatCount="indefinite" />}
+                    </path>
+                    <rect x="136.5" y="59.7" width="3.8" height="7" rx="1.2" fill="#FCD34D" />
+                    <rect x="142" y="59.7" width="3.8" height="7" rx="1.2" fill="#FCD34D" />
+                  </g>
+
                   {/* Center hub */}
-                  <circle cx="140" cy="140" r="6" fill="#DC2626" opacity="0.5" />
+                  <circle cx="140" cy="140" r="10" fill="#0F172A" opacity="0.75" />
+                  <circle cx="140" cy="140" r="6" fill="#DC2626" opacity="0.9" />
+                  {!game.completed && <circle cx="140" cy="140" r="14" fill="none" stroke="#F43F5E" opacity="0.3">
+                    <animate attributeName="r" values="12;16;12" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.35;0.1;0.35" dur="1.8s" repeatCount="indefinite" />
+                  </circle>}
                   {/* Freedom bridge */}
                   {game.completed && game.won && (
                     <>
@@ -501,7 +591,7 @@ export default function RatRace() {
                     </>
                   )}
                   {/* Labels */}
-                  <text x="140" y="240" textAnchor="middle" fill="#DC2626" fontSize="10" opacity="0.6">RAT RACE</text>
+                  <text x="140" y="242" textAnchor="middle" fill="#FDA4AF" fontSize="12" fontWeight="700" letterSpacing="2.1" opacity="1">RAT RACE</text>
                   {game.completed && game.won && (
                     <text x="260" y="40" textAnchor="middle" fill="#10B981" fontSize="10" fontWeight="bold">FREEDOM!</text>
                   )}
@@ -645,6 +735,11 @@ export default function RatRace() {
         @keyframes wheelSpin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes ratRunBob {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(2px); }
+          100% { transform: translateY(0px); }
         }
       `}</style>
     </section>
