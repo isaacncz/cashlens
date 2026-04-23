@@ -6,6 +6,8 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface MoneyMirrorPreset {
   name: string;
+  icon: string;
+  badge: string;
   salary: string;
   hours: string;
   commute: string;
@@ -27,6 +29,7 @@ interface MoneyMirrorResult {
 }
 
 type FlowKey = 'tax' | 'epf' | 'sst' | 'expense' | 'net';
+type InsightKey = 'rate' | 'keep' | 'time';
 
 function calculateTax(monthlySalary: number): number {
   const annual = monthlySalary * 12;
@@ -79,27 +82,33 @@ const HOURS_MAX = 100;
 const presets: MoneyMirrorPreset[] = [
   {
     name: 'Fresh Grad',
+    icon: '🎓',
+    badge: 'Starter',
     salary: '3500',
     hours: '45',
     commute: '2',
     expenses: '450',
-    description: 'Typical first-job pressure: salary looks okay, time freedom does not.',
+    description: 'Salary looks fine, but time freedom is tight.',
   },
   {
     name: 'Urban Commuter',
+    icon: '🏙️',
+    badge: 'Busy city',
     salary: '8000',
     hours: '55',
     commute: '3',
     expenses: '900',
-    description: 'Higher pay, but long hours and transport costs quietly eat the upside.',
+    description: 'Higher pay, but long hours and transport costs eat the upside.',
   },
   {
     name: 'Disciplined Saver',
+    icon: '💾',
+    badge: 'Lean spender',
     salary: '5000',
     hours: '42',
     commute: '1',
     expenses: '300',
-    description: 'Less lifestyle inflation leaves more room for real wealth building.',
+    description: 'Lower lifestyle drag leaves more room to build wealth.',
   },
 ];
 
@@ -138,6 +147,7 @@ export default function MoneyMirror() {
   const [calculated, setCalculated] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [highlightedFlow, setHighlightedFlow] = useState<FlowKey>('net');
+  const [activeInsight, setActiveInsight] = useState<InsightKey>('rate');
   const [supportsHover, setSupportsHover] = useState(false);
   const [results, setResults] = useState<MoneyMirrorResult>({
     trueHourly: 0,
@@ -300,6 +310,30 @@ export default function MoneyMirror() {
   const takeHomePercent = Math.max(0, highlightedItem.key === 'net' ? highlightedItem.percent : flowItems.find((item) => item.key === 'net')?.percent ?? 0);
   const netItem = flowItems.find((item) => item.key === 'net') ?? flowItems[flowItems.length - 1];
   const totalOutflow = Math.max(0, results.grossMonthly - netItem.amount);
+  const insightItems = [
+    {
+      key: 'rate' as const,
+      label: 'Real rate',
+      value: `RM ${results.trueHourly.toFixed(2)}/hr`,
+      detail: hourlyInsight.body,
+      tone: hourlyInsight.tone,
+    },
+    {
+      key: 'keep' as const,
+      label: 'Keep rate',
+      value: `${netItem.percent.toFixed(1)}%`,
+      detail: `From RM ${results.grossMonthly.toFixed(0)}, you keep RM ${netItem.amount.toFixed(0)} after tax, EPF, SST, and work costs.`,
+      tone: 'text-emerald',
+    },
+    {
+      key: 'time' as const,
+      label: 'Time traded',
+      value: `${results.annualHours.toFixed(0)} hrs/yr`,
+      detail: `At this pace, your job takes about ${Math.round(results.annualHours / 24)} full days each year.`,
+      tone: 'text-gold',
+    },
+  ];
+  const activeInsightItem = insightItems.find((item) => item.key === activeInsight) ?? insightItems[0];
   const handleFlowHover = (key: FlowKey) => {
     if (supportsHover) setHighlightedFlow(key);
   };
@@ -318,28 +352,32 @@ export default function MoneyMirror() {
               <span className="text-gold">Really Worth?</span>
             </h2>
             <p data-reveal className="text-slate text-base md:text-lg mb-8 leading-relaxed">
-              Enter your monthly details. Watch the hidden drains appear.
+              Enter monthly numbers and see where your salary actually goes.
             </p>
 
             <div data-reveal className="mb-6">
               <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Try a learning preset first</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {presets.map((preset) => (
                   <button
                     key={preset.name}
                     onClick={() => applyPreset(preset)}
-                    className={`px-3 py-2 rounded-full text-sm border transition-all duration-200 ${
+                    className={`text-left rounded-xl border p-3 transition-all duration-200 min-h-[82px] ${
                       selectedPreset === preset.name
-                        ? 'bg-gold text-navy border-gold'
-                        : 'bg-navy-surface border-navy-light text-white hover:border-gold/50'
+                        ? 'bg-gold/15 border-gold/50'
+                        : 'bg-navy-surface border-navy-light text-white hover:border-gold/40'
                     }`}
                   >
-                    {preset.name}
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-xl">{preset.icon}</span>
+                      <span className="text-[10px] uppercase tracking-[0.12em] text-slate">{preset.badge}</span>
+                    </div>
+                    <p className={`mt-2 text-sm font-semibold ${selectedPreset === preset.name ? 'text-gold' : 'text-white'}`}>{preset.name}</p>
                   </button>
                 ))}
               </div>
               {selectedPresetMeta && (
-                <p className="text-slate text-sm mt-3">{selectedPresetMeta.description}</p>
+                <p className="text-slate text-sm mt-3 rounded-xl border border-navy-light bg-navy-surface/40 px-3 py-2">{selectedPresetMeta.description}</p>
               )}
             </div>
 
@@ -445,17 +483,26 @@ export default function MoneyMirror() {
                   </div>
                 </div>
 
-                <div data-result className="bg-navy-surface/50 border border-gold/20 rounded-xl p-4">
-                  <p className="text-slate text-sm italic">
-                    Freedom comparison:{' '}
-                    <span className="text-gold">RM 5,000/month passive income from ASB = same cash, zero hours.</span>
-                  </p>
-                </div>
-
-                <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-6">
-                  <p className="text-slate text-xs uppercase mb-2">What this actually means</p>
-                  <p className={`text-lg font-bold mb-2 ${hourlyInsight.tone}`}>{hourlyInsight.title}</p>
-                  <p className="text-slate text-sm leading-relaxed">{hourlyInsight.body}</p>
+                <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-5">
+                  <p className="text-slate text-xs uppercase mb-3">Quick insights</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {insightItems.map((item) => (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setActiveInsight(item.key)}
+                        className={`min-h-9 px-3 rounded-full border text-xs font-semibold transition-all ${
+                          activeInsight === item.key
+                            ? 'border-gold/45 bg-gold/15 text-gold'
+                            : 'border-navy-light bg-navy text-slate hover:border-gold/30'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className={`text-base font-bold ${activeInsightItem.tone}`}>{activeInsightItem.value}</p>
+                  <p className="text-slate text-sm mt-2 leading-relaxed">{activeInsightItem.detail}</p>
                 </div>
               </div>
             )}
