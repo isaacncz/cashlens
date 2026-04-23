@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 216 56% 11%;
+    --foreground: 213 47% 95%;
+    --card: 216 50% 16%;
+    --card-foreground: 213 47% 95%;
+    --popover: 216 50% 16%;
+    --popover-foreground: 213 47% 95%;
+    --primary: 50 100% 50%;
+    --primary-foreground: 216 56% 11%;
+    --secondary: 216 33% 24%;
+    --secondary-foreground: 213 47% 95%;
+    --muted: 216 33% 24%;
+    --muted-foreground: 222 25% 52%;
+    --accent: 216 33% 24%;
+    --accent-foreground: 213 47% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 213 47% 95%;
+    --border: 216 33% 24%;
+    --input: 216 33% 24%;
+    --ring: 50 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+
+@layer utilities {
+  .font-mono-data {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
