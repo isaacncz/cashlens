@@ -537,7 +537,7 @@ export default function MoneyMirror() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
+                <div className="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
                   <div className="rounded-2xl border border-navy-light bg-[#0B1830] p-4">
                     <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow breakdown</p>
                     <div className="md:hidden flex flex-wrap gap-2 mb-3">

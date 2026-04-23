@@ -108,6 +108,7 @@ function formatRinggit(amount: number) {
 export default function CashflowQuadrant() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Quadrant | null>(null);
+  const [activeStep, setActiveStep] = useState<'income' | 'tax' | 'epf' | 'time' | 'net'>('income');
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -185,7 +186,16 @@ export default function CashflowQuadrant() {
         {/* Expanded Detail */}
         {selected && (
           <div className="bg-navy-surface border border-navy-light rounded-2xl p-6 md:p-8 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {quadrants.filter(q => q.key === selected).map(q => (
+            {quadrants.filter(q => q.key === selected).map(q => {
+              const stepInfo = {
+                income: { title: 'Income in', value: formatRinggit(q.monthlyIncome), note: 'This is the top of the pipeline before deductions.' },
+                tax: { title: 'Tax out', value: formatRinggit(q.taxAmount), note: 'Paid first to LHDN based on income band.' },
+                epf: { title: 'EPF out', value: formatRinggit(q.epfAmount), note: 'Forced savings that is useful later, but less liquid today.' },
+                time: { title: 'Time trade', value: q.timeHours === 0 ? 'No time trade' : `${q.timeHours} hrs/month`, note: q.timeHours === 0 ? 'Your income is no longer tied to working hours.' : 'These hours are the real cost behind the paycheck.' },
+                net: { title: 'Net left', value: formatRinggit(q.netTakeHome), note: 'The usable cashflow left after all outflows.' },
+              } as const;
+              const activeStepInfo = stepInfo[activeStep];
+              return (
               <div key={q.key}>
                 <div className="flex items-center gap-3 mb-4">
                   <h3 className={`text-2xl font-bold ${q.accent}`}>{q.name} — {q.persona}</h3>
@@ -193,29 +203,21 @@ export default function CashflowQuadrant() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <p className="text-gold font-mono-data text-3xl font-bold mb-4">{q.income}</p>
-                    <div className="space-y-3 mb-5">
-                      <div className="bg-emerald/10 border border-emerald/25 rounded-xl p-4">
-                        <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">Step 1 → Income in</p>
-                        <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.monthlyIncome)}</p>
+                    <div className="rounded-xl border border-navy-light bg-navy p-4 mb-4">
+                      <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow steps</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <button type="button" onClick={() => setActiveStep('income')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'income' ? 'border-emerald/40 bg-emerald/15 text-emerald' : 'border-navy-light bg-navy-surface text-slate hover:border-emerald/20'}`}>1 Income</button>
+                        <button type="button" onClick={() => setActiveStep('tax')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'tax' ? 'border-crimson/40 bg-crimson/15 text-crimson' : 'border-navy-light bg-navy-surface text-slate hover:border-crimson/20'}`}>2 Tax</button>
+                        <button type="button" onClick={() => setActiveStep('epf')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'epf' ? 'border-gold/40 bg-gold/15 text-gold' : 'border-navy-light bg-navy-surface text-slate hover:border-gold/20'}`}>3 EPF</button>
+                        <button type="button" onClick={() => setActiveStep('time')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'time' ? 'border-crimson/40 bg-crimson/15 text-crimson' : 'border-navy-light bg-navy-surface text-slate hover:border-crimson/20'}`}>4 Time</button>
+                        <button type="button" onClick={() => setActiveStep('net')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'net' ? 'border-emerald/40 bg-emerald/15 text-emerald' : 'border-navy-light bg-navy-surface text-slate hover:border-emerald/20'}`}>5 Net</button>
                       </div>
-                      <div className="rounded-xl border p-4" style={{ backgroundColor: 'rgba(220,38,38,0.12)', borderColor: 'rgba(220,38,38,0.35)' }}>
-                        <p className="text-xs uppercase tracking-[0.12em] mb-1" style={{ color: TAX_OUT }}>Step 2 → Tax out</p>
-                        <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.taxAmount)}</p>
-                      </div>
-                      <div className="bg-gold/10 border border-gold/25 rounded-xl p-4">
-                        <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Step 3 → EPF / forced savings</p>
-                        <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.epfAmount)}</p>
-                      </div>
-                      <div className={`${q.timeHours === 0 ? 'bg-emerald/10 border-emerald/30' : 'bg-crimson/10 border-crimson/30'} border rounded-xl p-4`}>
-                        <p className={`${q.timeHours === 0 ? 'text-emerald' : 'text-crimson'} text-xs uppercase tracking-[0.12em] mb-1`}>Step 4 → Time trade</p>
-                        <p className={`font-mono-data text-xl font-bold ${q.timeHours === 0 ? 'text-emerald' : 'text-white'}`}>
-                          {q.timeHours === 0 ? 'NO TIME TRADE' : `${q.timeHours} hrs/month`}
-                        </p>
-                      </div>
-                      <div className="bg-navy border border-navy-light rounded-xl p-4">
-                        <p className="text-white text-xs uppercase tracking-[0.12em] mb-1">Step 5 → Net flow left</p>
-                        <p className={`font-mono-data text-2xl font-bold ${q.accent}`}>{formatRinggit(q.netTakeHome)}</p>
-                      </div>
+                    </div>
+                    <div className="rounded-xl border border-gold/25 bg-navy-surface p-4 mb-5">
+                      <p className="text-slate text-xs uppercase mb-1">Focused step</p>
+                      <p className={`text-lg font-bold mb-1 ${activeStep === 'tax' || activeStep === 'time' ? 'text-crimson' : activeStep === 'epf' ? 'text-gold' : 'text-emerald'}`}>{activeStepInfo.title}</p>
+                      <p className="text-white font-mono-data text-xl font-bold">{activeStepInfo.value}</p>
+                      <p className="text-slate text-sm mt-2">{activeStepInfo.note}</p>
                     </div>
                     <ul className="space-y-2">
                       {q.details.map((d, i) => (
@@ -244,19 +246,19 @@ export default function CashflowQuadrant() {
                       <line x1="150" y1="36" x2="150" y2="212" stroke={q.pipeColors.income} strokeWidth="3" opacity="0.5" />
                       <text x="160" y="86" fill="#8892B0" fontSize="9">↓ flowing through the quadrant</text>
                       {/* Tax branch */}
-                      <line x1="150" y1="92" x2="60" y2="92" stroke={q.pipeColors.tax} strokeWidth={Math.max(2, q.pipeWidths.tax / 8)} opacity="0.7" />
+                      <line x1="150" y1="92" x2="60" y2="92" stroke={q.pipeColors.tax} strokeWidth={Math.max(2, q.pipeWidths.tax / 8)} opacity={activeStep === 'tax' ? '1' : '0.55'} />
                       <polygon points="60,92 68,88 68,96" fill={q.pipeColors.tax} opacity="0.8" />
                       <text x="26" y="88" fill={q.pipeColors.tax} fontSize="9" fontWeight="bold">Tax</text>
                       <text x="26" y="102" fill="#E6F1FF" fontSize="9">{formatRinggit(q.taxAmount)}</text>
                       {/* EPF branch */}
-                      <line x1="150" y1="136" x2="60" y2="136" stroke={q.pipeColors.epf} strokeWidth={Math.max(2, q.pipeWidths.epf / 8)} opacity="0.7" />
+                      <line x1="150" y1="136" x2="60" y2="136" stroke={q.pipeColors.epf} strokeWidth={Math.max(2, q.pipeWidths.epf / 8)} opacity={activeStep === 'epf' ? '1' : '0.55'} />
                       <polygon points="60,136 68,132 68,140" fill={q.pipeColors.epf} opacity="0.8" />
                       <text x="26" y="132" fill={q.pipeColors.epf} fontSize="9" fontWeight="bold">EPF</text>
                       <text x="26" y="146" fill="#E6F1FF" fontSize="9">{formatRinggit(q.epfAmount)}</text>
                       {/* Time branch */}
                       {q.pipeWidths.time > 0 && (
                         <>
-                          <line x1="150" y1="178" x2="240" y2="178" stroke={q.pipeColors.time} strokeWidth={Math.max(2, q.pipeWidths.time / 8)} opacity="0.7" />
+                          <line x1="150" y1="178" x2="240" y2="178" stroke={q.pipeColors.time} strokeWidth={Math.max(2, q.pipeWidths.time / 8)} opacity={activeStep === 'time' ? '1' : '0.55'} />
                           <text x="250" y="174" fill={q.pipeColors.time} fontSize="9" fontWeight="bold">Time</text>
                           <text x="250" y="188" fill="#E6F1FF" fontSize="9">{q.timeHours} hrs</text>
                           <polygon points="240,178 232,174 232,182" fill={q.pipeColors.time} opacity="0.8" />
@@ -269,7 +271,7 @@ export default function CashflowQuadrant() {
                         </>
                       )}
                       {/* Net flow */}
-                      <circle cx="150" cy="214" r="8" fill={q.pipeColors.income} opacity="0.4" />
+                      <circle cx="150" cy="214" r="8" fill={q.pipeColors.income} opacity={activeStep === 'net' ? '0.85' : '0.4'} />
                       <text x="150" y="232" textAnchor="middle" fill="#FFD700" fontSize="10" fontWeight="bold">NET LEFT</text>
                       <text x="150" y="248" textAnchor="middle" fill="#E6F1FF" fontSize="11" fontWeight="bold">{formatRinggit(q.netTakeHome)}</text>
                       {/* Flowing particles */}
@@ -291,12 +293,12 @@ export default function CashflowQuadrant() {
                       )}
                     </svg>
                     <p className="text-slate text-sm leading-relaxed mt-3">
-                      Follow the arrows: income enters at the top, deductions branch out left and right, and the amount that survives reaches the bottom as usable cash.
+                      Tap step chips to focus each part of the flow.
                     </p>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
 
