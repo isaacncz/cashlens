@@ -83,12 +83,11 @@ function calculateEISEmployee(salary: number): number {
   return contributable * 0.002;
 }
 
-function calculatePCB(monthlySalary: number, epfEmployee: number, socsoEmployee: number, eisEmployee: number): number {
+function calculatePCB(monthlySalary: number, epfEmployee: number): number {
   const annualGross = monthlySalary * 12;
   const epfRelief = Math.min(epfEmployee * 12, 4000);
-  const socsoEisRelief = Math.min((socsoEmployee + eisEmployee) * 12, 350);
   const personalRelief = 9000;
-  const chargeableAnnual = Math.max(0, annualGross - epfRelief - socsoEisRelief - personalRelief);
+  const chargeableAnnual = Math.max(0, annualGross - epfRelief - personalRelief);
   return calculateAnnualTax(chargeableAnnual) / 12;
 }
 
@@ -136,7 +135,7 @@ function computeMoneyMirrorResults(salary: number, hours: number, commute: numbe
   const epf = calculateEPF(salary);
   const socsoEmployee = calculateSOCSOEmployee(salary);
   const eisEmployee = calculateEISEmployee(salary);
-  const pcbMonthly = calculatePCB(salary, epf.employee, socsoEmployee, eisEmployee);
+  const pcbMonthly = calculatePCB(salary, epf.employee);
   const netIncome = salary - epf.employee - socsoEmployee - eisEmployee - pcbMonthly - expenses;
   const totalHours = hours * 4.3 + commute * 4.3 * 5;
   const trueHourly = totalHours > 0 ? netIncome / totalHours : 0;
@@ -587,7 +586,7 @@ export default function MoneyMirror() {
                         <div key={`stack-${item.key}`} style={{ width: `${Math.max(2, item.percent)}%`, backgroundColor: item.color }} />
                       ))}
                     </div>
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {flowItems.map((item) => {
                         const width = Math.max(item.key === 'net' ? 18 : 6, Math.min(100, item.percent));
                         const isHighlighted = highlightedFlow === item.key;
@@ -614,7 +613,7 @@ export default function MoneyMirror() {
                             </div>
                             <div className="mt-1 flex items-center justify-between">
                               <p className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</p>
-                              <p className="text-slate text-[11px]">{item.key === 'net' ? 'kept' : 'deduction'}</p>
+                              <p className="text-slate text-[11px]">{item.key === 'net' ? 'kept' : 'out'}</p>
                             </div>
                           </button>
                         );
@@ -632,7 +631,7 @@ export default function MoneyMirror() {
                     <div className="rounded-xl border border-navy-light bg-navy-surface/70 p-4">
                       <p className="text-slate text-xs uppercase mb-2">Tax model note</p>
                       <p className="text-white text-sm leading-relaxed">
-                        PCB is estimated using Malaysian progressive tax with personal relief, EPF relief cap, and SOCSO/EIS relief assumptions.
+                        PCB is estimated from Malaysian progressive tax with personal relief + EPF relief cap, then converted to monthly deduction.
                       </p>
                     </div>
                   </div>
