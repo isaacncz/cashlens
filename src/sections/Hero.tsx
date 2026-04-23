@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
 interface Particle {
@@ -10,12 +10,35 @@ interface Particle {
   phase: number;
 }
 
+const heroHighlights = [
+  {
+    key: 'lessons',
+    chip: '9 lessons',
+    title: 'Step-by-step learning path',
+    detail: 'Move from salary awareness to income engines with one focused action at each step.',
+  },
+  {
+    key: 'malaysia',
+    chip: 'Malaysia-first',
+    title: 'Local examples, local trade-offs',
+    detail: 'PTPTN, EPF, ASB, rental income, and tax realities are built into each module.',
+  },
+  {
+    key: 'private',
+    chip: 'Private by default',
+    title: 'Everything runs client-side',
+    detail: 'Try scenarios freely. Your inputs stay on your device during the experience.',
+  },
+] as const;
+
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const rafRef = useRef<number>(0);
+  const [activeHighlight, setActiveHighlight] = useState<(typeof heroHighlights)[number]['key']>('lessons');
+  const [supportsHover, setSupportsHover] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,6 +114,14 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const updateHoverSupport = () => setSupportsHover(mediaQuery.matches);
+    updateHoverSupport();
+    mediaQuery.addEventListener('change', updateHoverSupport);
+    return () => mediaQuery.removeEventListener('change', updateHoverSupport);
+  }, []);
+
+  useEffect(() => {
     if (!contentRef.current) return;
     const els = contentRef.current.querySelectorAll('[data-hero-reveal]');
     gsap.fromTo(
@@ -108,6 +139,12 @@ export default function Hero() {
     }
   };
 
+  const activeItem = heroHighlights.find((item) => item.key === activeHighlight) ?? heroHighlights[0];
+  const selectHighlight = (key: (typeof heroHighlights)[number]['key']) => setActiveHighlight(key);
+  const previewHighlight = (key: (typeof heroHighlights)[number]['key']) => {
+    if (supportsHover) setActiveHighlight(key);
+  };
+
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden" style={{ background: 'radial-gradient(ellipse at center, #112240 0%, #0A192F 70%)' }}>
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
@@ -122,7 +159,7 @@ export default function Hero() {
           For The First Time
         </h1>
         <p data-hero-reveal className="text-lg md:text-xl text-slate leading-relaxed mb-10 max-w-lg mx-auto opacity-0">
-          An interactive financial literacy experience built for Malaysians. Discover what your salary really means — and what it doesn't.
+          Interactive financial literacy for Malaysians. Learn by pressing, dragging, and simulating real money decisions.
         </p>
         <div data-hero-reveal className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0">
           <button
@@ -141,21 +178,29 @@ export default function Hero() {
           </button>
         </div>
 
-        <div data-hero-reveal className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-10 opacity-0">
-          <div className="rounded-2xl border border-navy-light bg-navy-surface/50 px-4 py-4 text-left">
-            <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">9 lessons</p>
-            <p className="text-white text-sm font-semibold">Step-by-step learning path</p>
-            <p className="text-slate text-xs mt-2">Move from salary awareness to income engines and freedom rules without guessing what to do next.</p>
+        <div data-hero-reveal className="mt-10 opacity-0">
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {heroHighlights.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onMouseEnter={() => previewHighlight(item.key)}
+                onFocus={() => selectHighlight(item.key)}
+                onClick={() => selectHighlight(item.key)}
+                className={`min-h-10 px-4 rounded-full border text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-200 ${
+                  activeHighlight === item.key
+                    ? 'border-gold/45 bg-gold/15 text-gold'
+                    : 'border-navy-light bg-navy-surface/50 text-slate md:hover:border-gold/30 md:hover:text-white'
+                }`}
+              >
+                {item.chip}
+              </button>
+            ))}
           </div>
-          <div className="rounded-2xl border border-navy-light bg-navy-surface/50 px-4 py-4 text-left">
-            <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Malaysia-first</p>
-            <p className="text-white text-sm font-semibold">Local examples, local trade-offs</p>
-            <p className="text-slate text-xs mt-2">PTPTN, EPF, ASB, rental income, and tax realities are built into the lessons.</p>
-          </div>
-          <div className="rounded-2xl border border-navy-light bg-navy-surface/50 px-4 py-4 text-left">
-            <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Private by default</p>
-            <p className="text-white text-sm font-semibold">Everything runs client-side</p>
-            <p className="text-slate text-xs mt-2">Try scenarios freely. Your inputs stay on your device during the experience.</p>
+          <div className="rounded-2xl border border-navy-light bg-navy-surface/50 px-5 py-5 text-left max-w-xl mx-auto">
+            <p className="text-white text-base font-semibold">{activeItem.title}</p>
+            <p className="text-slate text-sm mt-2">{activeItem.detail}</p>
+            <p className="text-slate text-xs mt-3">{supportsHover ? 'Hover to preview, click to lock.' : 'Tap each chip to explore.'}</p>
           </div>
         </div>
       </div>
