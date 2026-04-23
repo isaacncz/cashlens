@@ -22,17 +22,18 @@ interface MoneyMirrorResult {
   grossMonthly: number;
   epfEmployee: number;
   epfEmployer: number;
-  taxMonthly: number;
-  sstMonthly: number;
+  pcbMonthly: number;
+  socsoEmployee: number;
+  eisEmployee: number;
   workExpenses: number;
   netIncome: number;
 }
 
-type FlowKey = 'tax' | 'epf' | 'sst' | 'expense' | 'net';
+type FlowKey = 'pcb' | 'epf' | 'socso' | 'eis' | 'expense' | 'net';
 type InsightKey = 'rate' | 'keep' | 'time';
 
-function calculateTax(monthlySalary: number): number {
-  const annual = monthlySalary * 12;
+function calculateAnnualTax(chargeableAnnual: number): number {
+  if (chargeableAnnual <= 0) return 0;
   let tax = 0;
   const brackets = [
     { limit: 5000, rate: 0 },
@@ -47,7 +48,7 @@ function calculateTax(monthlySalary: number): number {
     { limit: 1000000, rate: 0.30 },
   ];
 
-  let remaining = annual;
+  let remaining = chargeableAnnual;
   let prevLimit = 0;
 
   for (const bracket of brackets) {
@@ -60,8 +61,8 @@ function calculateTax(monthlySalary: number): number {
 
   if (remaining > 0) tax += remaining * 0.3;
 
-  const rebate = annual <= 35000 ? 400 : 0;
-  return Math.max(0, tax - rebate) / 12;
+  const rebate = chargeableAnnual <= 35000 ? 400 : 0;
+  return Math.max(0, tax - rebate);
 }
 
 function calculateEPF(salary: number): { employee: number; employer: number } {
@@ -70,6 +71,25 @@ function calculateEPF(salary: number): { employee: number; employer: number } {
     employee: capped * 0.11,
     employer: capped * (salary <= 5000 ? 0.13 : 0.12),
   };
+}
+
+function calculateSOCSOEmployee(salary: number): number {
+  const contributable = Math.min(salary, 5000);
+  return contributable * 0.00495;
+}
+
+function calculateEISEmployee(salary: number): number {
+  const contributable = Math.min(salary, 4950);
+  return contributable * 0.002;
+}
+
+function calculatePCB(monthlySalary: number, epfEmployee: number, socsoEmployee: number, eisEmployee: number): number {
+  const annualGross = monthlySalary * 12;
+  const epfRelief = Math.min(epfEmployee * 12, 4000);
+  const socsoEisRelief = Math.min((socsoEmployee + eisEmployee) * 12, 350);
+  const personalRelief = 9000;
+  const chargeableAnnual = Math.max(0, annualGross - epfRelief - socsoEisRelief - personalRelief);
+  return calculateAnnualTax(chargeableAnnual) / 12;
 }
 
 const SALARY_MIN = 1000;
@@ -114,9 +134,10 @@ const presets: MoneyMirrorPreset[] = [
 
 function computeMoneyMirrorResults(salary: number, hours: number, commute: number, expenses: number): MoneyMirrorResult {
   const epf = calculateEPF(salary);
-  const taxMonthly = calculateTax(salary);
-  const sstMonthly = salary * 0.03;
-  const netIncome = salary - epf.employee - taxMonthly - sstMonthly - expenses;
+  const socsoEmployee = calculateSOCSOEmployee(salary);
+  const eisEmployee = calculateEISEmployee(salary);
+  const pcbMonthly = calculatePCB(salary, epf.employee, socsoEmployee, eisEmployee);
+  const netIncome = salary - epf.employee - socsoEmployee - eisEmployee - pcbMonthly - expenses;
   const totalHours = hours * 4.3 + commute * 4.3 * 5;
   const trueHourly = totalHours > 0 ? netIncome / totalHours : 0;
   const annualHours = totalHours * 12;
@@ -129,8 +150,9 @@ function computeMoneyMirrorResults(salary: number, hours: number, commute: numbe
     grossMonthly: salary,
     epfEmployee: epf.employee,
     epfEmployer: epf.employer,
-    taxMonthly,
-    sstMonthly,
+    pcbMonthly,
+    socsoEmployee,
+    eisEmployee,
     workExpenses: expenses,
     netIncome,
   };
@@ -156,8 +178,9 @@ export default function MoneyMirror() {
     grossMonthly: 0,
     epfEmployee: 0,
     epfEmployer: 0,
-    taxMonthly: 0,
-    sstMonthly: 0,
+    pcbMonthly: 0,
+    socsoEmployee: 0,
+    eisEmployee: 0,
     workExpenses: 0,
     netIncome: 0,
   });
@@ -249,15 +272,13 @@ export default function MoneyMirror() {
     const gross = Math.max(results.grossMonthly, 1);
     return [
       {
-        key: 'tax' as const,
-        label: 'Income tax',
-        amount: results.taxMonthly,
-        percent: (results.taxMonthly / gross) * 100,
+        key: 'pcb' as const,
+        label: 'PCB tax',
+        amount: results.pcbMonthly,
+        percent: (results.pcbMonthly / gross) * 100,
         color: '#DC2626',
         accent: 'text-crimson',
-        description: 'Paid to LHDN before you feel richer.',
-        side: 'left' as const,
-        y: 110,
+        description: 'Estimated monthly tax deduction (PCB).',
       },
       {
         key: 'epf' as const,
@@ -266,20 +287,25 @@ export default function MoneyMirror() {
         percent: (results.epfEmployee / gross) * 100,
         color: '#FFD700',
         accent: 'text-gold',
-        description: 'Forced savings — useful, but not liquid now.',
-        side: 'left' as const,
-        y: 165,
+        description: 'Employee EPF contribution.',
       },
       {
-        key: 'sst' as const,
-        label: 'SST drag',
-        amount: results.sstMonthly,
-        percent: (results.sstMonthly / gross) * 100,
-        color: '#64748B',
+        key: 'socso' as const,
+        label: 'SOCSO',
+        amount: results.socsoEmployee,
+        percent: (results.socsoEmployee / gross) * 100,
+        color: '#60A5FA',
+        accent: 'text-white',
+        description: 'PERKESO employee contribution.',
+      },
+      {
+        key: 'eis' as const,
+        label: 'EIS',
+        amount: results.eisEmployee,
+        percent: (results.eisEmployee / gross) * 100,
+        color: '#94A3B8',
         accent: 'text-slate',
-        description: 'Consumption tax pressure built into spending.',
-        side: 'right' as const,
-        y: 220,
+        description: 'Employment Insurance System contribution.',
       },
       {
         key: 'expense' as const,
@@ -289,8 +315,6 @@ export default function MoneyMirror() {
         color: '#DC2626',
         accent: 'text-crimson',
         description: 'Petrol, tolls, food, parking, uniforms, commute friction.',
-        side: 'right' as const,
-        y: 275,
       },
       {
         key: 'net' as const,
@@ -300,8 +324,6 @@ export default function MoneyMirror() {
         color: '#10B981',
         accent: 'text-emerald',
         description: 'This is what is truly left for living, saving, or investing.',
-        side: 'center' as const,
-        y: 330,
       },
     ];
   }, [results]);
@@ -322,7 +344,7 @@ export default function MoneyMirror() {
       key: 'keep' as const,
       label: 'Keep rate',
       value: `${netItem.percent.toFixed(1)}%`,
-      detail: `From RM ${results.grossMonthly.toFixed(0)}, you keep RM ${netItem.amount.toFixed(0)} after tax, EPF, SST, and work costs.`,
+      detail: `From RM ${results.grossMonthly.toFixed(0)}, you keep RM ${netItem.amount.toFixed(0)} after PCB, EPF, SOCSO, EIS, and work costs.`,
       tone: 'text-emerald',
     },
     {
@@ -522,10 +544,14 @@ export default function MoneyMirror() {
 
             {calculated ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="rounded-xl border border-gold/25 bg-gold/10 p-4">
                     <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Gross</p>
                     <p className="text-white font-mono-data text-xl font-bold">RM {results.grossMonthly.toFixed(0)}</p>
+                  </div>
+                  <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
+                    <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Statutory</p>
+                    <p className="text-white font-mono-data text-xl font-bold">RM {(results.pcbMonthly + results.epfEmployee + results.socsoEmployee + results.eisEmployee).toFixed(0)}</p>
                   </div>
                   <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
                     <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Total outflow</p>
@@ -537,7 +563,7 @@ export default function MoneyMirror() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
+                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_300px] gap-4 items-start">
                   <div className="rounded-2xl border border-navy-light bg-[#0B1830] p-4">
                     <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow breakdown</p>
                     <div className="md:hidden flex flex-wrap gap-2 mb-3">
@@ -556,9 +582,14 @@ export default function MoneyMirror() {
                         </button>
                       ))}
                     </div>
-                    <div className="space-y-3">
+                    <div className="rounded-lg bg-navy p-2 mb-3 flex h-3 overflow-hidden">
+                      {flowItems.map((item) => (
+                        <div key={`stack-${item.key}`} style={{ width: `${Math.max(2, item.percent)}%`, backgroundColor: item.color }} />
+                      ))}
+                    </div>
+                    <div className="space-y-2">
                       {flowItems.map((item) => {
-                        const width = Math.max(item.key === 'net' ? 18 : 10, Math.min(100, item.percent));
+                        const width = Math.max(item.key === 'net' ? 18 : 6, Math.min(100, item.percent));
                         const isHighlighted = highlightedFlow === item.key;
                         return (
                           <button
@@ -567,23 +598,23 @@ export default function MoneyMirror() {
                             onMouseEnter={() => handleFlowHover(item.key)}
                             onFocus={() => handleFlowSelect(item.key)}
                             onClick={() => handleFlowSelect(item.key)}
-                            className={`w-full text-left rounded-xl border px-4 py-4 transition-all duration-200 min-h-[84px] ${
+                            className={`w-full text-left rounded-lg border px-3 py-2 transition-all duration-200 ${
                               isHighlighted ? 'border-gold/40 bg-navy-surface' : 'border-navy-light/80 bg-navy md:hover:border-gold/20'
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-3 mb-2">
+                            <div className="flex items-center justify-between gap-3 mb-1">
                               <p className={`text-sm font-semibold ${item.key === 'net' ? 'text-emerald' : 'text-white'}`}>{item.label}</p>
                               <span className="text-white font-mono-data text-sm font-bold">{item.percent.toFixed(1)}%</span>
                             </div>
-                            <div className="h-2.5 rounded-full bg-navy-light overflow-hidden">
+                            <div className="h-2 rounded-full bg-navy-light overflow-hidden">
                               <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{ width: `${width}%`, backgroundColor: item.color }}
                               />
                             </div>
-                            <div className="mt-2 flex items-center justify-between">
-                              <p className={`font-mono-data text-sm font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</p>
-                              <p className="text-slate text-xs">{item.key === 'net' ? 'kept' : 'leaves your pay'}</p>
+                            <div className="mt-1 flex items-center justify-between">
+                              <p className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</p>
+                              <p className="text-slate text-[11px]">{item.key === 'net' ? 'kept' : 'deduction'}</p>
                             </div>
                           </button>
                         );
@@ -591,17 +622,17 @@ export default function MoneyMirror() {
                     </div>
                   </div>
 
-                  <div className="hidden md:block space-y-3">
-                    <div className="rounded-2xl border border-gold/25 bg-navy-surface p-4">
+                  <div className="space-y-3">
+                    <div className="rounded-xl border border-gold/25 bg-navy-surface p-4">
                       <p className="text-slate text-xs uppercase mb-1">Focused explanation</p>
                       <p className={`text-base font-bold mb-1 ${highlightedItem.accent}`}>{highlightedItem.label} — {highlightedItem.percent.toFixed(1)}%</p>
                       <p className="text-slate text-sm leading-relaxed">{highlightedItem.description}</p>
-                      <p className="text-white font-mono-data text-sm mt-3">RM {highlightedItem.amount.toFixed(0)} / month</p>
+                      <p className="text-white font-mono-data text-sm mt-2">RM {highlightedItem.amount.toFixed(0)} / month</p>
                     </div>
-                    <div className="rounded-2xl border border-navy-light bg-navy-surface/70 p-4">
-                      <p className="text-slate text-xs uppercase mb-2">Interaction</p>
+                    <div className="rounded-xl border border-navy-light bg-navy-surface/70 p-4">
+                      <p className="text-slate text-xs uppercase mb-2">Tax model note</p>
                       <p className="text-white text-sm leading-relaxed">
-                        Hover cards to preview details. Click any card to lock selection.
+                        PCB is estimated using Malaysian progressive tax with personal relief, EPF relief cap, and SOCSO/EIS relief assumptions.
                       </p>
                     </div>
                   </div>
