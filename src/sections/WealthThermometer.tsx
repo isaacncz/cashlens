@@ -12,6 +12,18 @@ interface ThermometerResult {
   zone: 'crisis' | 'precarious' | 'freedom' | 'infinite';
 }
 
+interface ExampleProfile {
+  name: string;
+  asb: string;
+  unitTrust: string;
+  savings: string;
+  dividends: string;
+  rental: string;
+  stockDividends: string;
+  expenses: string;
+  description: string;
+}
+
 const zoneConfig = {
   crisis: { label: 'Crisis', color: '#DC2626', message: 'One retrenchment away from disaster.', icon: '🔴' },
   precarious: { label: 'Precarious', color: '#FFD700', message: 'Can survive, can\'t thrive.', icon: '🟡' },
@@ -42,6 +54,72 @@ const actionSteps: Record<string, string[]> = {
   ],
 };
 
+const exampleProfiles: ExampleProfile[] = [
+  {
+    name: 'Starting Out',
+    asb: '3000',
+    unitTrust: '0',
+    savings: '1500',
+    dividends: '20',
+    rental: '0',
+    stockDividends: '0',
+    expenses: '2800',
+    description: 'Low liquidity and no meaningful passive income yet.',
+  },
+  {
+    name: 'Buffer Builder',
+    asb: '18000',
+    unitTrust: '8000',
+    savings: '12000',
+    dividends: '120',
+    rental: '0',
+    stockDividends: '80',
+    expenses: '3500',
+    description: 'Emergency runway exists, but salary is still doing most of the work.',
+  },
+  {
+    name: 'Cashflow Machine',
+    asb: '80000',
+    unitTrust: '30000',
+    savings: '20000',
+    dividends: '350',
+    rental: '2200',
+    stockDividends: '650',
+    expenses: '3000',
+    description: 'Multiple income streams are now carrying the lifestyle.',
+  },
+];
+
+function calculateThermometerResult(
+  asb: string,
+  unitTrust: string,
+  savings: string,
+  dividends: string,
+  rental: string,
+  stockDividends: string,
+  expenses: string,
+): ThermometerResult {
+  const totalLiquid = (parseFloat(asb) || 0) + (parseFloat(unitTrust) || 0) + (parseFloat(savings) || 0);
+  const monthlyPassive = (parseFloat(dividends) || 0) + (parseFloat(rental) || 0) + (parseFloat(stockDividends) || 0);
+  const monthlyExpenses = parseFloat(expenses) || 1;
+
+  let monthsFreedom: number;
+  let zone: ThermometerResult['zone'];
+
+  if (monthlyPassive >= monthlyExpenses) {
+    monthsFreedom = Infinity;
+    zone = 'infinite';
+  } else {
+    const expenseCoverage = monthlyPassive > 0 ? totalLiquid / (monthlyExpenses - monthlyPassive) : totalLiquid / monthlyExpenses;
+    monthsFreedom = expenseCoverage;
+    if (monthsFreedom <= 3) zone = 'crisis';
+    else if (monthsFreedom <= 12) zone = 'precarious';
+    else zone = 'freedom';
+  }
+
+  return { totalLiquid, monthlyPassive, monthlyExpenses, monthsFreedom, zone };
+}
+
 export default function WealthThermometer() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -54,6 +132,7 @@ export default function WealthThermometer() {
   const [expenses, setExpenses] = useState('');
   const [result, setResult] = useState<ThermometerResult | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -64,29 +143,9 @@ export default function WealthThermometer() {
     });
   }, []);
 
-  const calculate = () => {
-    const totalLiquid = (parseFloat(asb) || 0) + (parseFloat(unitTrust) || 0) + (parseFloat(savings) || 0);
-    const monthlyPassive = (parseFloat(dividends) || 0) + (parseFloat(rental) || 0) + (parseFloat(stockDividends) || 0);
-    const monthlyExpenses = parseFloat(expenses) || 1;
-
-    let monthsFreedom: number;
-    let zone: ThermometerResult['zone'];
-
-    if (monthlyPassive >= monthlyExpenses) {
-      monthsFreedom = Infinity;
-      zone = 'infinite';
-    } else {
-      const expenseCoverage = monthlyPassive > 0 ? totalLiquid / (monthlyExpenses - monthlyPassive) : totalLiquid / monthlyExpenses;
-      monthsFreedom = expenseCoverage;
-      if (monthsFreedom <= 3) zone = 'crisis';
-      else if (monthsFreedom <= 12) zone = 'precarious';
-      else zone = 'freedom';
-    }
-
-    const res = { totalLiquid, monthlyPassive, monthlyExpenses, monthsFreedom, zone };
+  const revealResult = (res: ThermometerResult) => {
     setResult(res);
     setShowResult(true);
-
     setTimeout(() => {
       if (resultRef.current) {
         const els = resultRef.current.querySelectorAll('[data-result]');
@@ -95,7 +154,7 @@ export default function WealthThermometer() {
     }, 100);
   };
 
-  const inputClass = "w-full bg-navy-surface border border-navy-light rounded-lg px-4 py-3 text-white font-mono-data text-sm focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(255,215,0,0.15)] transition-all placeholder:text-navy-light";
+  const inputClass = "w-full bg-navy-surface border border-navy-light rounded-lg px-4 py-3 text-white font-mono-data text-sm focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(255,215,0,0.15)] transition-all placeholder:text-slate";
   const labelClass = "block text-xs font-medium uppercase tracking-wider text-slate mb-2";
 
   const fillPercent = result
@@ -103,6 +162,46 @@ export default function WealthThermometer() {
       ? 100
       : Math.min(100, (result.monthsFreedom / 60) * 100)
     : 0;
+  const selectedProfileMeta = exampleProfiles.find((profile) => profile.name === selectedProfile);
+  const hasAnyInput = [asb, unitTrust, savings, dividends, rental, stockDividends, expenses].some((value) => value.trim().length > 0);
+  const hasEnoughInput = expenses.trim().length > 0 || selectedProfile !== null;
+  const freedomScore = result
+    ? result.zone === 'infinite'
+      ? 100
+      : Math.min(99, Math.round((fillPercent + (result.monthlyPassive / Math.max(result.monthlyExpenses, 1)) * 30)))
+    : 0;
+
+  const applyProfile = (profile: ExampleProfile) => {
+    setSelectedProfile(profile.name);
+    setAsb(profile.asb);
+    setUnitTrust(profile.unitTrust);
+    setSavings(profile.savings);
+    setDividends(profile.dividends);
+    setRental(profile.rental);
+    setStockDividends(profile.stockDividends);
+    setExpenses(profile.expenses);
+    revealResult(
+      calculateThermometerResult(
+        profile.asb,
+        profile.unitTrust,
+        profile.savings,
+        profile.dividends,
+        profile.rental,
+        profile.stockDividends,
+        profile.expenses,
+      ),
+    );
+  };
+
+  useEffect(() => {
+    if (!hasAnyInput || !hasEnoughInput) {
+      setShowResult(false);
+      return;
+    }
+
+    setResult(calculateThermometerResult(asb, unitTrust, savings, dividends, rental, stockDividends, expenses));
+    setShowResult(true);
+  }, [asb, unitTrust, savings, dividends, rental, stockDividends, expenses, hasAnyInput, hasEnoughInput]);
 
   return (
     <section id="wealth-thermometer" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
@@ -121,6 +220,27 @@ export default function WealthThermometer() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calculator Form */}
           <div data-reveal>
+            <div className="mb-6">
+              <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Try an example profile</p>
+              <div className="flex flex-wrap gap-2">
+                {exampleProfiles.map((profile) => (
+                  <button
+                    key={profile.name}
+                    onClick={() => applyProfile(profile)}
+                    className={`px-3 py-2 rounded-full text-sm border transition-all duration-200 ${
+                      selectedProfile === profile.name
+                        ? 'bg-gold text-navy border-gold'
+                        : 'bg-navy-surface border-navy-light text-white hover:border-gold/50'
+                    }`}
+                  >
+                    {profile.name}
+                  </button>
+                ))}
+              </div>
+              {selectedProfileMeta && (
+                <p className="text-slate text-sm mt-3">{selectedProfileMeta.description}</p>
+              )}
+            </div>
             <div className="space-y-6">
               <div>
                 <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
@@ -140,7 +260,7 @@ export default function WealthThermometer() {
                     <input type="number" value={savings} onChange={e => setSavings(e.target.value)} placeholder="5000" className={inputClass} />
                   </div>
                   <div className="flex items-end">
-                    <p className="text-navy-light text-xs pb-3">EPF is NOT liquid — locked until 55/60</p>
+                    <p className="text-slate text-xs pb-3">EPF is NOT liquid — locked until 55/60</p>
                   </div>
                 </div>
               </div>
@@ -175,12 +295,12 @@ export default function WealthThermometer() {
                 </div>
               </div>
 
-              <button
-                onClick={calculate}
-                className="w-full py-4 bg-gold text-navy font-semibold rounded-lg hover:shadow-[0_4px_16px_rgba(255,215,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-              >
-                Calculate My Freedom
-              </button>
+              <div className={`w-full py-4 px-5 rounded-xl border ${hasEnoughInput ? 'border-emerald/30 bg-emerald/10' : 'border-navy-light bg-navy-surface/40'}`}>
+                <p className={`text-sm font-semibold ${hasEnoughInput ? 'text-emerald' : 'text-slate'}`}>
+                  {hasEnoughInput ? 'Live mode on — your freedom score updates automatically.' : 'Add your monthly expenses to unlock live freedom tracking.'}
+                </p>
+                <p className="text-slate text-xs mt-1">Tap a profile or type values. No extra calculate step needed.</p>
+              </div>
             </div>
           </div>
 
@@ -190,10 +310,14 @@ export default function WealthThermometer() {
               <div className="space-y-6">
                 {/* Thermometer */}
                 <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-6 md:p-8 flex flex-col items-center">
-                  <p data-result className="text-navy-light text-xs uppercase mb-2">Your Wealth Thermometer</p>
+                  <p data-result className="text-slate text-xs uppercase mb-2">Your Wealth Thermometer</p>
                   <p data-result className="text-3xl md:text-4xl font-bold font-mono-data mb-6" style={{ color: zoneConfig[result.zone].color }}>
                     {result.zone === 'infinite' ? 'Financially Free!' : `${result.monthsFreedom.toFixed(1)} months`}
                   </p>
+                  <div data-result className="mb-5 px-4 py-3 rounded-xl border border-gold/20 bg-gold/10 text-center">
+                    <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Freedom score</p>
+                    <p className="text-white font-mono-data text-2xl font-bold">{freedomScore}/100</p>
+                  </div>
 
                   <div className="flex items-start gap-8">
                     <div className="relative">
@@ -237,7 +361,7 @@ export default function WealthThermometer() {
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: z.color }} />
                             <div>
                               <p className="text-white text-xs font-medium">{z.label}</p>
-                              <p className="text-navy-light text-[10px]">{z.sub}</p>
+                              <p className="text-slate text-[10px]">{z.sub}</p>
                             </div>
                           </div>
                         );
@@ -248,15 +372,15 @@ export default function WealthThermometer() {
                   {/* Summary Stats */}
                   <div data-result className="grid grid-cols-3 gap-4 mt-8 w-full">
                     <div className="text-center">
-                      <p className="text-navy-light text-xs uppercase">Liquid Assets</p>
+                      <p className="text-slate text-xs uppercase">Liquid Assets</p>
                       <p className="text-gold font-mono-data text-lg font-bold">RM {result.totalLiquid.toLocaleString()}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-navy-light text-xs uppercase">Passive Income</p>
+                      <p className="text-slate text-xs uppercase">Passive Income</p>
                       <p className="text-emerald font-mono-data text-lg font-bold">RM {result.monthlyPassive.toFixed(0)}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-navy-light text-xs uppercase">Expenses</p>
+                      <p className="text-slate text-xs uppercase">Expenses</p>
                       <p className="text-crimson font-mono-data text-lg font-bold">RM {result.monthlyExpenses.toFixed(0)}</p>
                     </div>
                   </div>
@@ -296,7 +420,7 @@ export default function WealthThermometer() {
                 <div className="w-16 h-16 rounded-full bg-navy-light flex items-center justify-center mb-4">
                   <span className="text-3xl">🌡️</span>
                 </div>
-                <p className="text-navy-light text-sm text-center">Enter your financial details and click "Calculate My Freedom" to see your Wealth Thermometer.</p>
+                <p className="text-slate text-sm text-center">Enter your financial details or tap a sample profile to see your Wealth Thermometer update live.</p>
               </div>
             )}
           </div>
@@ -305,3 +429,4 @@ export default function WealthThermometer() {
     </section>
   );
 }
+

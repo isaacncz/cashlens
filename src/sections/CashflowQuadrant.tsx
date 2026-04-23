@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 type Quadrant = 'E' | 'S' | 'B' | 'I';
+const TAX_BLUE = '#4DA3FF';
 
 interface QuadrantData {
   key: Quadrant;
@@ -12,6 +13,11 @@ interface QuadrantData {
   name: string;
   persona: string;
   income: string;
+  monthlyIncome: number;
+  taxAmount: number;
+  epfAmount: number;
+  timeHours: number;
+  netTakeHome: number;
   accent: string;
   borderColor: string;
   tagline: string;
@@ -27,11 +33,16 @@ const quadrants: QuadrantData[] = [
     name: 'Ahmad',
     persona: 'Software Engineer at GLC',
     income: 'RM 8,000/month',
+    monthlyIncome: 8000,
+    taxAmount: 980,
+    epfAmount: 880,
+    timeHours: 160,
+    netTakeHome: 6140,
     accent: 'text-malaysian-blue',
     borderColor: 'border-malaysian-blue',
     tagline: "Your salary makes your boss rich. Who makes you rich?",
     details: ['LHDN progressive tax up to 24%', 'EPF: 11% employee + 12% employer (locked)', '9-to-6 + MRT commute', 'Highest tax burden, zero time freedom'],
-    pipeColors: { tax: '#0033A0', epf: '#DAA520', time: '#DC2626', income: '#FFD700' },
+    pipeColors: { tax: TAX_BLUE, epf: '#DAA520', time: '#DC2626', income: '#FFD700' },
     pipeWidths: { tax: 28, epf: 23, time: 45, income: 35 },
   },
   {
@@ -40,11 +51,16 @@ const quadrants: QuadrantData[] = [
     name: 'Sarah',
     persona: 'Freelance Designer',
     income: 'RM 12,000/month',
+    monthlyIncome: 12000,
+    taxAmount: 1650,
+    epfAmount: 0,
+    timeHours: 220,
+    netTakeHome: 10350,
     accent: 'text-slate-light',
     borderColor: 'border-slate',
     tagline: "Sarah earns more than Ahmad. But she has no safety net.",
     details: ['No employer EPF contribution', 'Higher effective tax rate', 'No work = No income', 'Time pipe is WIDEST'],
-    pipeColors: { tax: '#0033A0', epf: '#64748B', time: '#DC2626', income: '#FFD700' },
+    pipeColors: { tax: TAX_BLUE, epf: '#64748B', time: '#DC2626', income: '#FFD700' },
     pipeWidths: { tax: 35, epf: 0, time: 55, income: 42 },
   },
   {
@@ -53,11 +69,16 @@ const quadrants: QuadrantData[] = [
     name: 'Raj',
     persona: 'Sdn Bhd Owner',
     income: 'Corporate tax: 24%',
+    monthlyIncome: 18000,
+    taxAmount: 2700,
+    epfAmount: 900,
+    timeHours: 40,
+    netTakeHome: 14400,
     accent: 'text-emerald',
     borderColor: 'border-emerald',
     tagline: "Raj's company pays his lifestyle. These are expenses, not liabilities.",
     details: ['Company pays car, phone, travel', 'Dividends: tax-exempt up to RM 100K', 'Leverage through business structure', 'Thin time pipe'],
-    pipeColors: { tax: '#0033A0', epf: '#DAA520', time: '#10B981', income: '#10B981' },
+    pipeColors: { tax: TAX_BLUE, epf: '#DAA520', time: '#10B981', income: '#10B981' },
     pipeWidths: { tax: 15, epf: 10, time: 8, income: 50 },
   },
   {
@@ -66,14 +87,23 @@ const quadrants: QuadrantData[] = [
     name: 'Aminah',
     persona: 'ASB + Rental Portfolio',
     income: 'RM 6,000/month passive',
+    monthlyIncome: 6000,
+    taxAmount: 150,
+    epfAmount: 0,
+    timeHours: 0,
+    netTakeHome: 5850,
     accent: 'text-gold',
     borderColor: 'border-gold',
     tagline: "Aminah stopped working at 42. Her income never did.",
     details: ['ASB dividends + rental + dividend stocks', 'Tax: Minimal (dividends exempt)', 'Time pipe: GONE', 'Multiple income streams'],
-    pipeColors: { tax: '#0033A0', epf: '#DAA520', time: '#10B981', income: '#FFD700' },
+    pipeColors: { tax: TAX_BLUE, epf: '#DAA520', time: '#10B981', income: '#FFD700' },
     pipeWidths: { tax: 5, epf: 5, time: 0, income: 60 },
   },
 ];
+
+function formatRinggit(amount: number) {
+  return `RM ${amount.toLocaleString()}`;
+}
 
 export default function CashflowQuadrant() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -121,11 +151,12 @@ export default function CashflowQuadrant() {
                   <span className={`text-sm font-bold px-3 py-1 rounded-full border ${q.borderColor} ${q.accent} bg-opacity-10`}>
                     {q.key}
                   </span>
-                  <span className="text-navy-light text-xs uppercase tracking-wider">{q.label}</span>
+                  <span className="text-slate text-xs uppercase tracking-wider">{q.label}</span>
                 </div>
-                <h3 className="text-white font-bold text-lg mb-1">{q.name}</h3>
+                <h3 className="text-white font-bold text-xl mb-1">{q.name}</h3>
                 <p className="text-slate text-sm mb-2">{q.persona}</p>
-                <p className={`font-mono-data text-sm font-bold ${q.accent}`}>{q.income}</p>
+                <p className={`font-mono-data text-lg md:text-2xl font-bold ${q.accent}`}>{q.income}</p>
+                <p className="text-slate text-xs mt-1">Net usable flow: <span className="text-white font-semibold">{formatRinggit(q.netTakeHome)}</span></p>
 
                 {/* Mini Pipe Preview */}
                 <div className="mt-4 h-12 relative">
@@ -164,7 +195,31 @@ export default function CashflowQuadrant() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <p className="text-gold font-mono-data text-2xl font-bold mb-4">{q.income}</p>
+                    <p className="text-gold font-mono-data text-3xl font-bold mb-4">{q.income}</p>
+                    <div className="space-y-3 mb-5">
+                      <div className="bg-emerald/10 border border-emerald/25 rounded-xl p-4">
+                        <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">Step 1 → Income in</p>
+                        <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.monthlyIncome)}</p>
+                      </div>
+                      <div className="rounded-xl border p-4" style={{ backgroundColor: 'rgba(77,163,255,0.14)', borderColor: 'rgba(77,163,255,0.45)' }}>
+                        <p className="text-xs uppercase tracking-[0.12em] mb-1" style={{ color: TAX_BLUE }}>Step 2 → Tax out</p>
+                        <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.taxAmount)}</p>
+                      </div>
+                      <div className="bg-gold/10 border border-gold/25 rounded-xl p-4">
+                        <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Step 3 → EPF / forced savings</p>
+                        <p className="text-white font-mono-data text-xl font-bold">{formatRinggit(q.epfAmount)}</p>
+                      </div>
+                      <div className={`${q.timeHours === 0 ? 'bg-emerald/10 border-emerald/30' : 'bg-crimson/10 border-crimson/30'} border rounded-xl p-4`}>
+                        <p className={`${q.timeHours === 0 ? 'text-emerald' : 'text-crimson'} text-xs uppercase tracking-[0.12em] mb-1`}>Step 4 → Time trade</p>
+                        <p className={`font-mono-data text-xl font-bold ${q.timeHours === 0 ? 'text-emerald' : 'text-white'}`}>
+                          {q.timeHours === 0 ? 'NO TIME TRADE' : `${q.timeHours} hrs/month`}
+                        </p>
+                      </div>
+                      <div className="bg-navy border border-navy-light rounded-xl p-4">
+                        <p className="text-white text-xs uppercase tracking-[0.12em] mb-1">Step 5 → Net flow left</p>
+                        <p className={`font-mono-data text-2xl font-bold ${q.accent}`}>{formatRinggit(q.netTakeHome)}</p>
+                      </div>
+                    </div>
                     <ul className="space-y-2">
                       {q.details.map((d, i) => (
                         <li key={i} className="flex items-start gap-2 text-slate text-sm">
@@ -175,50 +230,72 @@ export default function CashflowQuadrant() {
                     </ul>
                   </div>
                   <div className="relative">
-                    <svg width="100%" height="200" viewBox="0 0 300 200">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald/10 text-emerald border border-emerald/25" title="Income entering the system">Green = income in</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-crimson/10 text-crimson border border-crimson/25" title="Time and lifestyle drain">Red = deduction / time out</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: 'rgba(77,163,255,0.14)', color: TAX_BLUE, borderColor: 'rgba(77,163,255,0.45)' }} title="Tax flow">Blue = tax out</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gold/10 text-gold border border-gold/25" title="Locked or retained wealth">Gold = savings / net</span>
+                    </div>
+                    <svg width="100%" height="260" viewBox="0 0 300 260">
                       {/* Income source */}
-                      <circle cx="150" cy="20" r="12" fill={q.pipeColors.income} opacity="0.3" />
-                      <text x="150" y="24" textAnchor="middle" fill={q.pipeColors.income} fontSize="8" fontWeight="bold">INCOME</text>
+                      <circle cx="150" cy="24" r="12" fill={q.pipeColors.income} opacity="0.3" />
+                      <title>{`${q.name} monthly income: ${formatRinggit(q.monthlyIncome)}`}</title>
+                      <text x="150" y="28" textAnchor="middle" fill={q.pipeColors.income} fontSize="8" fontWeight="bold">IN</text>
+                      <text x="150" y="48" textAnchor="middle" fill="#E6F1FF" fontSize="11" fontWeight="bold">{formatRinggit(q.monthlyIncome)}</text>
+                      <text x="150" y="63" textAnchor="middle" fill="#8892B0" fontSize="9">Income enters</text>
                       {/* Main flow down */}
-                      <line x1="150" y1="32" x2="150" y2="180" stroke={q.pipeColors.income} strokeWidth="3" opacity="0.5" />
+                      <line x1="150" y1="36" x2="150" y2="212" stroke={q.pipeColors.income} strokeWidth="3" opacity="0.5" />
+                      <text x="160" y="86" fill="#8892B0" fontSize="9">↓ flowing through the quadrant</text>
                       {/* Tax branch */}
-                      <line x1="150" y1="60" x2="60" y2="60" stroke={q.pipeColors.tax} strokeWidth={Math.max(2, q.pipeWidths.tax / 8)} opacity="0.7" />
-                      <text x="30" y="58" fill={q.pipeColors.tax} fontSize="8">TAX</text>
+                      <line x1="150" y1="92" x2="60" y2="92" stroke={q.pipeColors.tax} strokeWidth={Math.max(2, q.pipeWidths.tax / 8)} opacity="0.7" />
+                      <polygon points="60,92 68,88 68,96" fill={q.pipeColors.tax} opacity="0.8" />
+                      <text x="26" y="88" fill={q.pipeColors.tax} fontSize="9" fontWeight="bold">Tax</text>
+                      <text x="26" y="102" fill="#E6F1FF" fontSize="9">{formatRinggit(q.taxAmount)}</text>
                       {/* EPF branch */}
-                      <line x1="150" y1="100" x2="60" y2="100" stroke={q.pipeColors.epf} strokeWidth={Math.max(2, q.pipeWidths.epf / 8)} opacity="0.7" />
-                      <text x="30" y="98" fill={q.pipeColors.epf} fontSize="8">EPF</text>
+                      <line x1="150" y1="136" x2="60" y2="136" stroke={q.pipeColors.epf} strokeWidth={Math.max(2, q.pipeWidths.epf / 8)} opacity="0.7" />
+                      <polygon points="60,136 68,132 68,140" fill={q.pipeColors.epf} opacity="0.8" />
+                      <text x="26" y="132" fill={q.pipeColors.epf} fontSize="9" fontWeight="bold">EPF</text>
+                      <text x="26" y="146" fill="#E6F1FF" fontSize="9">{formatRinggit(q.epfAmount)}</text>
                       {/* Time branch */}
                       {q.pipeWidths.time > 0 && (
                         <>
-                          <line x1="150" y1="140" x2="240" y2="140" stroke={q.pipeColors.time} strokeWidth={Math.max(2, q.pipeWidths.time / 8)} opacity="0.7" />
-                          <text x="250" y="143" fill={q.pipeColors.time} fontSize="8">TIME</text>
-                          <polygon points="245,135 255,140 245,145" fill={q.pipeColors.time} opacity="0.5" />
+                          <line x1="150" y1="178" x2="240" y2="178" stroke={q.pipeColors.time} strokeWidth={Math.max(2, q.pipeWidths.time / 8)} opacity="0.7" />
+                          <text x="250" y="174" fill={q.pipeColors.time} fontSize="9" fontWeight="bold">Time</text>
+                          <text x="250" y="188" fill="#E6F1FF" fontSize="9">{q.timeHours} hrs</text>
+                          <polygon points="240,178 232,174 232,182" fill={q.pipeColors.time} opacity="0.8" />
                         </>
                       )}
                       {q.pipeWidths.time === 0 && (
-                        <text x="160" y="143" fill="#10B981" fontSize="8" fontWeight="bold">NO TIME TRADE!</text>
+                        <>
+                          <rect x="168" y="164" width="96" height="28" rx="14" fill="#10B981" opacity="0.14" />
+                          <text x="216" y="182" textAnchor="middle" fill="#10B981" fontSize="13" fontWeight="bold">NO TIME TRADE</text>
+                        </>
                       )}
                       {/* Net flow */}
-                      <circle cx="150" cy="180" r="8" fill={q.pipeColors.income} opacity="0.4" />
-                      <text x="150" y="196" textAnchor="middle" fill="#FFD700" fontSize="8" fontWeight="bold">NET</text>
+                      <circle cx="150" cy="214" r="8" fill={q.pipeColors.income} opacity="0.4" />
+                      <text x="150" y="232" textAnchor="middle" fill="#FFD700" fontSize="10" fontWeight="bold">NET LEFT</text>
+                      <text x="150" y="248" textAnchor="middle" fill="#E6F1FF" fontSize="11" fontWeight="bold">{formatRinggit(q.netTakeHome)}</text>
                       {/* Flowing particles */}
                       <circle r="2" fill={q.pipeColors.income}>
-                        <animate attributeName="cy" values="35;175" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="cy" values="42;208" dur="2s" repeatCount="indefinite" />
                         <animate attributeName="cx" values="150;150" dur="2s" repeatCount="indefinite" />
                       </circle>
                       {q.pipeWidths.tax > 10 && (
                         <circle r="1.5" fill={q.pipeColors.tax}>
                           <animate attributeName="cx" values="150;65" dur="1.5s" repeatCount="indefinite" />
-                          <animate attributeName="cy" values="60;60" dur="1.5s" repeatCount="indefinite" />
+                          <animate attributeName="cy" values="92;92" dur="1.5s" repeatCount="indefinite" />
                         </circle>
                       )}
                       {q.pipeWidths.time > 10 && (
                         <circle r="1.5" fill={q.pipeColors.time}>
                           <animate attributeName="cx" values="150;235" dur="1.5s" repeatCount="indefinite" />
-                          <animate attributeName="cy" values="140;140" dur="1.5s" repeatCount="indefinite" />
+                          <animate attributeName="cy" values="178;178" dur="1.5s" repeatCount="indefinite" />
                         </circle>
                       )}
                     </svg>
+                    <p className="text-slate text-sm leading-relaxed mt-3">
+                      Follow the arrows: income enters at the top, deductions branch out left and right, and the amount that survives reaches the bottom as usable cash.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -242,7 +319,7 @@ export default function CashflowQuadrant() {
                 background: `linear-gradient(to right, #DC2626 0%, #FFD700 50%, #10B981 100%)`,
               }}
             />
-            <div className="flex justify-between mt-2 text-xs text-navy-light">
+            <div className="flex justify-between mt-2 text-xs text-slate">
               <span className={sliderValue < 1 ? 'text-crimson font-bold' : ''}>E — Employee</span>
               <span className={sliderValue >= 1 && sliderValue < 2 ? 'text-slate-light font-bold' : ''}>S — Self-employed</span>
               <span className={sliderValue >= 2 && sliderValue < 3 ? 'text-emerald font-bold' : ''}>B — Business</span>
@@ -293,3 +370,4 @@ export default function CashflowQuadrant() {
     </section>
   );
 }
+

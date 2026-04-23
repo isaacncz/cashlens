@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -36,9 +36,19 @@ export default function AssetLiability() {
   const [dragging, setDragging] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ id: string; correct: boolean } | null>(null);
   const [showHouseTrap, setShowHouseTrap] = useState(false);
-  const [completed, setCompleted] = useState(false);
   const [assetFlow, setAssetFlow] = useState(0);
   const [liabilityLeak, setLiabilityLeak] = useState(0);
+  const assetParticles = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => ({
+        startX: -20 + i * 30,
+        endX: 420 + i * 30,
+        startY: 8 + (i % 3) * 2,
+        endY: 10 + ((i + 1) % 3) * 2,
+        duration: `${3 + i * 0.5}s`,
+      })),
+    [],
+  );
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -49,29 +59,31 @@ export default function AssetLiability() {
     });
   }, []);
 
+  const completed = available.length === 0;
+
   useEffect(() => {
-    if (available.length === 0 && !completed) {
-      setCompleted(true);
-      setTimeout(() => {
-        const summary = document.getElementById('asset-summary');
-        if (summary) {
-          gsap.fromTo(summary, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' });
-        }
-      }, 100);
-    }
-  }, [available, completed]);
+    if (!completed) return;
+    const timeoutId = window.setTimeout(() => {
+      const summary = document.getElementById('asset-summary');
+      if (summary) {
+        gsap.fromTo(summary, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' });
+      }
+    }, 100);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [completed]);
 
   const handleDragStart = (id: string) => {
     setDragging(id);
   };
 
-  const handleDrop = (target: 'asset' | 'liability') => {
-    if (!dragging) return;
-    const item = items.find(i => i.id === dragging);
+  const handleDrop = (target: 'asset' | 'liability', itemId = dragging) => {
+    if (!itemId) return;
+    const item = items.find(i => i.id === itemId);
     if (!item) return;
 
     const correct = item.category === target;
-    setFeedback({ id: dragging, correct });
+    setFeedback({ id: itemId, correct });
 
     if (item.special === 'house-trap' && target === 'asset') {
       setShowHouseTrap(true);
@@ -79,7 +91,7 @@ export default function AssetLiability() {
     }
 
     if (correct) {
-      setAvailable(prev => prev.filter(i => i.id !== dragging));
+      setAvailable(prev => prev.filter(i => i.id !== itemId));
       if (target === 'asset') {
         setAssets(prev => [...prev, item]);
         setAssetFlow(prev => Math.min(prev + 1, 6));
@@ -122,32 +134,54 @@ export default function AssetLiability() {
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
           Drag each item into the right bucket. Watch the river respond.
         </p>
+        <div data-reveal className="mb-6 bg-navy-surface/50 border border-navy-light rounded-2xl p-4">
+          <p className="text-white text-sm font-medium mb-1">Mobile-friendly option</p>
+          <p className="text-slate text-sm">You can still drag items, but every card now also includes single-tap buttons for <span className="text-emerald font-semibold">Asset</span> and <span className="text-crimson font-semibold">Liability</span>.</p>
+        </div>
 
         {/* Available Items */}
         {available.length > 0 && (
           <div data-reveal className="mb-8">
-            <p className="text-navy-light text-xs uppercase tracking-wider mb-4">Drag these items into a bucket</p>
+            <p className="text-slate text-xs uppercase tracking-wider mb-4">Drag these items into a bucket</p>
             <div className="flex flex-wrap gap-3">
               {available.map(item => (
-                <button
+                <div
                   key={item.id}
-                  draggable
-                  onDragStart={() => handleDragStart(item.id)}
-                  onDragEnd={() => setDragging(null)}
-                  onClick={() => {
-                    setDragging(item.id);
-                    // On mobile, show a choice
-                    const choice = window.confirm(`Place "${item.label}" into:\nOK = Assets bucket\nCancel = Liabilities bucket`);
-                    handleDrop(choice ? 'asset' : 'liability');
-                  }}
-                  className={`flex items-center gap-3 bg-navy-surface border rounded-xl px-4 py-3 cursor-grab active:cursor-grabbing transition-all duration-200 hover:scale-[1.02] hover:shadow-card ${getCardStyle(item)} ${dragging === item.id ? 'opacity-70 rotate-2' : ''}`}
+                  className={`bg-navy-surface border rounded-xl p-3 transition-all duration-200 hover:scale-[1.02] hover:shadow-card ${getCardStyle(item)} ${dragging === item.id ? 'opacity-70 rotate-2' : ''}`}
                 >
-                  <span className="text-2xl">{item.icon}</span>
-                  <div className="text-left">
-                    <p className="text-white text-sm font-medium">{item.label}</p>
-                    <p className="text-navy-light text-xs">{item.description}</p>
+                  <button
+                    draggable
+                    onDragStart={() => handleDragStart(item.id)}
+                    onDragEnd={() => setDragging(null)}
+                    className="flex items-center gap-3 text-left w-full cursor-grab active:cursor-grabbing"
+                  >
+                    <span className="text-2xl">{item.icon}</span>
+                    <div className="text-left">
+                      <p className="text-white text-sm font-medium">{item.label}</p>
+                      <p className="text-slate text-xs">{item.description}</p>
+                    </div>
+                  </button>
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <button
+                      onClick={() => {
+                        setDragging(item.id);
+                        handleDrop('asset', item.id);
+                      }}
+                      className="px-3 py-2 rounded-lg border border-emerald/40 bg-emerald/10 text-emerald text-xs font-semibold hover:bg-emerald/20 transition-colors"
+                    >
+                      Put in Asset
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDragging(item.id);
+                        handleDrop('liability', item.id);
+                      }}
+                      className="px-3 py-2 rounded-lg border border-crimson/40 bg-crimson/10 text-crimson text-xs font-semibold hover:bg-crimson/20 transition-colors"
+                    >
+                      Put in Liability
+                    </button>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -172,7 +206,7 @@ export default function AssetLiability() {
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-emerald" />
               <h3 className="text-emerald font-bold text-lg uppercase tracking-wider">Assets</h3>
-              <span className="text-navy-light text-sm ml-auto">{assets.length} items</span>
+              <span className="text-slate text-sm ml-auto">{assets.length} items</span>
             </div>
             <div className="space-y-2">
               {assets.map(item => (
@@ -184,13 +218,13 @@ export default function AssetLiability() {
                   )}
                 </div>
               ))}
-              {assets.length === 0 && <p className="text-navy-light text-sm italic">Drop assets here</p>}
+              {assets.length === 0 && <p className="text-slate text-sm italic">Drop assets here</p>}
             </div>
             {/* Asset River */}
             <div className="mt-4">
               <svg width="100%" height="20" viewBox="0 0 400 20">
                 <path
-                  d={`M0,10 Q50,${5 + Math.sin(Date.now() * 0.003) * 3} 100,10 T200,10 T300,10 T400,10`}
+                  d="M0,10 Q50,5 100,10 T200,10 T300,10 T400,10"
                   stroke="#10B981"
                   strokeWidth={riverWidth / 10}
                   fill="none"
@@ -201,10 +235,10 @@ export default function AssetLiability() {
                     values="M0,10 Q50,5 100,10 T200,10 T300,10 T400,10;M0,10 Q50,15 100,10 T200,10 T300,10 T400,10;M0,10 Q50,5 100,10 T200,10 T300,10 T400,10"
                     dur="3s" repeatCount="indefinite" />
                 </path>
-                {assetFlow > 0 && Array.from({ length: assetFlow * 2 }).map((_, i) => (
+                {assetFlow > 0 && assetParticles.slice(0, assetFlow * 2).map((particle, i) => (
                   <circle key={i} r="2" fill="#10B981" opacity="0.8">
-                    <animate attributeName="cx" values={`${-20 + i * 30};${420 + i * 30}`} dur={`${3 + i * 0.5}s`} repeatCount="indefinite" />
-                    <animate attributeName="cy" values={`${8 + Math.random() * 4};${8 + Math.random() * 4}`} dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values={`${particle.startX};${particle.endX}`} dur={particle.duration} repeatCount="indefinite" />
+                    <animate attributeName="cy" values={`${particle.startY};${particle.endY}`} dur="2s" repeatCount="indefinite" />
                   </circle>
                 ))}
               </svg>
@@ -220,7 +254,7 @@ export default function AssetLiability() {
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-crimson" />
               <h3 className="text-crimson font-bold text-lg uppercase tracking-wider">Liabilities</h3>
-              <span className="text-navy-light text-sm ml-auto">{liabilities.length} items</span>
+              <span className="text-slate text-sm ml-auto">{liabilities.length} items</span>
             </div>
             <div className="space-y-2">
               {liabilities.map(item => (
@@ -229,7 +263,7 @@ export default function AssetLiability() {
                   <span className="text-white text-sm">{item.label}</span>
                 </div>
               ))}
-              {liabilities.length === 0 && <p className="text-navy-light text-sm italic">Drop liabilities here</p>}
+              {liabilities.length === 0 && <p className="text-slate text-sm italic">Drop liabilities here</p>}
             </div>
             {/* Liability River */}
             <div className="mt-4">
@@ -284,3 +318,4 @@ export default function AssetLiability() {
     </section>
   );
 }
+

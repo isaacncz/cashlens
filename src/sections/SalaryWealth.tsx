@@ -195,7 +195,7 @@ export default function SalaryWealth() {
                     )}
                   </div>
                   <div>
-                    <p className="text-navy-light text-xs uppercase mb-1">Freedom</p>
+                    <p className="text-slate text-xs uppercase mb-1">Freedom</p>
                     <p className="font-mono-data text-xl font-bold" style={{ color: i === 0 ? (adjustedLimFreedom < 12 ? '#DC2626' : '#FFD700') : c.freedomColor }}>
                       {showFreedom}
                     </p>
@@ -208,7 +208,7 @@ export default function SalaryWealth() {
                 {/* Dr. Lim salary slider */}
                 {i === 0 && (
                   <div className="mt-4 pt-4 border-t border-navy-light">
-                    <label className="text-navy-light text-xs uppercase mb-2 block">Adjust Dr. Lim's salary</label>
+                    <label className="text-slate text-xs uppercase mb-2 block">Adjust Dr. Lim's salary</label>
                     <input
                       type="range"
                       min="25000"
@@ -219,7 +219,7 @@ export default function SalaryWealth() {
                       className="w-full h-2 rounded-full appearance-none cursor-pointer"
                       style={{ background: `linear-gradient(to right, #FFD700 ${((limSalary - 25000) / 75000) * 100}%, #233554 ${((limSalary - 25000) / 75000) * 100}%)` }}
                     />
-                    <p className="text-navy-light text-xs mt-1">Notice: More salary ≠ More freedom</p>
+                    <p className="text-slate text-xs mt-1">Notice: More salary ≠ More freedom</p>
                   </div>
                 )}
               </div>
@@ -236,17 +236,17 @@ export default function SalaryWealth() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-navy/50 rounded-lg p-4 border border-navy-light">
-              <p className="text-navy-light text-xs uppercase mb-1">EPF Account 1</p>
+              <p className="text-slate text-xs uppercase mb-1">EPF Account 1</p>
               <p className="text-gold font-mono-data text-lg font-bold">70%</p>
               <p className="text-slate text-xs">Locked until 55/60</p>
             </div>
             <div className="bg-navy/50 rounded-lg p-4 border border-navy-light">
-              <p className="text-navy-light text-xs uppercase mb-1">EPF Account 2</p>
+              <p className="text-slate text-xs uppercase mb-1">EPF Account 2</p>
               <p className="text-gold font-mono-data text-lg font-bold">30%</p>
               <p className="text-slate text-xs">Accessible (limited)</p>
             </div>
             <div className="bg-navy/50 rounded-lg p-4 border border-crimson/30">
-              <p className="text-navy-light text-xs uppercase mb-1">True Liquidity</p>
+              <p className="text-slate text-xs uppercase mb-1">True Liquidity</p>
               <p className="text-crimson font-mono-data text-lg font-bold">~30%</p>
               <p className="text-slate text-xs">EPF is not wealth. It's forced savings.</p>
             </div>
@@ -289,3 +289,4 @@ export default function SalaryWealth() {
     </section>
   );
 }
+

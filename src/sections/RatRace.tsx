@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -26,6 +26,12 @@ interface Decision {
 interface Event {
   text: string;
   choices: { label: string; effect: (s: GameState) => Partial<GameState> }[];
+}
+
+interface ImpactChip {
+  label: string;
+  value: string;
+  tone: 'good' | 'bad' | 'neutral';
 }
 
 const initialState: GameState = {
@@ -125,15 +131,121 @@ function getRandomPair(): [Decision, Decision] {
   return [shuffled[0], shuffled[1]];
 }
 
+function shouldShowRandomEvent(year: number) {
+  return year > 1 && Math.random() < 0.25;
+}
+
+function getRandomEvent() {
+  return randomEvents[Math.floor(Math.random() * randomEvents.length)];
+}
+
+function formatImpactAmount(value: number): string {
+  return `${value > 0 ? '+' : value < 0 ? '-' : ''}RM ${Math.abs(value).toFixed(0)}`;
+}
+
+function getImpactPreview(current: GameState, effect: Partial<GameState>): ImpactChip[] {
+  const chips: ImpactChip[] = [];
+
+  const pushChip = (
+    label: string,
+    nextValue: number | undefined,
+    currentValue: number,
+    goodWhenPositive: boolean,
+  ) => {
+    if (typeof nextValue !== 'number' || nextValue === currentValue) return;
+    const delta = nextValue - currentValue;
+    chips.push({
+      label,
+      value: formatImpactAmount(delta),
+      tone: delta === 0 ? 'neutral' : (delta > 0) === goodWhenPositive ? 'good' : 'bad',
+    });
+  };
+
+  pushChip('Salary', effect.salary, current.salary, true);
+  pushChip('Expenses', effect.expenses, current.expenses, false);
+  pushChip('Passive', effect.passiveIncome, current.passiveIncome, true);
+  pushChip('PTPTN', effect.ptptnDebt, current.ptptnDebt, false);
+  pushChip('ASB', effect.asbBalance, current.asbBalance, true);
+
+  return chips.length > 0
+    ? chips
+    : [{ label: 'Impact', value: 'No immediate change', tone: 'neutral' }];
+}
+
+function scoreDecision(current: GameState, effect: Partial<GameState>) {
+  const nextSalary = effect.salary ?? current.salary;
+  const nextExpenses = effect.expenses ?? current.expenses;
+  const nextPassive = effect.passiveIncome ?? current.passiveIncome;
+  const nextDebt = effect.ptptnDebt ?? current.ptptnDebt;
+  const nextAsb = effect.asbBalance ?? current.asbBalance;
+
+  return (
+    (nextPassive - current.passiveIncome) * 4 +
+    (nextSalary - current.salary) * 2 +
+    (current.ptptnDebt - nextDebt) * 1.2 +
+    (nextAsb - current.asbBalance) * 0.08 -
+    (nextExpenses - current.expenses) * 3
+  );
+}
+
+function getDecisionCoaching(current: GameState, effect: Partial<GameState>) {
+  const score = scoreDecision(current, effect);
+  if (score >= 1200) {
+    return { label: 'Builds freedom faster', tone: 'good' as const };
+  }
+  if (score >= 200) {
+    return { label: 'Reasonable long-term move', tone: 'neutral' as const };
+  }
+  return { label: 'Comfort now, pressure later', tone: 'bad' as const };
+}
+
+function advanceGameState(current: GameState, updates: Partial<GameState> = {}): GameState {
+  const next = { ...current, ...updates };
+  next.year += 1;
+  next.age += 1;
+
+  if (next.asbBalance > 0) {
+    next.asbBalance = next.asbBalance * 1.055;
+    next.passiveIncome = next.passiveIncome + next.asbBalance * 0.005;
+  }
+
+  if (next.year % 3 === 0) next.salary += 300;
+
+  next.expenses = next.expenses * 1.02;
+
+  if (next.passiveIncome >= next.expenses * 0.8) {
+    next.completed = true;
+    next.won = true;
+  } else if (next.age >= 65) {
+    next.completed = true;
+    next.won = false;
+  }
+
+  return next;
+}
+
 export default function RatRace() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [game, setGame] = useState<GameState>(initialState);
-  const [currentDecisions, setCurrentDecisions] = useState<[Decision, Decision] | null>(null);
+  const [currentDecisions, setCurrentDecisions] = useState<[Decision, Decision] | null>([decisions[1], decisions[2]]);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const [message, setMessage] = useState('');
   const [workHarderClicks, setWorkHarderClicks] = useState(0);
-  const [showIntro, setShowIntro] = useState(true);
   const [logs, setLogs] = useState<string[]>([]);
+  const [freedomXp, setFreedomXp] = useState(0);
+  const [smartStreak, setSmartStreak] = useState(0);
+  const confettiPieces = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => ({
+        x: 248 + (i % 4) * 11 + (i % 2) * 3,
+        y: 42 + Math.floor(i / 4) * 12 + (i % 3) * 2,
+        rotationX: 255 + i * 3,
+        rotationY: 50 + i * 2,
+        duration: `${1 + (i % 4) * 0.2}s`,
+        color: ['#FFD700', '#10B981', '#E6F1FF'][i % 3],
+      })),
+    [],
+  );
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -143,43 +255,6 @@ export default function RatRace() {
       scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
     });
   }, []);
-
-  const nextYear = useCallback((updates: Partial<GameState> = {}) => {
-    setGame(prev => {
-      const next = { ...prev, ...updates };
-      next.year += 1;
-      next.age += 1;
-      // ASB grows
-      if (next.asbBalance > 0) {
-        next.asbBalance = next.asbBalance * 1.055;
-        next.passiveIncome = next.passiveIncome + next.asbBalance * 0.005;
-      }
-      // Salary raise
-      if (next.year % 3 === 0) next.salary += 300;
-      // Expense inflation
-      next.expenses = next.expenses * 1.02;
-      // Check win/lose
-      if (next.passiveIncome >= next.expenses * 0.8) {
-        next.completed = true;
-        next.won = true;
-      } else if (next.age >= 65) {
-        next.completed = true;
-        next.won = false;
-      }
-      return next;
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!game.completed && !showIntro && !currentDecisions && !currentEvent) {
-      // Show random event occasionally
-      if (game.year > 1 && Math.random() < 0.25) {
-        setCurrentEvent(randomEvents[Math.floor(Math.random() * randomEvents.length)]);
-      } else {
-        setCurrentDecisions(getRandomPair());
-      }
-    }
-  }, [game.year, game.completed, showIntro, currentDecisions, currentEvent]);
 
   useEffect(() => {
     if (game.completed) {
@@ -192,18 +267,41 @@ export default function RatRace() {
 
   const makeDecision = (decision: Decision) => {
     const effect = decision.effect(game);
-    setGame(prev => ({ ...prev, ...effect }));
+    const score = scoreDecision(game, effect);
+    const xpGain = Math.max(8, Math.round(Math.max(score, 0) / 80));
     setLogs(prev => [`Year ${game.year}: ${decision.text}`, ...prev].slice(0, 8));
+    const nextGame = advanceGameState(game, effect);
+    setGame(nextGame);
+    setFreedomXp(prev => prev + xpGain);
+    setSmartStreak(prev => (score >= 1200 ? prev + 1 : score >= 200 ? prev : 0));
     setCurrentDecisions(null);
-    nextYear(effect);
+    if (nextGame.completed) {
+      setCurrentEvent(null);
+      return;
+    }
+    if (shouldShowRandomEvent(nextGame.year)) {
+      setCurrentEvent(getRandomEvent());
+    } else {
+      setCurrentEvent(null);
+      setCurrentDecisions(getRandomPair());
+    }
   };
 
   const handleEvent = (choice: { label: string; effect: (s: GameState) => Partial<GameState> }) => {
     const effect = choice.effect(game);
-    setGame(prev => ({ ...prev, ...effect }));
+    const score = scoreDecision(game, effect);
+    const xpGain = Math.max(5, Math.round(Math.max(score, 0) / 120));
     setLogs(prev => [`Year ${game.year}: ${currentEvent?.text} → ${choice.label}`, ...prev].slice(0, 8));
+    const nextGame = advanceGameState(game, effect);
+    setGame(nextGame);
+    setFreedomXp(prev => prev + xpGain);
+    setSmartStreak(prev => (score >= 1200 ? prev + 1 : score >= 200 ? prev : 0));
     setCurrentEvent(null);
-    nextYear(effect);
+    if (nextGame.completed) {
+      setCurrentDecisions(null);
+      return;
+    }
+    setCurrentDecisions(getRandomPair());
   };
 
   const workHarder = () => {
@@ -212,22 +310,21 @@ export default function RatRace() {
     setTimeout(() => setMessage(''), 2000);
   };
 
-  const startGame = () => {
-    setShowIntro(false);
-    setCurrentDecisions(getRandomPair());
-  };
-
   const resetGame = () => {
     setGame(initialState);
-    setCurrentDecisions(null);
+    setCurrentDecisions([decisions[1], decisions[2]]);
     setCurrentEvent(null);
     setMessage('');
     setWorkHarderClicks(0);
-    setShowIntro(true);
     setLogs([]);
+    setFreedomXp(0);
+    setSmartStreak(0);
   };
 
   const freedomPercent = Math.min(100, (game.passiveIncome / Math.max(game.expenses, 1)) * 100);
+  const monthlyGap = game.passiveIncome - game.expenses;
+  const playerTier = freedomXp >= 140 ? 'Investor Mindset' : freedomXp >= 70 ? 'Freedom Builder' : freedomXp >= 25 ? 'Cashflow Rookie' : 'Fresh Grad';
+  const wheelSpinDuration = `${Math.max(1.5, 8 - workHarderClicks * 0.2)}s`;
 
   return (
     <section id="rat-race" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
@@ -239,41 +336,32 @@ export default function RatRace() {
           Work Harder.{' '}
           <span className="text-crimson">Never Leave the Wheel.</span>
         </h2>
-
-        {showIntro ? (
-          <div data-reveal className="max-w-lg mx-auto text-center py-10">
-            <p className="text-slate text-lg mb-6">
-              You are a fresh graduate: RM 3,500/month, PTPTN debt RM 30,000. Each year you make one financial decision. Will you escape the Rat Race?
-            </p>
-            <div className="bg-navy-surface border border-navy-light rounded-xl p-6 mb-8 text-left">
-              <p className="text-navy-light text-xs uppercase mb-3">Starting Position</p>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-slate">Age:</span> <span className="text-white font-mono-data">22</span></div>
-                <div><span className="text-slate">Salary:</span> <span className="text-gold font-mono-data">RM 3,500</span></div>
-                <div><span className="text-slate">Expenses:</span> <span className="text-crimson font-mono-data">RM 2,800</span></div>
-                <div><span className="text-slate">PTPTN:</span> <span className="text-crimson font-mono-data">RM 30,000</span></div>
-              </div>
+        <div data-reveal className="bg-navy-surface/50 border border-navy-light rounded-2xl p-5 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Mission starts immediately</p>
+              <p className="text-slate text-sm">You are a fresh graduate: RM 3,500/month salary, RM 30,000 PTPTN debt. Tap a choice to play Year 1 right away.</p>
             </div>
-            <button
-              onClick={startGame}
-              className="px-8 py-4 bg-crimson text-white font-semibold rounded-lg hover:shadow-[0_4px_16px_rgba(220,38,38,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-            >
-              Start Simulation
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 rounded-full bg-gold/10 border border-gold/20 text-gold text-xs font-semibold">{playerTier}</span>
+              <span className="px-3 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-xs font-semibold">XP {freedomXp}</span>
+              <span className="px-3 py-1 rounded-full bg-navy border border-navy-light text-white text-xs font-semibold">Smart streak {smartStreak}</span>
+            </div>
           </div>
-        ) : (
-          <div data-reveal className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        </div>
+
+        <div data-reveal className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Left Panel - Game Status */}
             <div className="lg:col-span-2 space-y-4">
               {/* Status Panel */}
               <div className="bg-navy-surface border border-navy-light rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="text-navy-light text-xs uppercase">Year {game.year}</p>
+                    <p className="text-slate text-xs uppercase">Year {game.year}</p>
                     <p className="text-white text-2xl font-bold font-mono-data">Age {game.age}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-navy-light text-xs uppercase">Freedom</p>
+                    <p className="text-slate text-xs uppercase">Freedom</p>
                     <p className={`font-mono-data text-lg font-bold ${freedomPercent >= 80 ? 'text-emerald' : freedomPercent >= 40 ? 'text-gold' : 'text-crimson'}`}>
                       {freedomPercent.toFixed(0)}%
                     </p>
@@ -313,6 +401,23 @@ export default function RatRace() {
                     <span className="text-slate text-sm">ASB Balance</span>
                     <span className="text-gold font-mono-data">RM {game.asbBalance.toLocaleString()}</span>
                   </div>
+                  <div className="bg-navy/60 border border-navy-light rounded-xl p-4 mt-2">
+                    <p className="text-slate text-xs uppercase mb-1">Monthly gap right now</p>
+                    <p className={`font-mono-data text-xl font-bold ${monthlyGap >= 0 ? 'text-emerald' : 'text-crimson'}`}>
+                      {monthlyGap >= 0 ? '+' : '-'} RM {Math.abs(monthlyGap).toFixed(0)}
+                    </p>
+                    <p className="text-slate text-xs mt-2">Positive means your passive income already covers your lifestyle.</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-navy/60 border border-navy-light rounded-xl p-4">
+                      <p className="text-slate text-xs uppercase mb-1">Freedom XP</p>
+                      <p className="text-gold font-mono-data text-xl font-bold">{freedomXp}</p>
+                    </div>
+                    <div className="bg-navy/60 border border-navy-light rounded-xl p-4">
+                      <p className="text-slate text-xs uppercase mb-1">Smart streak</p>
+                      <p className="text-emerald font-mono-data text-xl font-bold">{smartStreak}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -333,7 +438,7 @@ export default function RatRace() {
               {logs.length > 0 && (
                 <div className="bg-navy-surface/50 border border-navy-light rounded-xl p-4 max-h-40 overflow-y-auto">
                   {logs.map((log, i) => (
-                    <p key={i} className="text-navy-light text-xs mb-1">{log}</p>
+                    <p key={i} className="text-slate text-xs mb-1">{log}</p>
                   ))}
                 </div>
               )}
@@ -345,7 +450,7 @@ export default function RatRace() {
               <div className="bg-navy-surface border border-navy-light rounded-2xl p-6 mb-6 flex justify-center">
                 <svg width="280" height="280" viewBox="0 0 280 280">
                   {/* Wheel */}
-                  <g style={{ animation: game.completed && game.won ? 'none' : 'wheelSpin 8s linear infinite', transformOrigin: '140px 140px' }}>
+                  <g style={{ animation: game.completed && game.won ? 'none' : `wheelSpin ${wheelSpinDuration} linear infinite`, transformOrigin: '140px 140px' }}>
                     <circle cx="140" cy="140" r="110" fill="none" stroke="#DC2626" strokeWidth="2.5" opacity="0.6" />
                     {/* Spokes */}
                     {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
@@ -385,12 +490,12 @@ export default function RatRace() {
                       <circle cx="260" cy="55" r="8" fill="#10B981" />
                       <rect x="254" y="63" width="12" height="16" rx="3" fill="#10B981" />
                       {/* Confetti */}
-                      {[...Array(12)].map((_, i) => (
-                        <rect key={i} x={250 + Math.random() * 40} y={40 + Math.random() * 40}
-                          width="4" height="8" fill={['#FFD700', '#10B981', '#E6F1FF'][i % 3]} opacity="0.8">
+                      {confettiPieces.map((piece, i) => (
+                        <rect key={i} x={piece.x} y={piece.y}
+                          width="4" height="8" fill={piece.color} opacity="0.8">
                           <animateTransform attributeName="transform" type="rotate"
-                            from={`0 ${255 + i * 3} ${50 + i * 2}`} to={`360 ${255 + i * 3} ${50 + i * 2}`}
-                            dur={`${1 + Math.random()}s`} repeatCount="indefinite" />
+                            from={`0 ${piece.rotationX} ${piece.rotationY}`} to={`360 ${piece.rotationX} ${piece.rotationY}`}
+                            dur={piece.duration} repeatCount="indefinite" />
                         </rect>
                       ))}
                     </>
@@ -406,18 +511,57 @@ export default function RatRace() {
               {/* Decision Cards */}
               {!game.completed && currentDecisions && (
                 <div className="space-y-4">
+                  <div className="bg-navy-surface/50 border border-navy-light rounded-xl p-4">
+                    <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Coach's lens</p>
+                    <p className="text-slate text-sm">A strong choice should increase passive income, reduce debt, or buy back time without permanently locking in higher expenses.</p>
+                  </div>
                   <p className="text-slate text-sm text-center">Year {game.year} — Choose your path:</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {currentDecisions.map((d, i) => (
-                      <button
-                        key={i}
-                        onClick={() => makeDecision(d)}
-                        className="bg-navy-surface border border-navy-light rounded-xl p-5 text-left hover:border-gold/40 hover:shadow-elevated transition-all duration-200 group"
-                      >
-                        <span className="text-3xl mb-3 block">{d.icon}</span>
-                        <p className="text-white text-sm font-medium group-hover:text-gold transition-colors">{d.text}</p>
-                      </button>
-                    ))}
+                    {currentDecisions.map((d, i) => {
+                      const impactChips = getImpactPreview(game, d.effect(game));
+                      const coaching = getDecisionCoaching(game, d.effect(game));
+                      const xpReward = Math.max(8, Math.round(Math.max(scoreDecision(game, d.effect(game)), 0) / 80));
+
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => makeDecision(d)}
+                          className="bg-navy-surface border border-navy-light rounded-xl p-5 text-left hover:border-gold/40 hover:shadow-elevated transition-all duration-200 group"
+                        >
+                          <span className="text-3xl mb-3 block">{d.icon}</span>
+                          <span
+                            className={`inline-flex px-2.5 py-1 rounded-full text-[11px] font-semibold border mb-3 ${
+                              coaching.tone === 'good'
+                                ? 'bg-emerald/10 text-emerald border-emerald/30'
+                                : coaching.tone === 'bad'
+                                  ? 'bg-crimson/10 text-crimson border-crimson/30'
+                                  : 'bg-gold/10 text-gold border-gold/30'
+                            }`}
+                          >
+                            {coaching.label}
+                          </span>
+                          <p className="text-white text-sm font-medium group-hover:text-gold transition-colors mb-4">{d.text}</p>
+                          <p className="text-slate text-xs mb-3">Reward: +{xpReward} XP if this builds freedom.</p>
+                          <div className="flex flex-wrap gap-2">
+                            {impactChips.map(chip => (
+                              <span
+                                key={`${d.text}-${chip.label}`}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                                  chip.tone === 'good'
+                                    ? 'bg-emerald/10 text-emerald border-emerald/30'
+                                    : chip.tone === 'bad'
+                                      ? 'bg-crimson/10 text-crimson border-crimson/30'
+                                      : 'bg-navy/70 text-slate border-navy-light'
+                                }`}
+                              >
+                                {chip.label}: {chip.value}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-slate text-xs mt-4">Real-time preview: this is the immediate impact before year-end growth and inflation.</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -427,18 +571,38 @@ export default function RatRace() {
                 <div className="bg-navy-surface border border-gold/30 rounded-2xl p-6">
                   <p className="text-gold text-sm font-medium mb-1">Life Event!</p>
                   <p className="text-white text-base mb-4">{currentEvent.text}</p>
-                  <div className="flex gap-3">
-                    {currentEvent.choices.map((c, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleEvent(c)}
-                        className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          i === 0 ? 'bg-crimson/20 border border-crimson/40 text-crimson hover:bg-crimson/30' : 'bg-emerald/20 border border-emerald/40 text-emerald hover:bg-emerald/30'
-                        }`}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {currentEvent.choices.map((c, i) => {
+                      const impactChips = getImpactPreview(game, c.effect(game));
+
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => handleEvent(c)}
+                          className={`rounded-lg text-sm font-medium transition-all duration-200 p-4 text-left ${
+                            i === 0 ? 'bg-crimson/20 border border-crimson/40 text-crimson hover:bg-crimson/30' : 'bg-emerald/20 border border-emerald/40 text-emerald hover:bg-emerald/30'
+                          }`}
+                        >
+                          <p className="mb-3">{c.label}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {impactChips.map(chip => (
+                              <span
+                                key={`${c.label}-${chip.label}`}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                                  chip.tone === 'good'
+                                    ? 'bg-emerald/10 text-emerald border-emerald/30'
+                                    : chip.tone === 'bad'
+                                      ? 'bg-crimson/10 text-crimson border-crimson/30'
+                                      : 'bg-navy/70 text-slate border-navy-light'
+                                }`}
+                              >
+                                {chip.label}: {chip.value}
+                              </span>
+                            ))}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -460,7 +624,7 @@ export default function RatRace() {
                       <p className="text-slate text-sm mb-4">
                         43 years on the wheel. You worked hard. But you never left.
                       </p>
-                      <p className="text-navy-light text-sm italic">
+                      <p className="text-slate text-sm italic">
  Passive income: RM {game.passiveIncome.toFixed(0)} — still short of RM {game.expenses.toFixed(0)} expenses.
                       </p>
                     </>
@@ -475,7 +639,6 @@ export default function RatRace() {
               )}
             </div>
           </div>
-        )}
       </div>
 
       <style>{`
@@ -487,3 +650,4 @@ export default function RatRace() {
     </section>
   );
 }
+

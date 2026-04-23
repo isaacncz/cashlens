@@ -6,6 +6,7 @@ const moduleLinks = [
   { label: 'Debt Visualizer', target: 'debt' },
   { label: 'Salary vs Wealth', target: 'salary-wealth' },
   { label: 'Wealth Thermometer', target: 'wealth-thermometer' },
+  { label: 'Financial Literacy Playbook', target: 'literacy-playbook' },
 ];
 
 export default function Footer() {

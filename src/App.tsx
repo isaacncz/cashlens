@@ -8,6 +8,7 @@ import RatRace from './sections/RatRace';
 import DebtVisualizer from './sections/DebtVisualizer';
 import SalaryWealth from './sections/SalaryWealth';
 import WealthThermometer from './sections/WealthThermometer';
+import LiteracyPlaybook from './sections/LiteracyPlaybook';
 import Footer from './sections/Footer';
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
       <DebtVisualizer />
       <SalaryWealth />
       <WealthThermometer />
+      <LiteracyPlaybook />
       <Footer />
     </div>
   );

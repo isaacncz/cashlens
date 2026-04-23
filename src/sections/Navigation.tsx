@@ -8,6 +8,7 @@ const navLinks = [
   { label: 'Debt', target: 'debt' },
   { label: 'Salary', target: 'salary-wealth' },
   { label: 'Wealth', target: 'wealth-thermometer' },
+  { label: 'Playbook', target: 'literacy-playbook' },
 ];
 
 export default function Navigation() {
@@ -60,6 +61,9 @@ export default function Navigation() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const activeIndex = Math.max(0, navLinks.findIndex((link) => link.target === activeSection));
+  const progressPercent = ((activeIndex + 1) / navLinks.length) * 100;
+
   return (
     <nav
       ref={navRef}
@@ -91,16 +95,22 @@ export default function Navigation() {
               {link.label}
             </button>
           ))}
-          <div className="flex items-center gap-1 text-xs ml-4">
-            <span className="text-gold font-medium">EN</span>
-            <span className="text-navy-light">/</span>
-            <span className="text-navy-light opacity-50">BM</span>
+          <div className="flex items-center gap-3 ml-4">
+            <div className="px-3 py-1 rounded-full border border-gold/20 bg-gold/10 text-gold text-xs font-semibold">
+              Lesson {activeIndex + 1}/{navLinks.length}
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-gold font-medium">EN</span>
+              <span className="text-slate">/</span>
+              <span className="text-slate opacity-50">BM</span>
+            </div>
           </div>
         </div>
 
         <button
           className="lg:hidden text-white p-2"
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle navigation menu"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             {mobileOpen ? (
@@ -122,6 +132,13 @@ export default function Navigation() {
       {mobileOpen && (
         <div className="absolute top-16 left-0 right-0 bg-navy/95 backdrop-blur-lg border-b border-navy-light lg:hidden">
           <div className="flex flex-col p-4 gap-3">
+            <div className="rounded-xl bg-gold/10 border border-gold/20 px-3 py-3">
+              <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Your progress</p>
+              <p className="text-white text-sm font-medium">Lesson {activeIndex + 1} of {navLinks.length}</p>
+              <div className="w-full bg-navy-light rounded-full h-2 mt-3 overflow-hidden">
+                <div className="bg-gold h-2 rounded-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+              </div>
+            </div>
             {navLinks.map(link => (
               <button
                 key={link.target}
@@ -138,6 +155,14 @@ export default function Navigation() {
           </div>
         </div>
       )}
+
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-navy-light/60 overflow-hidden">
+        <div
+          className="h-full bg-gold transition-all duration-300"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
     </nav>
   );
 }
+
