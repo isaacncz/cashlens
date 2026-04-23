@@ -64,7 +64,6 @@ module.exports = {
           light: "#CCD6F6",
         },
         white: "#E6F1FF",
-        "malaysian-blue": "#0033A0",
         "asb-red": "#8B0000",
         "epf-gold": "#DAA520",
       },

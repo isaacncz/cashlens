@@ -243,8 +243,8 @@ export default function MoneyMirror() {
         label: 'Income tax',
         amount: results.taxMonthly,
         percent: (results.taxMonthly / gross) * 100,
-        color: '#0033A0',
-        accent: 'text-malaysian-blue',
+        color: '#DC2626',
+        accent: 'text-crimson',
         description: 'Paid to LHDN before you feel richer.',
         side: 'left' as const,
         y: 110,
@@ -551,38 +551,12 @@ export default function MoneyMirror() {
                       <p className="text-slate text-sm leading-relaxed">{highlightedItem.description}</p>
                       <p className="text-white font-mono-data text-sm mt-3">RM {highlightedItem.amount.toFixed(0)} / month</p>
                     </div>
-
-                  {flowItems.map((item) => (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onMouseEnter={() => handleFlowHover(item.key)}
-                      onFocus={() => handleFlowSelect(item.key)}
-                      onClick={() => handleFlowSelect(item.key)}
-                      className={`w-full text-left rounded-2xl border p-4 transition-all duration-200 ${
-                        highlightedFlow === item.key
-                          ? 'border-gold/40 bg-navy-surface shadow-[0_0_20px_rgba(255,215,0,0.08)]'
-                          : 'border-navy-light bg-navy-surface/60 md:hover:border-gold/20'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-white text-sm font-semibold">{item.label}</p>
-                          <p className="text-slate text-xs mt-1">{item.description}</p>
-                        </div>
-                        <span className="text-white font-mono-data text-sm font-bold">{item.percent.toFixed(1)}%</span>
-                      </div>
-                      <div className="mt-3 flex items-center justify-between">
-                        <span className={`font-mono-data text-sm font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</span>
-                        <div className="w-24 bg-navy-light rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${Math.max(6, Math.min(100, item.percent))}%`, backgroundColor: item.color }}
-                          />
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+                    <div className="rounded-2xl border border-navy-light bg-navy-surface/70 p-4">
+                      <p className="text-slate text-xs uppercase mb-2">Interaction</p>
+                      <p className="text-white text-sm leading-relaxed">
+                        Hover cards to preview details. Click any card to lock selection.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

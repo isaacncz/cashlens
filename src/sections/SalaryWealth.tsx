@@ -121,7 +121,7 @@ export default function SalaryWealth() {
     <section id="salary-wealth" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
         <p data-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 06 / Salary Illusion
+          Module 07 / Salary Illusion
         </p>
         <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
           High Salary.{' '}

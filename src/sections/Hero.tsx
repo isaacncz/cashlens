@@ -143,9 +143,9 @@ export default function Hero() {
 
         <div data-hero-reveal className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-10 opacity-0">
           <div className="rounded-2xl border border-navy-light bg-navy-surface/50 px-4 py-4 text-left">
-            <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">8 lessons</p>
+            <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">9 lessons</p>
             <p className="text-white text-sm font-semibold">Step-by-step learning path</p>
-            <p className="text-slate text-xs mt-2">Move from salary awareness to freedom rules without guessing what to do next.</p>
+            <p className="text-slate text-xs mt-2">Move from salary awareness to income engines and freedom rules without guessing what to do next.</p>
           </div>
           <div className="rounded-2xl border border-navy-light bg-navy-surface/50 px-4 py-4 text-left">
             <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Malaysia-first</p>

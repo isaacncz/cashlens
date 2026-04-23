@@ -330,7 +330,7 @@ export default function RatRace() {
     <section id="rat-race" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
         <p data-reveal className="text-crimson text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 04 / Rat Race Simulator
+          Module 05 / Rat Race Simulator
         </p>
         <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
           Work Harder.{' '}

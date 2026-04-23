@@ -4,6 +4,7 @@ const navLinks = [
   { label: 'Money Mirror', target: 'money-mirror' },
   { label: 'Assets', target: 'asset-liability' },
   { label: 'Quadrant', target: 'cashflow-quadrant' },
+  { label: 'Streams', target: 'income-engine' },
   { label: 'Rat Race', target: 'rat-race' },
   { label: 'Debt', target: 'debt' },
   { label: 'Salary', target: 'salary-wealth' },

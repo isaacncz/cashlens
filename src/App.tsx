@@ -4,6 +4,7 @@ import Hero from './sections/Hero';
 import MoneyMirror from './sections/MoneyMirror';
 import AssetLiability from './sections/AssetLiability';
 import CashflowQuadrant from './sections/CashflowQuadrant';
+import IncomeEngine from './sections/IncomeEngine';
 import RatRace from './sections/RatRace';
 import DebtVisualizer from './sections/DebtVisualizer';
 import SalaryWealth from './sections/SalaryWealth';
@@ -21,6 +22,7 @@ export default function App() {
       <MoneyMirror />
       <AssetLiability />
       <CashflowQuadrant />
+      <IncomeEngine />
       <RatRace />
       <DebtVisualizer />
       <SalaryWealth />
