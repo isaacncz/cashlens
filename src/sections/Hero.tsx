@@ -146,25 +146,25 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden" style={{ background: 'radial-gradient(ellipse at center, #112240 0%, #0A192F 70%)' }}>
+    <section className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden pt-[calc(env(safe-area-inset-top)+7.5rem)] pb-10 sm:pt-28 sm:pb-14" style={{ background: 'radial-gradient(ellipse at center, #112240 0%, #0A192F 70%)' }}>
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
-      <div ref={contentRef} className="relative z-10 text-center px-6 max-w-2xl mx-auto">
-        <p data-hero-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-6 opacity-0">
+      <div ref={contentRef} className="relative z-10 text-center px-4 sm:px-6 max-w-2xl mx-auto">
+        <p data-hero-reveal className="text-gold text-[11px] sm:text-xs font-medium tracking-[0.1em] uppercase mb-4 sm:mb-6 opacity-0">
           Cashflow Lens Malaysia
         </p>
-        <h1 data-hero-reveal className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight mb-6 opacity-0" style={{ color: '#E6F1FF' }}>
+        <h1 data-hero-reveal className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight mb-5 sm:mb-6 opacity-0" style={{ color: '#E6F1FF' }}>
           See Money Clearly{' '}
           <span className="text-gold">/</span>
           <br />
           For The First Time
         </h1>
-        <p data-hero-reveal className="text-lg md:text-xl text-slate leading-relaxed mb-10 max-w-lg mx-auto opacity-0">
+        <p data-hero-reveal className="text-base sm:text-lg md:text-xl text-slate leading-relaxed mb-8 sm:mb-10 max-w-lg mx-auto opacity-0">
           Interactive financial literacy for Malaysians. Learn by pressing, dragging, and simulating real money decisions.
         </p>
         <div data-hero-reveal className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0">
           <button
             onClick={scrollToModules}
-            className="group relative px-8 py-4 border border-gold text-gold font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+            className="group relative w-full sm:w-auto sm:min-w-[260px] px-8 py-4 border border-gold text-gold font-semibold rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]"
           >
             <span className="absolute inset-0 bg-gold transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out" />
             <span className="relative z-10 group-hover:text-navy transition-colors duration-300">Start Your Journey</span>
@@ -178,8 +178,8 @@ export default function Hero() {
           </button>
         </div>
 
-        <div data-hero-reveal className="mt-10 opacity-0">
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
+        <div data-hero-reveal className="mt-8 sm:mt-10 opacity-0">
+          <div className="flex flex-wrap justify-center gap-2 mb-4 max-w-[340px] sm:max-w-none mx-auto">
             {heroHighlights.map((item) => (
               <button
                 key={item.key}
@@ -187,7 +187,7 @@ export default function Hero() {
                 onMouseEnter={() => previewHighlight(item.key)}
                 onFocus={() => selectHighlight(item.key)}
                 onClick={() => selectHighlight(item.key)}
-                className={`min-h-10 px-4 rounded-full border text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-200 ${
+                className={`min-h-10 px-4 rounded-full border text-[11px] sm:text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-200 ${
                   activeHighlight === item.key
                     ? 'border-gold/45 bg-gold/15 text-gold'
                     : 'border-navy-light bg-navy-surface/50 text-slate md:hover:border-gold/30 md:hover:text-white'

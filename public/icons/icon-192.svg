@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192" role="img" aria-label="Cashflow Lens icon">
+  <rect width="192" height="192" rx="42" fill="#0b1020" />
+  <circle cx="84" cy="84" r="42" fill="none" stroke="#38bdf8" stroke-width="12" />
+  <line x1="116" y1="116" x2="154" y2="154" stroke="#38bdf8" stroke-width="12" stroke-linecap="round" />
+  <text x="96" y="118" text-anchor="middle" font-size="46" font-family="Inter, Arial, sans-serif" font-weight="700" fill="#22d3ee">₿</text>
+</svg>
