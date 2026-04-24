@@ -146,7 +146,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden pt-24 pb-10 sm:pt-28 sm:pb-14" style={{ background: 'radial-gradient(ellipse at center, #112240 0%, #0A192F 70%)' }}>
+    <section className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden pt-[calc(env(safe-area-inset-top)+7.5rem)] pb-10 sm:pt-28 sm:pb-14" style={{ background: 'radial-gradient(ellipse at center, #112240 0%, #0A192F 70%)' }}>
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
       <div ref={contentRef} className="relative z-10 text-center px-4 sm:px-6 max-w-2xl mx-auto">
         <p data-hero-reveal className="text-gold text-[11px] sm:text-xs font-medium tracking-[0.1em] uppercase mb-4 sm:mb-6 opacity-0">
