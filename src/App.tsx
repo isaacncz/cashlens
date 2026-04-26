@@ -11,6 +11,7 @@ import SalaryWealth from './sections/SalaryWealth';
 import WealthThermometer from './sections/WealthThermometer';
 import LiteracyPlaybook from './sections/LiteracyPlaybook';
 import Footer from './sections/Footer';
+import AIIncomeLab from './sections/AIIncomeLab';
 
 export default function App() {
   useLenis();
@@ -28,6 +29,7 @@ export default function App() {
       <SalaryWealth />
       <WealthThermometer />
       <LiteracyPlaybook />
+      <AIIncomeLab />
       <Footer />
     </div>
   );
