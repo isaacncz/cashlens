@@ -10,6 +10,7 @@ const navLinks = [
   { label: 'Salary', target: 'salary-wealth' },
   { label: 'Wealth', target: 'wealth-thermometer' },
   { label: 'Playbook', target: 'literacy-playbook' },
+  { label: 'AI Lab', target: 'ai-income-lab' },
 ];
 
 export default function Navigation() {
