@@ -15,43 +15,43 @@ const find = id => repeatSalesProducts.find(p => p.id === id);
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 0.000001, `${actual} != ${expected}`);
 const starter = repeatSalesProducts.filter(p => p.checked);
 
-test('approved catalog preserves 28 unique SKUs, decimal prices and Malaysia AP/RP', () => {
+test('approved catalog preserves 28 unique SKUs, decimal prices and Malaysia ABO prices (AP)', () => {
   assert.equal(repeatSalesProducts.length, 28);
   assert.equal(new Set(repeatSalesProducts.map(p => p.id)).size, 28);
-  assert.equal(find('124107').ap, 9.5);
-  assert.equal(find('124107').price, 11.9);
-  assert.equal(find('120539').price, 6963.4);
-  assert.equal(find('122943M').ap, 595);
+  assert.equal(find('124107').aboPrice, 9.5);
+  assert.ok(repeatSalesProducts.every(product => !Object.hasOwn(product, 'price')), 'Retail price is not part of the active catalog');
+  assert.equal(find('120539').aboPrice, 5570.5);
+  assert.equal(find('122943M').aboPrice, 595);
 });
-test('starter basket uses actual RP and purchase intervals through 50 years', () => {
-  close(projectRepeatSales(starter, 1, 1, 100).total, 150.7);
-  close(projectRepeatSales(starter, 12, 1, 100).total, 742.8);
-  close(projectRepeatSales(starter, 600, 1, 100).total, 37140);
-  close(projectRepeatSales(starter, 600, 20, 100).total, 742800);
-  close(projectRepeatSales(starter, 600, 1, 100).recurringMonthly, 61.9);
+test('starter basket uses actual ABO prices and purchase intervals through 50 years', () => {
+  close(projectRepeatSales(starter, 1, 1, 100).total, 120.5);
+  close(projectRepeatSales(starter, 12, 1, 100).total, 594);
+  close(projectRepeatSales(starter, 600, 1, 100).total, 29700);
+  close(projectRepeatSales(starter, 600, 20, 100).total, 594000);
+  close(projectRepeatSales(starter, 600, 1, 100).recurringMonthly, 49.5);
 });
 test('a purchase on the horizon boundary is counted in the next month', () => {
   const product = find('124106');
-  close(projectRepeatSales([product], 3, 1, 100).total, 36.9);
-  close(projectRepeatSales([product], 4, 1, 100).total, 73.8);
+  close(projectRepeatSales([product], 3, 1, 100).total, 29.5);
+  close(projectRepeatSales([product], 4, 1, 100).total, 59);
 });
 test('appliances are counted once; annual filters start after the included filter', () => {
   const device = find('122940M'), filter = find('122943M');
-  close(projectRepeatSales([device], 600, 1, 100).total, 5850);
+  close(projectRepeatSales([device], 600, 1, 100).total, 4680);
   close(projectRepeatSales([device], 600, 1, 100).recurringMonthly, 0);
   close(projectRepeatSales([filter], 12, 1, 100).total, 0);
-  close(projectRepeatSales([filter], 13, 1, 100).total, 743.8);
-  close(projectRepeatSales([device, filter], 600, 1, 100).total, 5850 + 49 * 743.8);
+  close(projectRepeatSales([filter], 13, 1, 100).total, 595);
+  close(projectRepeatSales([device, filter], 600, 1, 100).total, 4680 + 49 * 595);
 });
 test('annual attrition is an explicit original-cohort stress test', () => {
-  close(projectRepeatSales(starter, 600, 1, 0, 'annual-attrition').total, 742.8);
-  close(projectRepeatSales(starter, 24, 1, 50, 'annual-attrition').total, 742.8 * 1.5);
-  close(projectRepeatSales([find('122943M')], 24, 1, 50, 'annual-attrition').total, 743.8 * 0.5);
+  close(projectRepeatSales(starter, 600, 1, 0, 'annual-attrition').total, 594);
+  close(projectRepeatSales(starter, 24, 1, 50, 'annual-attrition').total, 594 * 1.5);
+  close(projectRepeatSales([find('122943M')], 24, 1, 50, 'annual-attrition').total, 595 * 0.5);
 });
 test('editable cycles, empty basket and chart cumulative totals agree', () => {
   const changed = { ...find('124106'), every: 1 };
-  close(projectRepeatSales([changed], 12, 1, 100).total, 36.9 * 12);
-  close(projectRepeatSales([{ ...changed, every: 0 }], 600, 1, 100).total, 36.9);
+  close(projectRepeatSales([changed], 12, 1, 100).total, 29.5 * 12);
+  close(projectRepeatSales([{ ...changed, every: 0 }], 600, 1, 100).total, 29.5);
   const empty = projectRepeatSales([], 600, 1, 100);
   assert.equal(empty.total, 0);
   assert.deepEqual(empty.categories, []);
@@ -65,11 +65,11 @@ test('editable cycles, empty basket and chart cumulative totals agree', () => {
 });
 test('limits and month labels cover the full supported range', () => {
   close(projectRepeatSales(starter, 600, 100, 100).total, projectRepeatSales(starter, 600, 20, 100).total);
-  close(projectRepeatSales(starter, 600, 1).total, 18645.35);
-  close(projectRepeatSales(starter, 24, 1, NaN).total, 818.15);
-  close(projectRepeatSales(starter, 900, 1, 100).total, 37140);
-  close(projectRepeatSales(starter, 1, 0, 100).total, 150.7);
-  close(projectRepeatSales(starter, NaN, NaN, NaN).total, 150.7);
+  close(projectRepeatSales(starter, 600, 1).total, 14910.25);
+  close(projectRepeatSales(starter, 24, 1, NaN).total, 654.25);
+  close(projectRepeatSales(starter, 900, 1, 100).total, 29700);
+  close(projectRepeatSales(starter, 1, 0, 100).total, 120.5);
+  close(projectRepeatSales(starter, NaN, NaN, NaN).total, 120.5);
   assert.equal(durationLabel(1), '1 month');
   assert.equal(durationLabel(13), '1 year 1 month');
   assert.equal(durationLabel(600), '50 years');
@@ -77,19 +77,26 @@ test('limits and month labels cover the full supported range', () => {
 
 test('default 50% repeat purchases continue through decades without annual decay', () => {
   // First purchases are full price; all subsequent scheduled purchases use 50%.
-  const firstPurchase = 36.9 + 43.8 + 70;
-  close(projectRepeatSales(starter, 12, 1).total, firstPurchase + (742.8 - firstPurchase) * 0.5);
-  close(projectRepeatSales(starter, 600, 1).total, firstPurchase + (37140 - firstPurchase) * 0.5);
-  close(projectRepeatSales(starter, 291, 1).total, 9099.3); // Screenshot's 24 years 3 months.
-  close(projectRepeatSales(starter, 600, 20).total, 372907);
+  const firstPurchase = 29.5 + 35 + 56;
+  close(projectRepeatSales(starter, 12, 1).total, firstPurchase + (594 - firstPurchase) * 0.5);
+  close(projectRepeatSales(starter, 600, 1).total, firstPurchase + (29700 - firstPurchase) * 0.5);
+  close(projectRepeatSales(starter, 291, 1).total, 7276.5); // Screenshot's 24 years 3 months.
+  close(projectRepeatSales(starter, 600, 20).total, 298205);
   const projection = projectRepeatSales(starter, 600, 1);
   const totalAt = month => projection.categories.reduce((sum, group) => sum + group.cumulative[month], 0);
-  close(totalAt(252) - totalAt(240), 371.4);
-  close(totalAt(600) - totalAt(588), 371.4);
+  close(totalAt(252) - totalAt(240), 297);
+  close(totalAt(600) - totalAt(588), 297);
   assert.ok(totalAt(600) > totalAt(300), 'Later decades keep adding repeat revenue');
 });
 test('zero repeat rate and one-time goods may correctly have flat cumulative revenue', () => {
-  close(projectRepeatSales(starter, 600, 1, 0).total, 150.7);
-  close(projectRepeatSales([find('122940M')], 600, 1, 50).total, 5850);
-  close(projectRepeatSales([find('122943M')], 600, 1, 50).total, 49 * 743.8 * 0.5);
+  close(projectRepeatSales(starter, 600, 1, 0).total, 120.5);
+  close(projectRepeatSales([find('122940M')], 600, 1, 50).total, 4680);
+  close(projectRepeatSales([find('122943M')], 600, 1, 50).total, 49 * 595 * 0.5);
+});
+
+test('ABO price is the only calculation basis, including one-time purchases', () => {
+  const product = { ...find('124106'), price: 999999 };
+  close(projectRepeatSales([product], 1, 1, 100).total, 29.5);
+  close(projectRepeatSales([{ ...product, every: 0 }], 600, 1, 50).total, 29.5);
+  close(projectRepeatSales([product], 600, 1, 50).recurringMonthly, 29.5 / 3);
 });

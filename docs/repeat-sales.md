@@ -6,7 +6,7 @@ A client-side calculator for people exploring an FMCG business, available in its
 
 The 28 Malaysia products are transcribed from **ABO Price List SA13, April 2026**, supplied as `ABO_Price_List_202604.pdf`. Nutrition: printed page 2. Personal care: pages 8–9. eSpring and its e3 Carbon Filter: page 9. Atmosphere appliances and filters: page 10. Home care: page 11.
 
-`src/data/repeatSalesProducts.ts` keeps each SKU, pack size, AP, RP, source page, category, default selection, and example purchase interval. Revenue uses RP. AP, SKU, and source page appear under “Show price details.” Do not substitute BV or Brunei prices. Purchase cycles are editable examples, not dosage or usage advice. Follow product instructions and indicators for actual replacement timing.
+`src/data/repeatSalesProducts.ts` keeps each SKU, pack size, ABO price (`aboPrice`), source page, category, default selection, and example purchase interval. All visible product prices, monthly averages, chart values, and totals use only the Malaysia AP (ABO price) column. The active catalog contains no retail-price field. SKU and source page appear under “Show source details.” Do not substitute BV, RP, or Brunei prices. Purchase cycles are editable examples, not dosage or usage advice. Follow product instructions and indicators for actual replacement timing.
 
 ## Two distinct buying assumptions
 
@@ -23,23 +23,23 @@ Both modes keep the customer group between 1 and 20 and support 1–600 months. 
 
 Purchases within `[0, horizon)` are counted. Consumables start at month 0, then repeat at the chosen interval. Appliances default to one purchase at month 0. Filters start after their chosen interval, treating the initial appliance filter as included. At 600 months an annual filter has 49 replacement purchases. Standalone filters also use this delayed replacement schedule. One-time goods are never multiplied by the repeat rate.
 
-In repeat-purchase mode, purchase share is `1` at month 0 and `rate / 100` at each later scheduled purchase. In annual-attrition mode it is `(rate / 100) ** floor(month / 12)`. Each purchase is RP × chosen customers × purchase share. Keep precision until display.
+In repeat-purchase mode, purchase share is `1` at month 0 and `rate / 100` at each later scheduled purchase. In annual-attrition mode it is `(rate / 100) ** floor(month / 12)`. Each purchase is Malaysia ABO price (AP) × chosen customers × purchase share. Keep precision until display.
 
-The chart and headline use the same cumulative monthly arrays, stacked by category. The full-basket monthly average is RP divided by the interval, per customer, before the scenario's repeat/attrition rate. Prices stay fixed: no inflation, customer acquisition, reinvestment, or assumed compound returns. Revenue is before expenses and is not profit. A 50-year scenario explores assumptions; it is not a forecast.
+The chart and headline use the same cumulative monthly arrays, stacked by category. The full-basket monthly average is ABO price divided by the interval, per customer, before the scenario's repeat/attrition rate. Prices stay fixed: no inflation, customer acquisition, reinvestment, or assumed compound returns. Revenue is before expenses and is not profit. A 50-year scenario explores assumptions; it is not a forecast.
 
 ## Independently checked examples
 
 Default basket: toothpaste 200g every 3 months, Dish Drops 1L every 3 months, shampoo 280ml every 2 months.
 
-The first purchase is RM36.90 + RM43.80 + RM70.00 = **RM150.70**. At 100% purchasing, the full basket generates RM742.80 annually or RM37,140.00 over 50 years. At 50% repeat purchasing, total = first purchase + 50% × all later purchases:
+The first purchase is RM29.50 + RM35.00 + RM56.00 = **RM120.50**. At 100% purchasing, the full basket generates RM594.00 annually or RM29,700.00 over 50 years. At 50% repeat purchasing, total = first purchase + 50% × all later purchases:
 
-- 1 year: RM150.70 + (RM742.80 − RM150.70) × 0.5 = **RM446.75**.
-- 24 years 3 months (the reported screenshot): **RM9,099.30**.
-- 50 years: RM150.70 + (RM37,140.00 − RM150.70) × 0.5 = **RM18,645.35**.
-- 20 customers over 50 years: **RM372,907.00**.
-- Every full later year, including year 50, adds **RM371.40 per customer**.
+- 1 year: RM120.50 + (RM594.00 − RM120.50) × 0.5 = **RM357.25**.
+- 24 years 3 months (the reported screenshot): **RM7,276.50**.
+- 50 years: RM120.50 + (RM29,700.00 − RM120.50) × 0.5 = **RM14,910.25**.
+- 20 customers over 50 years: **RM298,205.00**.
+- Every full later year, including year 50, adds **RM297.00 per customer**.
 
-In the explicit annual-attrition comparison, 50% annual retention approaches RM1,485.60 over 50 years, reproducing and explaining the old flat curve.
+In the explicit annual-attrition comparison, 50% annual retention approaches RM1,188.00 over 50 years, reproducing the old flat curve’s shape using ABO prices.
 
 ## Mobile, navigation, and accessibility
 
@@ -53,4 +53,4 @@ Learn and Compounding use hash links (`#learn`, `#compounding`, legacy alias `#r
 
 Run `npm test`, `npm run build`, and targeted ESLint on changed files. `npm run lint` also reports existing unrelated repository issues. For UI regression checks, start `npm run dev`, then run `npm run test:browser`. Install Chromium with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `CASHLENS_TEST_URL` optionally changes the default `http://localhost:3000/`.
 
-Tests distinguish the two scenario formulas, verify a positive year-49-to-50 revenue increment, preserve legitimate flat one-time/zero-repeat cases, and check source prices, purchase boundaries, filters, limits, and chart totals. Browser checks cover the exact screenshot horizon, both scenario labels, cap/default/reset behavior, navigation, touch layouts, and the summary/projection overlap regression.
+Tests distinguish the two scenario formulas, verify a positive year-49-to-50 revenue increment, preserve legitimate flat one-time/zero-repeat cases, and check ABO-only prices (including a regression that injects an ignored retail-price property), purchase boundaries, filters, limits, and chart totals. Browser checks cover the exact screenshot horizon, both scenario labels, cap/default/reset behavior, navigation, touch layouts, and the summary/projection overlap regression.

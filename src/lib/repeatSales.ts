@@ -39,17 +39,17 @@ export function projectRepeatSales(
       groups.set(product.category, group);
     }
     if (product.every === 0) {
-      group.purchases[0] += product.price * customers;
+      group.purchases[0] += product.aboPrice * customers;
       continue;
     }
     if (!PURCHASE_INTERVALS.includes(product.every as typeof PURCHASE_INTERVALS[number])) continue;
-    recurringMonthly += product.price / product.every * customers;
+    recurringMonthly += product.aboPrice / product.every * customers;
     const first = product.type === 'filter' ? product.every : 0;
     for (let t = first; t < months; t += product.every) {
       const buyerShare = model === 'annual-attrition'
         ? rate ** Math.floor(t / 12)
         : t === 0 ? 1 : rate;
-      group.purchases[t] += product.price * customers * buyerShare;
+      group.purchases[t] += product.aboPrice * customers * buyerShare;
     }
   }
   const categories = [...groups].map(([name, group]) => {
