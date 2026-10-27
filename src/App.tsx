@@ -5,6 +5,7 @@ import MoneyMirror from './sections/MoneyMirror';
 import AssetLiability from './sections/AssetLiability';
 import CashflowQuadrant from './sections/CashflowQuadrant';
 import IncomeEngine from './sections/IncomeEngine';
+import RepeatSales from './sections/RepeatSales';
 import RatRace from './sections/RatRace';
 import DebtVisualizer from './sections/DebtVisualizer';
 import SalaryWealth from './sections/SalaryWealth';
@@ -23,6 +24,7 @@ export default function App() {
       <AssetLiability />
       <CashflowQuadrant />
       <IncomeEngine />
+      <RepeatSales />
       <RatRace />
       <DebtVisualizer />
       <SalaryWealth />

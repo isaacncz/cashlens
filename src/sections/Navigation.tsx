@@ -5,6 +5,7 @@ const navLinks = [
   { label: 'Assets', target: 'asset-liability' },
   { label: 'Quadrant', target: 'cashflow-quadrant' },
   { label: 'Streams', target: 'income-engine' },
+  { label: 'Repeat Sales', target: 'repeat-sales' },
   { label: 'Rat Race', target: 'rat-race' },
   { label: 'Debt', target: 'debt' },
   { label: 'Salary', target: 'salary-wealth' },
@@ -81,7 +82,7 @@ export default function Navigation() {
           <span className="text-slate text-[11px] sm:text-xs leading-none">Malaysia</span>
         </button>
 
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden xl:flex items-center gap-4">
           {navLinks.map(link => (
             <button
               key={link.target}
@@ -109,7 +110,7 @@ export default function Navigation() {
         </div>
 
         <button
-          className="lg:hidden text-white p-2"
+          className="xl:hidden text-white p-2"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle navigation menu"
         >
@@ -131,7 +132,7 @@ export default function Navigation() {
       </div>
 
       {mobileOpen && (
-        <div className="absolute top-full left-0 right-0 bg-navy/95 backdrop-blur-lg border-b border-navy-light lg:hidden max-h-[calc(100svh-3.5rem-env(safe-area-inset-top))] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 bg-navy/95 backdrop-blur-lg border-b border-navy-light xl:hidden max-h-[calc(100svh-3.5rem-env(safe-area-inset-top))] overflow-y-auto">
           <div className="flex flex-col p-4 gap-3 pb-6">
             <div className="rounded-xl bg-gold/10 border border-gold/20 px-3 py-3">
               <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Your progress</p>
@@ -157,7 +158,7 @@ export default function Navigation() {
         </div>
       )}
 
-      <div className="hidden lg:block absolute bottom-0 left-0 right-0 h-px bg-navy-light/60 overflow-hidden">
+      <div className="hidden xl:block absolute bottom-0 left-0 right-0 h-px bg-navy-light/60 overflow-hidden">
         <div
           className="h-full bg-gold transition-all duration-300"
           style={{ width: `${progressPercent}%` }}

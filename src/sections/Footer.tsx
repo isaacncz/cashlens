@@ -2,6 +2,8 @@ const moduleLinks = [
   { label: 'Money Mirror', target: 'money-mirror' },
   { label: 'Asset vs Liability', target: 'asset-liability' },
   { label: 'Cashflow Quadrant', target: 'cashflow-quadrant' },
+  { label: 'Income Engine', target: 'income-engine' },
+  { label: 'Repeat Sales', target: 'repeat-sales' },
   { label: 'Rat Race Simulator', target: 'rat-race' },
   { label: 'Debt Visualizer', target: 'debt' },
   { label: 'Salary vs Wealth', target: 'salary-wealth' },

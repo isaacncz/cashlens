@@ -13,7 +13,7 @@ interface Particle {
 const heroHighlights = [
   {
     key: 'lessons',
-    chip: '9 lessons',
+    chip: '10 lessons',
     title: 'Step-by-step learning path',
     detail: 'Move from salary awareness to income engines with one focused action at each step.',
   },
