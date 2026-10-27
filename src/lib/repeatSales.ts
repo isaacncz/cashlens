@@ -2,8 +2,9 @@ import type { ProductCategory, RepeatSalesProduct } from '../data/repeatSalesPro
 
 export const MAX_MONTHS = 600;
 export const MAX_CUSTOMERS = 20;
-export const DEFAULT_RETENTION = 50;
+export const DEFAULT_REPEAT_RATE = 50;
 export const PURCHASE_INTERVALS = [0, 1, 2, 3, 6, 12, 24, 60, 120] as const;
+export type PurchaseModel = 'repeat-purchases' | 'annual-attrition';
 
 export interface Projection {
   total: number;
@@ -11,20 +12,24 @@ export interface Projection {
   categories: { name: ProductCategory; color: string; cumulative: number[] }[];
 }
 
-/** Purchases at month t are included only after t: [0, months).
- * Filters start after their first interval; devices default to a single purchase.
- * Retention is annual, applied to the original cohort at each year boundary.
- * Fractional customers express expected averages. Keep precision until display.
+/** Purchases within [0, months) are included. First consumable/device purchases
+ * use the full chosen customer count; filters begin after their first interval.
+ *
+ * repeat-purchases: the same rate of the chosen group buys at each later cycle.
+ * annual-attrition: a stress test where only the shrinking original cohort buys.
+ * These distinct assumptions must never share an ambiguous "retention" label.
+ * Fractional buyers express expected averages. Retain precision until display.
  */
 export function projectRepeatSales(
   products: readonly RepeatSalesProduct[],
   requestedMonths: number,
   requestedCustomers: number,
-  annualRetention: number = DEFAULT_RETENTION,
+  ratePercent: number = DEFAULT_REPEAT_RATE,
+  model: PurchaseModel = 'repeat-purchases',
 ): Projection {
   const months = Math.min(MAX_MONTHS, Math.max(1, Math.round(Number.isFinite(requestedMonths) ? requestedMonths : 1)));
   const customers = Math.min(MAX_CUSTOMERS, Math.max(1, Math.round(Number.isFinite(requestedCustomers) ? requestedCustomers : 1)));
-  const retention = Math.min(1, Math.max(0, Number.isFinite(annualRetention) ? annualRetention / 100 : DEFAULT_RETENTION / 100));
+  const rate = Math.min(1, Math.max(0, Number.isFinite(ratePercent) ? ratePercent / 100 : DEFAULT_REPEAT_RATE / 100));
   const groups = new Map<ProductCategory, { color: string; purchases: number[] }>();
   let recurringMonthly = 0;
   for (const product of products) {
@@ -41,7 +46,10 @@ export function projectRepeatSales(
     recurringMonthly += product.price / product.every * customers;
     const first = product.type === 'filter' ? product.every : 0;
     for (let t = first; t < months; t += product.every) {
-      group.purchases[t] += product.price * customers * retention ** Math.floor(t / 12);
+      const buyerShare = model === 'annual-attrition'
+        ? rate ** Math.floor(t / 12)
+        : t === 0 ? 1 : rate;
+      group.purchases[t] += product.price * customers * buyerShare;
     }
   }
   const categories = [...groups].map(([name, group]) => {

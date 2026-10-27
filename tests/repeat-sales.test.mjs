@@ -43,10 +43,10 @@ test('appliances are counted once; annual filters start after the included filte
   close(projectRepeatSales([filter], 13, 1, 100).total, 743.8);
   close(projectRepeatSales([device, filter], 600, 1, 100).total, 5850 + 49 * 743.8);
 });
-test('annual retention shrinks the original cohort without adding customers', () => {
-  close(projectRepeatSales(starter, 600, 1, 0).total, 742.8);
-  close(projectRepeatSales(starter, 24, 1, 50).total, 742.8 * 1.5);
-  close(projectRepeatSales([find('122943M')], 24, 1, 50).total, 743.8 * 0.5);
+test('annual attrition is an explicit original-cohort stress test', () => {
+  close(projectRepeatSales(starter, 600, 1, 0, 'annual-attrition').total, 742.8);
+  close(projectRepeatSales(starter, 24, 1, 50, 'annual-attrition').total, 742.8 * 1.5);
+  close(projectRepeatSales([find('122943M')], 24, 1, 50, 'annual-attrition').total, 743.8 * 0.5);
 });
 test('editable cycles, empty basket and chart cumulative totals agree', () => {
   const changed = { ...find('124106'), every: 1 };
@@ -65,12 +65,31 @@ test('editable cycles, empty basket and chart cumulative totals agree', () => {
 });
 test('limits and month labels cover the full supported range', () => {
   close(projectRepeatSales(starter, 600, 100, 100).total, projectRepeatSales(starter, 600, 20, 100).total);
-  close(projectRepeatSales(starter, 600, 1).total, 1485.6);
-  close(projectRepeatSales(starter, 24, 1, NaN).total, 1114.2);
+  close(projectRepeatSales(starter, 600, 1).total, 18645.35);
+  close(projectRepeatSales(starter, 24, 1, NaN).total, 818.15);
   close(projectRepeatSales(starter, 900, 1, 100).total, 37140);
   close(projectRepeatSales(starter, 1, 0, 100).total, 150.7);
   close(projectRepeatSales(starter, NaN, NaN, NaN).total, 150.7);
   assert.equal(durationLabel(1), '1 month');
   assert.equal(durationLabel(13), '1 year 1 month');
   assert.equal(durationLabel(600), '50 years');
+});
+
+test('default 50% repeat purchases continue through decades without annual decay', () => {
+  // First purchases are full price; all subsequent scheduled purchases use 50%.
+  const firstPurchase = 36.9 + 43.8 + 70;
+  close(projectRepeatSales(starter, 12, 1).total, firstPurchase + (742.8 - firstPurchase) * 0.5);
+  close(projectRepeatSales(starter, 600, 1).total, firstPurchase + (37140 - firstPurchase) * 0.5);
+  close(projectRepeatSales(starter, 291, 1).total, 9099.3); // Screenshot's 24 years 3 months.
+  close(projectRepeatSales(starter, 600, 20).total, 372907);
+  const projection = projectRepeatSales(starter, 600, 1);
+  const totalAt = month => projection.categories.reduce((sum, group) => sum + group.cumulative[month], 0);
+  close(totalAt(252) - totalAt(240), 371.4);
+  close(totalAt(600) - totalAt(588), 371.4);
+  assert.ok(totalAt(600) > totalAt(300), 'Later decades keep adding repeat revenue');
+});
+test('zero repeat rate and one-time goods may correctly have flat cumulative revenue', () => {
+  close(projectRepeatSales(starter, 600, 1, 0).total, 150.7);
+  close(projectRepeatSales([find('122940M')], 600, 1, 50).total, 5850);
+  close(projectRepeatSales([find('122943M')], 600, 1, 50).total, 49 * 743.8 * 0.5);
 });

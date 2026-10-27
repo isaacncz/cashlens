@@ -1,33 +1,56 @@
 # The Power of Repeat Sales
 
-A client-side calculator for people exploring an FMCG business, available in its own **Compounding** tab. The **Learn** tab contains the original nine financial lessons. It retains Cashlens's navy/gold visual system and the approved basket-and-chart composition. Scoped styles live in `src/sections/RepeatSales.css`; no original brand tokens are replaced.
+A client-side calculator for people exploring an FMCG business, available in its own **Compounding** tab. **Learn** contains the original nine financial lessons. The calculator retains the approved navy/gold basket-and-chart design and stores no customer data.
 
 ## Catalog provenance
 
 The 28 Malaysia products are transcribed from **ABO Price List SA13, April 2026**, supplied as `ABO_Price_List_202604.pdf`. Nutrition: printed page 2. Personal care: pages 8–9. eSpring and its e3 Carbon Filter: page 9. Atmosphere appliances and filters: page 10. Home care: page 11.
 
-`src/data/repeatSalesProducts.ts` keeps each SKU, pack size, AP, RP, source page, category, default selection, and example purchase interval. RP is customer sales revenue; AP is contextual purchase-price information, not earnings. Do not substitute BV or Brunei prices. Retain two decimal places.
+`src/data/repeatSalesProducts.ts` keeps each SKU, pack size, AP, RP, source page, category, default selection, and example purchase interval. Revenue uses RP. AP, SKU, and source page appear under “Show price details.” Do not substitute BV or Brunei prices. Purchase cycles are editable examples, not dosage or usage advice. Follow product instructions and indicators for actual replacement timing.
 
-## Model
+## Two distinct buying assumptions
 
-`src/lib/repeatSales.ts` contains pure projection functions. The horizon spans 1–600 months. Both customer controls span 1–20, enforced again in the projection model. Annual retention defaults to 50%, remains adjustable from 0–100%, and shrinks the original cohort at each 12-month boundary without adding customers.
+The previous default applied 50% **annual attrition** to the same original cohort indefinitely. This was mathematically consistent with that assumption but unsuitable as the default repeat-business story: the customer group became 1, 0.5, 0.25, and so on, so cumulative sales approached a finite ceiling. The default must not silently label that as ongoing repeat purchasing.
 
-Purchases within `[0, horizon)` are counted: consumables first at month 0, then at the chosen interval; appliances default to one purchase at month 0; filters first after their chosen interval. At 600 months an annual filter has 49 replacement purchases, with the initial appliance filter assumed included. Selecting a standalone filter also uses this delayed schedule. Actual replacement schedules depend on product instructions/indicators. Intervals can be edited, including a one-time purchase. No source-backed usage or dosage is inferred from these examples.
+`src/lib/repeatSales.ts` now exposes two explicit modes:
 
-The chart stacks revenue by category and uses the same cumulative monthly arrays as the total. Recurring monthly average is steady-state RP divided by interval before retention, excluding one-time purchases. Values are expected averages; retain calculation precision until formatting. Fixed current prices, no inflation, new customers, or reinvestment. Revenue excludes expenses and is not profit; a 50-year scenario is not a forecast.
+- **Repeat purchases (default):** the initial consumable purchase uses the full selected group. Every subsequent scheduled purchase uses the same repeat-purchase rate, default 50%, applied to that group. There is no repeated annual decay and no new customer acquisition. Fractional buyers represent an expected average. Future scheduled purchases continue to add revenue at a positive rate.
+- **Annual attrition (comparison stress test):** each year's remaining original customers are multiplied by the selected annual retention rate. At 50%, this cohort shrinks exponentially and cumulative revenue legitimately levels off. Both the control label and explanation change when this mode is chosen.
 
-Default basket: toothpaste 200g every 3 months, Dish Drops 1L every 3 months, shampoo 280ml every 2 months. At the default 50% annual retention, one starting customer generates RM150.70 in the first month, RM742.80 in one year, and RM1,485.60 over 50 years. Reset returns to one customer and 50% retention. At an explicitly selected 100% retention, the same basket generates RM37,140.00 over 50 years.
+Both modes keep the customer group between 1 and 20 and support 1–600 months. Reset restores one customer, 50% repeat purchasing, the 50-year horizon, and the starter basket. Users may adjust the rate between 0% and 100%. A zero repeat rate or a basket containing only one-time goods can correctly produce a flat line after the first purchase; the chart must not fabricate continued growth.
 
-## Interaction and accessibility
+## Purchase accounting
 
-Product selection, search, category filtering, selected-only view, editable intervals, clearing, and reset remain in memory. “Show selected” opens the selected basket. Price details (AP, SKU, source page) are available on demand to keep the default catalog concise. On desktop the catalog has an isolated scroll region and the result stays beside it. On mobile six products appear initially with a control to expand all 28; the page scrolls naturally. A sticky live revenue summary remains below the header while selecting products, with a jump to the full projection that accounts for both the header and summary heights. The mobile visible-product count reflects the collapsed six-product catalog. Product names and pack sizes share one checkbox label, maintaining a large touch area without extra row spacing. Native form controls have labels and visible focus; total and product impact use polite live regions. Duration is represented in months with a human-readable `aria-valuetext`. The two page tabs use hash URLs (`#learn`, `#compounding`, with `#repeat-sales` kept as an alias), support browser history and arrow-key navigation, and keep both panels mounted so inputs survive tab changes. The learning header has an accessible lesson menu with Escape/outside-click dismissal. Touch devices and reduced-motion users use native scrolling; desktop Lenis is resized on tab changes. Mobile layout stacks the basket and result; no backend, tracking, or stored customer data is added.
+Purchases within `[0, horizon)` are counted. Consumables start at month 0, then repeat at the chosen interval. Appliances default to one purchase at month 0. Filters start after their chosen interval, treating the initial appliance filter as included. At 600 months an annual filter has 49 replacement purchases. Standalone filters also use this delayed replacement schedule. One-time goods are never multiplied by the repeat rate.
+
+In repeat-purchase mode, purchase share is `1` at month 0 and `rate / 100` at each later scheduled purchase. In annual-attrition mode it is `(rate / 100) ** floor(month / 12)`. Each purchase is RP × chosen customers × purchase share. Keep precision until display.
+
+The chart and headline use the same cumulative monthly arrays, stacked by category. The full-basket monthly average is RP divided by the interval, per customer, before the scenario's repeat/attrition rate. Prices stay fixed: no inflation, customer acquisition, reinvestment, or assumed compound returns. Revenue is before expenses and is not profit. A 50-year scenario explores assumptions; it is not a forecast.
+
+## Independently checked examples
+
+Default basket: toothpaste 200g every 3 months, Dish Drops 1L every 3 months, shampoo 280ml every 2 months.
+
+The first purchase is RM36.90 + RM43.80 + RM70.00 = **RM150.70**. At 100% purchasing, the full basket generates RM742.80 annually or RM37,140.00 over 50 years. At 50% repeat purchasing, total = first purchase + 50% × all later purchases:
+
+- 1 year: RM150.70 + (RM742.80 − RM150.70) × 0.5 = **RM446.75**.
+- 24 years 3 months (the reported screenshot): **RM9,099.30**.
+- 50 years: RM150.70 + (RM37,140.00 − RM150.70) × 0.5 = **RM18,645.35**.
+- 20 customers over 50 years: **RM372,907.00**.
+- Every full later year, including year 50, adds **RM371.40 per customer**.
+
+In the explicit annual-attrition comparison, 50% annual retention approaches RM1,485.60 over 50 years, reproducing and explaining the old flat curve.
+
+## Mobile, navigation, and accessibility
+
+The mobile catalog initially shows six products, with an option to browse all 28. Its count reflects the actual visible rows. A compact sticky total remains available while browsing products. An IntersectionObserver hides that extra total when the projection enters the main viewing area, so it cannot cover the projection heading, amount, or chart as in the reported screenshot. Space remains reserved to avoid a scroll jump. “View projection” scrolls below the measured header and moves focus to the result; a hiding summary cannot retain keyboard focus.
+
+The header publishes its actual height through a ResizeObserver, including safe-area padding. Anchor scrolling uses that measurement. Controls have labels, visible focus, and 44px control areas; mobile text-entry controls use 16px text. Product names and pack sizes share a checkbox label. Price details remain available on demand. Scoped slider tracks prevent style leakage from the older learning modules.
+
+Learn and Compounding use hash links (`#learn`, `#compounding`, legacy alias `#repeat-sales`), browser history, and arrow-key tab navigation. Both panels remain mounted so inputs survive tab changes. The learning menu dismisses with Escape or outside click. Touch and reduced-motion users get native scrolling. Desktop Lenis is resized when switching tabs.
 
 ## Validation
 
-Run `npm test`, `npm run build`, and `npm run lint`. For browser regression checks, start `npm run dev`, then run `npm run test:browser` (install Chromium with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to an installed binary). The optional `CASHLENS_TEST_URL` changes the default `http://localhost:3000/`. Unit tests cover source price anchors, purchase boundaries, retention, devices/filters, customer scaling, changed intervals, chart totals, and empty/limit states. Existing repository-wide lint issues may require tracking separately; new lesson files should pass targeted ESLint. Check navigation, catalog scrolling, totals, long amounts, empty search, keyboard controls, and screenshots at desktop and mobile widths.
+Run `npm test`, `npm run build`, and targeted ESLint on changed files. `npm run lint` also reports existing unrelated repository issues. For UI regression checks, start `npm run dev`, then run `npm run test:browser`. Install Chromium with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `CASHLENS_TEST_URL` optionally changes the default `http://localhost:3000/`.
 
-## Impeccable polish
-
-This pass follows the installed Impeccable `polish` workflow: retain the approved navy/gold world, content, catalog, calculation behavior, and separate tabs. Shared shell/calculator colors now use `--site-*` aliases for the existing palette. Controls use a common 44px minimum height; mobile text-entry controls use 16px text. Control borders contrast at 3.50:1 against the result surface; secondary text contrasts at 8.55:1. Sliders have scoped tracks and thumbs so the learning modules' older global styles do not leak into the calculator.
-
-The header publishes its actual height through a ResizeObserver. Anchor scrolling and sticky summaries use that measurement, including safe-area padding. Typography, focus states, selected/hover states, catalog toolbar grouping, and responsive spacing are consistent. CSS overrides and unused selectors were consolidated. The original learning-module tokens and financial content remain intact.
+Tests distinguish the two scenario formulas, verify a positive year-49-to-50 revenue increment, preserve legitimate flat one-time/zero-repeat cases, and check source prices, purchase boundaries, filters, limits, and chart totals. Browser checks cover the exact screenshot horizon, both scenario labels, cap/default/reset behavior, navigation, touch layouts, and the summary/projection overlap regression.

@@ -21,11 +21,12 @@ try {
     await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
     await page.locator('#panel-compounding:not([hidden])').waitFor();
     assert.equal(await page.locator('#panel-learn').isVisible(), false);
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM1,485.60');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM18,645.35');
     assert.equal(await page.locator('.rs-product:visible').count(), mobile ? 6 : 28);
-    assert.equal(await page.locator('#rs-retention').inputValue(), '50');
+    assert.equal(await page.locator('#rs-repeat-rate').inputValue(), '50');
+    assert.ok(await page.getByRole('radio', { name: 'Repeat purchases', exact: true }).isChecked());
     assert.equal(await page.locator('#rs-customers').getAttribute('max'), '20');
-    assert.equal(await page.getByRole('slider', { name: 'Starting customers, maximum 20' }).getAttribute('max'), '20');
+    assert.equal(await page.getByRole('slider', { name: 'Customer group, maximum 20' }).getAttribute('max'), '20');
     if (mobile) {
       assert.equal(await page.locator('.rs-count-mobile').innerText(), 'Showing 6 of 28');
       await page.getByRole('button', { name: 'Browse all 28 products' }).click();
@@ -33,17 +34,22 @@ try {
       assert.equal(await page.locator('.rs-product:visible').count(), 28);
       await page.getByRole('button', { name: 'Show fewer products' }).click();
       await page.locator('#rs-pick-124107').check();
-      assert.equal(await page.locator('.rs-mobile-summary p').innerText(), 'RM1,628.40');
+      assert.equal(await page.locator('.rs-mobile-summary p').innerText(), 'RM20,436.30');
       await page.locator('#rs-pick-124107').uncheck();
       await page.locator('.rs-product').nth(4).scrollIntoViewIfNeeded();
+      await page.locator('.rs-mobile-summary').waitFor({ state: 'visible' });
       const header = await page.locator('.site-header').boundingBox();
       const summary = await page.locator('.rs-mobile-summary').boundingBox();
       assert.ok(Math.abs(summary.y - header.height) < 4, 'Live summary stays directly under the header');
+      await page.getByRole('button', { name: 'View projection', exact: true }).click();
+      await page.locator('.rs-mobile-summary').waitFor({ state: 'hidden' });
+      const resultTop = (await page.locator('#rs-projection').boundingBox()).y;
+      assert.ok(resultTop >= header.height, 'The summary must not cover the main projection amount');
     }
     await page.locator('#rs-customers').fill('100');
     await page.locator('#rs-customers').blur();
     assert.equal(await page.locator('#rs-customers').inputValue(), '20', 'Excess customers are clamped to 20');
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM29,712.00');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM372,907.00');
     await page.getByRole('tab', { name: 'Learn', exact: true }).click();
     await page.locator('#panel-learn:not([hidden])').waitFor();
     await page.getByRole('button', { name: 'Lessons' }).click();
@@ -52,7 +58,7 @@ try {
     assert.equal(await page.getByRole('navigation', { name: 'Financial lessons' }).isVisible(), false);
     await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
     await page.locator('#panel-compounding:not([hidden])').waitFor();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM29,712.00', 'Scenario survives switching tabs');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM372,907.00', 'Scenario survives switching tabs');
     await page.goBack();
     await page.locator('#panel-learn:not([hidden])').waitFor();
     await page.goForward();
@@ -63,9 +69,18 @@ try {
     }
     await page.getByRole('button', { name: 'Reset', exact: true }).click();
     assert.equal(await page.locator('#rs-customers').inputValue(), '1');
-    assert.equal(await page.locator('#rs-retention').inputValue(), '50');
+    assert.equal(await page.locator('#rs-repeat-rate').inputValue(), '50');
     await page.goto(new URL('#compounding', baseUrl).href, { waitUntil: 'networkidle' });
     await page.locator('#panel-compounding:not([hidden])').waitFor();
+    await page.locator('#rs-months').fill('291');
+    await page.locator('#rs-months').dispatchEvent('input');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM9,099.30', 'Screenshot horizon keeps accumulating repeat revenue');
+    await page.getByRole('radio', { name: 'Annual attrition', exact: true }).check();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM1,485.60', 'Annual customer loss is an explicitly different scenario');
+    await page.getByRole('radio', { name: 'Repeat purchases', exact: true }).check();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM9,099.30');
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM18,645.35');
     await page.getByRole('tab', { name: 'Compounding', exact: true }).focus();
     await page.keyboard.press('ArrowLeft');
     await page.locator('#panel-learn:not([hidden])').waitFor();
