@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
+import { getHeaderOffset } from '../lib/pageNavigation';
 import './Navigation.css';
 
 export type AppTab = 'learn' | 'compounding';
@@ -18,8 +19,19 @@ const navLinks = [
 export default function Navigation({ activeTab, onTabChange }: { activeTab: AppTab; onTabChange: (tab: AppTab) => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('money-mirror');
+  const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const syncHeight = () => document.documentElement.style.setProperty('--site-header-height', `${header.getBoundingClientRect().height}px`);
+    syncHeight();
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (activeTab !== 'learn') return;
@@ -47,7 +59,7 @@ export default function Navigation({ activeTab, onTabChange }: { activeTab: AppT
   const selectTab = (tab: AppTab) => { setMenuOpen(false); onTabChange(tab); };
   const activeIndex = Math.max(0, navLinks.findIndex(link => link.target === activeSection));
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <div className="site-header-inner">
         <button className="site-brand" onClick={() => selectTab('learn')} aria-label="Cashflow Lens home">Cashflow Lens<span>Malaysia</span></button>
         <div className="site-tabs" role="tablist" aria-label="Cashlens pages" onKeyDown={event => {
@@ -65,7 +77,7 @@ export default function Navigation({ activeTab, onTabChange }: { activeTab: AppT
         if (window.location.hash === `#${link.target}`) {
           event.preventDefault();
           const target = document.getElementById(link.target);
-          if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - (window.innerWidth <= 760 ? 120 : 88), behavior: 'instant' });
+          if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - getHeaderOffset(), behavior: 'instant' });
         }
       }}><span>{String(index + 1).padStart(2, '0')}</span>{link.label}</a>)}</nav>}
     </header>

@@ -1,3 +1,5 @@
+import { getHeaderOffset } from '../lib/pageNavigation';
+
 const moduleLinks = [
   { label: 'Money Mirror', target: 'money-mirror' },
   { label: 'Asset vs Liability', target: 'asset-liability' },
@@ -14,7 +16,7 @@ export default function Footer() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      const y = el.getBoundingClientRect().top + window.scrollY - (window.innerWidth <= 760 ? 120 : 88);
+      const y = el.getBoundingClientRect().top + window.scrollY - getHeaderOffset();
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };

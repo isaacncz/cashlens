@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLenis } from './hooks/useLenis';
+import { getHeaderOffset } from './lib/pageNavigation';
 import Navigation from './sections/Navigation';
 import type { AppTab } from './sections/Navigation';
 import Hero from './sections/Hero';
@@ -28,7 +29,7 @@ export default function App() {
       requestAnimationFrame(() => {
         const hash = window.location.hash.slice(1);
         const target = !['learn', 'compounding', 'repeat-sales'].includes(hash) ? document.getElementById(hash) : null;
-        const offset = window.innerWidth <= 760 ? 120 : 88;
+        const offset = getHeaderOffset();
         const top = target ? target.getBoundingClientRect().top + window.scrollY - offset : 0;
         window.scrollTo({ top, behavior: 'instant' });
         lenis.current?.scrollTo(top, { immediate: true, force: true });

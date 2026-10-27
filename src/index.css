@@ -24,6 +24,17 @@
     --input: 216 33% 24%;
     --ring: 50 100% 50%;
     --radius: 0.5rem;
+
+    /* Existing Cashlens colors, shared by the page shell and calculator. */
+    --site-bg: #0a192f;
+    --site-surface: #102139;
+    --site-surface-active: #19334a;
+    --site-text: #edf3fa;
+    --site-muted: #afbed0;
+    --site-line: #2c4058;
+    --site-control-border: #61778f;
+    --site-accent: #f4cf75;
+    --site-positive: #8ed8b4;
   }
 
   body {
@@ -51,20 +62,19 @@
   }
 }
 
-#panel-learn > section[id] { scroll-margin-top: 88px; }
+#panel-learn > section[id] { scroll-margin-top: calc(var(--site-header-height, 73px) + 16px); }
 /* Page shell: keep hidden tabs out of layout without discarding their inputs. */
 [role="tabpanel"][hidden] { display: none !important; }
 .learning-intro { max-width: 1200px; margin: auto; padding: 160px 48px 64px; }
 .learning-intro h1 { font-size: clamp(36px, 5vw, 64px); line-height: 1.12; letter-spacing: -.035em; font-weight: 700; margin-bottom: 24px; }
-.learning-intro h1 span { color: #f4cf75; }
-.learning-intro > p { color: #afbed0; max-width: 560px; font-size: 16px; line-height: 1.8; }
+.learning-intro h1 span { color: var(--site-accent); }
+.learning-intro > p { color: var(--site-muted); max-width: 560px; font-size: 16px; line-height: 1.8; }
 .learning-intro-actions { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; margin: 28px 0; }
-.learning-intro-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; font-size: 14px; font-weight: 600; color: #f4cf75; text-underline-offset: 4px; }
-.learning-intro-actions a:first-child { color: #0a192f; background: #f4cf75; border-radius: 8px; padding: 10px 22px; }
+.learning-intro-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; font-size: 14px; font-weight: 600; color: var(--site-accent); text-underline-offset: 4px; }
+.learning-intro-actions a:first-child { color: var(--site-bg); background: var(--site-accent); border-radius: 8px; padding: 10px 22px; }
 .learning-intro .learning-intro-note { font-size: 12px; }
-.learning-intro a:focus-visible { outline: 3px solid #f4cf75; outline-offset: 4px; }
+.learning-intro a:focus-visible { outline: 3px solid var(--site-accent); outline-offset: 4px; }
 @media (max-width: 760px) {
-  #panel-learn > section[id] { scroll-margin-top: 120px; }
   .learning-intro { padding: 150px 24px 32px; }
   .learning-intro h1 { font-size: clamp(34px, 9vw, 48px); }
   .learning-intro > p { font-size: 14px; }

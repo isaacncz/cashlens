@@ -27,7 +27,9 @@ try {
     assert.equal(await page.locator('#rs-customers').getAttribute('max'), '20');
     assert.equal(await page.getByRole('slider', { name: 'Starting customers, maximum 20' }).getAttribute('max'), '20');
     if (mobile) {
+      assert.equal(await page.locator('.rs-count-mobile').innerText(), 'Showing 6 of 28');
       await page.getByRole('button', { name: 'Browse all 28 products' }).click();
+      assert.equal(await page.locator('.rs-count-mobile').innerText(), 'Showing 28 of 28');
       assert.equal(await page.locator('.rs-product:visible').count(), 28);
       await page.getByRole('button', { name: 'Show fewer products' }).click();
       await page.locator('#rs-pick-124107').check();
