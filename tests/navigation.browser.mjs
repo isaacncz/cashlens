@@ -1,0 +1,71 @@
+import assert from 'node:assert/strict';
+import { chromium } from 'playwright';
+
+// Start the app with `npm run dev` before running this script.
+const baseUrl = process.env.CASHLENS_TEST_URL ?? 'http://localhost:3000/';
+const browser = await chromium.launch({
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+});
+const errors = [];
+try {
+  for (const mobile of [false, true]) {
+    const context = await browser.newContext({
+      viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
+      isMobile: mobile,
+      hasTouch: mobile,
+      reducedMotion: 'reduce',
+    });
+    const page = await context.newPage();
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(baseUrl, { waitUntil: 'networkidle' });
+    await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
+    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    assert.equal(await page.locator('#panel-learn').isVisible(), false);
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM37,140.00');
+    assert.equal(await page.locator('.rs-product:visible').count(), mobile ? 6 : 28);
+    if (mobile) {
+      await page.getByRole('button', { name: 'Browse all 28 products' }).click();
+      assert.equal(await page.locator('.rs-product:visible').count(), 28);
+      await page.getByRole('button', { name: 'Show fewer products' }).click();
+      await page.locator('#rs-pick-124107').check();
+      assert.equal(await page.locator('.rs-mobile-summary p').innerText(), 'RM40,710.00');
+      await page.locator('#rs-pick-124107').uncheck();
+      await page.locator('.rs-product').nth(4).scrollIntoViewIfNeeded();
+      const header = await page.locator('.site-header').boundingBox();
+      const summary = await page.locator('.rs-mobile-summary').boundingBox();
+      assert.ok(Math.abs(summary.y - header.height) < 4, 'Live summary stays directly under the header');
+    }
+    await page.locator('#rs-customers').fill('100');
+    await page.locator('#rs-customers').blur();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM3,714,000.00');
+    await page.getByRole('tab', { name: 'Learn', exact: true }).click();
+    await page.locator('#panel-learn:not([hidden])').waitFor();
+    await page.getByRole('button', { name: 'Lessons' }).click();
+    await page.getByRole('navigation', { name: 'Financial lessons' }).waitFor();
+    await page.keyboard.press('Escape');
+    assert.equal(await page.getByRole('navigation', { name: 'Financial lessons' }).isVisible(), false);
+    await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
+    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM3,714,000.00', 'Scenario survives switching tabs');
+    await page.goBack();
+    await page.locator('#panel-learn:not([hidden])').waitFor();
+    await page.goForward();
+    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    for (const width of mobile ? [320, 390, 760] : [768, 1024, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No horizontal overflow at ${width}px`);
+    }
+    await page.goto(new URL('#compounding', baseUrl).href, { waitUntil: 'networkidle' });
+    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    await page.getByRole('tab', { name: 'Compounding', exact: true }).focus();
+    await page.keyboard.press('ArrowLeft');
+    await page.locator('#panel-learn:not([hidden])').waitFor();
+    await page.keyboard.press('ArrowRight');
+    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    await context.close();
+  }
+  assert.deepEqual(errors, [], 'No browser errors');
+  console.log('Desktop and touch-mobile tab, basket, history, keyboard, menu, sticky-total, and responsive checks passed.');
+} finally {
+  await browser.close();
+}

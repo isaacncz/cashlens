@@ -1,169 +1,73 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, X } from 'lucide-react';
+import './Navigation.css';
 
+export type AppTab = 'learn' | 'compounding';
 const navLinks = [
   { label: 'Money Mirror', target: 'money-mirror' },
-  { label: 'Assets', target: 'asset-liability' },
-  { label: 'Quadrant', target: 'cashflow-quadrant' },
-  { label: 'Streams', target: 'income-engine' },
-  { label: 'Repeat Sales', target: 'repeat-sales' },
+  { label: 'Assets & liabilities', target: 'asset-liability' },
+  { label: 'Cashflow Quadrant', target: 'cashflow-quadrant' },
+  { label: 'Income Engine', target: 'income-engine' },
   { label: 'Rat Race', target: 'rat-race' },
   { label: 'Debt', target: 'debt' },
-  { label: 'Salary', target: 'salary-wealth' },
-  { label: 'Wealth', target: 'wealth-thermometer' },
-  { label: 'Playbook', target: 'literacy-playbook' },
+  { label: 'Salary & wealth', target: 'salary-wealth' },
+  { label: 'Wealth Thermometer', target: 'wealth-thermometer' },
+  { label: 'Financial Playbook', target: 'literacy-playbook' },
 ];
 
-export default function Navigation() {
-  const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('');
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
+export default function Navigation({ activeTab, onTabChange }: { activeTab: AppTab; onTabChange: (tab: AppTab) => void }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('money-mirror');
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 80);
+    if (activeTab !== 'learn') return;
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActiveSection(visible[0].target.id);
+    }, { rootMargin: '-20% 0px -50% 0px', threshold: 0 });
+    navLinks.forEach(link => { const target = document.getElementById(link.target); if (target) observer.observe(target); });
+    return () => observer.disconnect();
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node) && !menuButton.current?.contains(event.target as Node)) setMenuOpen(false);
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    const closeEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setMenuOpen(false); menuButton.current?.focus(); }
+    };
+    document.addEventListener('pointerdown', closeOutside);
+    document.addEventListener('keydown', closeEscape);
+    return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', closeEscape); };
+  }, [menuOpen]);
 
-  useEffect(() => {
-    const sections = navLinks.map(l => document.getElementById(l.target)).filter(Boolean) as HTMLElement[];
-    if (sections.length === 0) return;
-
-    const observers: IntersectionObserver[] = [];
-    sections.forEach(section => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              setActiveSection(section.id);
-            }
-          });
-        },
-        { threshold: 0.3 }
-      );
-      observer.observe(section);
-      observers.push(observer);
-    });
-
-    return () => observers.forEach(o => o.disconnect());
-  }, []);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const y = el.getBoundingClientRect().top + window.scrollY - 70;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-    setMobileOpen(false);
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const activeIndex = Math.max(0, navLinks.findIndex((link) => link.target === activeSection));
-  const progressPercent = ((activeIndex + 1) / navLinks.length) * 100;
-
+  const selectTab = (tab: AppTab) => { setMenuOpen(false); onTabChange(tab); };
+  const activeIndex = Math.max(0, navLinks.findIndex(link => link.target === activeSection));
   return (
-    <nav
-      ref={navRef}
-      className="fixed top-0 left-0 right-0 z-50 h-14 sm:h-16 flex items-center transition-all duration-300 pt-[env(safe-area-inset-top)]"
-      style={{
-        backgroundColor: scrolled || mobileOpen ? 'rgba(10, 25, 47, 0.9)' : 'rgba(10, 25, 47, 0)',
-        backdropFilter: scrolled || mobileOpen ? 'blur(12px)' : 'none',
-        borderBottom: scrolled || mobileOpen ? '1px solid rgba(35, 53, 84, 0.5)' : '1px solid transparent',
-      }}
-    >
-      <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 flex items-center justify-between">
-        <button onClick={scrollToTop} className="flex items-center gap-2 cursor-pointer">
-          <span className="text-gold font-bold text-lg sm:text-xl tracking-tight leading-none">Cashflow Lens</span>
-          <span className="text-slate text-[11px] sm:text-xs leading-none">Malaysia</span>
-        </button>
-
-        <div className="hidden xl:flex items-center gap-4">
-          {navLinks.map(link => (
-            <button
-              key={link.target}
-              onClick={() => scrollTo(link.target)}
-              className="text-sm transition-colors duration-200 cursor-pointer"
-              style={{
-                color: activeSection === link.target ? '#FFD700' : '#8892B0',
-              }}
-              onMouseEnter={e => { if (activeSection !== link.target) e.currentTarget.style.color = '#E6F1FF'; }}
-              onMouseLeave={e => { if (activeSection !== link.target) e.currentTarget.style.color = '#8892B0'; }}
-            >
-              {link.label}
-            </button>
-          ))}
-          <div className="flex items-center gap-3 ml-4">
-            <div className="px-3 py-1 rounded-full border border-gold/20 bg-gold/10 text-gold text-xs font-semibold">
-              Lesson {activeIndex + 1}/{navLinks.length}
-            </div>
-            <div className="flex items-center gap-1 text-xs">
-              <span className="text-gold font-medium">EN</span>
-              <span className="text-slate">/</span>
-              <span className="text-slate opacity-50">BM</span>
-            </div>
-          </div>
+    <header className="site-header">
+      <div className="site-header-inner">
+        <button className="site-brand" onClick={() => selectTab('learn')} aria-label="Cashflow Lens home">Cashflow Lens<span>Malaysia</span></button>
+        <div className="site-tabs" role="tablist" aria-label="Cashlens pages" onKeyDown={event => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const next: AppTab = event.key === 'Home' ? 'learn' : event.key === 'End' ? 'compounding' : activeTab === 'learn' ? 'compounding' : 'learn';
+          selectTab(next); document.getElementById(`tab-${next}`)?.focus();
+        }}>
+          {(['learn', 'compounding'] as const).map(tab => <button key={tab} id={`tab-${tab}`} type="button" role="tab" aria-selected={activeTab === tab} aria-controls={`panel-${tab}`} tabIndex={activeTab === tab ? 0 : -1} onClick={() => selectTab(tab)}>{tab === 'learn' ? 'Learn' : 'Compounding'}</button>)}
         </div>
-
-        <button
-          className="xl:hidden text-white p-2"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle navigation menu"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {mobileOpen ? (
-              <>
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </>
-            ) : (
-              <>
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </>
-            )}
-          </svg>
-        </button>
+        <div className="site-header-action">{activeTab === 'learn' ? <button ref={menuButton} className="site-lessons-button" type="button" aria-expanded={menuOpen} aria-controls="lesson-menu" onClick={() => setMenuOpen(value => !value)}><span>Lessons <small>{activeIndex + 1}/9</small></span>{menuOpen ? <X size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}</button> : <span className="site-private">On your device</span>}</div>
       </div>
-
-      {mobileOpen && (
-        <div className="absolute top-full left-0 right-0 bg-navy/95 backdrop-blur-lg border-b border-navy-light xl:hidden max-h-[calc(100svh-3.5rem-env(safe-area-inset-top))] overflow-y-auto">
-          <div className="flex flex-col p-4 gap-3 pb-6">
-            <div className="rounded-xl bg-gold/10 border border-gold/20 px-3 py-3">
-              <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Your progress</p>
-              <p className="text-white text-sm font-medium">Lesson {activeIndex + 1} of {navLinks.length}</p>
-              <div className="w-full bg-navy-light rounded-full h-2 mt-3 overflow-hidden">
-                <div className="bg-gold h-2 rounded-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
-              </div>
-            </div>
-            {navLinks.map(link => (
-              <button
-                key={link.target}
-                onClick={() => scrollTo(link.target)}
-                className="text-left text-sm py-2 px-3 rounded-lg transition-colors"
-                style={{
-                  color: activeSection === link.target ? '#FFD700' : '#8892B0',
-                  backgroundColor: activeSection === link.target ? 'rgba(255, 215, 0, 0.1)' : 'transparent',
-                }}
-              >
-                {link.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="hidden xl:block absolute bottom-0 left-0 right-0 h-px bg-navy-light/60 overflow-hidden">
-        <div
-          className="h-full bg-gold transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-    </nav>
+      {menuOpen && activeTab === 'learn' && <nav id="lesson-menu" className="site-lesson-menu" ref={menuRef} aria-label="Financial lessons" data-lenis-prevent>{navLinks.map((link, index) => <a key={link.target} href={`#${link.target}`} aria-current={activeSection === link.target ? 'location' : undefined} onClick={event => {
+        setMenuOpen(false);
+        if (window.location.hash === `#${link.target}`) {
+          event.preventDefault();
+          const target = document.getElementById(link.target);
+          if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - (window.innerWidth <= 760 ? 120 : 88), behavior: 'instant' });
+        }
+      }}><span>{String(index + 1).padStart(2, '0')}</span>{link.label}</a>)}</nav>}
+    </header>
   );
 }

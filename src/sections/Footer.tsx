@@ -3,7 +3,6 @@ const moduleLinks = [
   { label: 'Asset vs Liability', target: 'asset-liability' },
   { label: 'Cashflow Quadrant', target: 'cashflow-quadrant' },
   { label: 'Income Engine', target: 'income-engine' },
-  { label: 'Repeat Sales', target: 'repeat-sales' },
   { label: 'Rat Race Simulator', target: 'rat-race' },
   { label: 'Debt Visualizer', target: 'debt' },
   { label: 'Salary vs Wealth', target: 'salary-wealth' },
@@ -15,7 +14,7 @@ export default function Footer() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      const y = el.getBoundingClientRect().top + window.scrollY - 70;
+      const y = el.getBoundingClientRect().top + window.scrollY - (window.innerWidth <= 760 ? 120 : 88);
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
@@ -31,7 +30,7 @@ export default function Footer() {
             </p>
           </div>
           <div className="md:w-1/3">
-            <h4 className="text-white text-xs font-medium uppercase tracking-wider mb-4">Modules</h4>
+            <h4 className="text-white text-xs font-medium uppercase tracking-wider mb-4">Lessons</h4>
             <div className="grid grid-cols-2 gap-2">
               {moduleLinks.map(link => (
                 <button
@@ -45,6 +44,7 @@ export default function Footer() {
             </div>
           </div>
           <div className="md:w-1/3">
+            <a href="#compounding" className="inline-flex min-h-11 items-center text-gold text-sm mb-4 underline underline-offset-4">Open Compounding</a>
             <h4 className="text-white text-xs font-medium uppercase tracking-wider mb-4">Disclaimer</h4>
             <p className="text-slate text-xs leading-relaxed">
               This is financial education, not licensed financial advice. Consult a licensed financial planner for personalized advice. All calculations are estimates for educational purposes.

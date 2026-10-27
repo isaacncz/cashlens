@@ -59,6 +59,8 @@ export default function RepeatSales() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All categories');
   const [selectedOnly, setSelectedOnly] = useState(false);
+  const [catalogExpanded, setCatalogExpanded] = useState(false);
+  const [showPricingDetails, setShowPricingDetails] = useState(false);
   const [lastProductId, setLastProductId] = useState<string | null>(null);
   const catalog = useMemo(() => repeatSalesProducts.map(product => ({ ...product, every: intervals[product.id] ?? product.every })), [intervals]);
   const selected = useMemo(() => catalog.filter(product => selectedIds.includes(product.id)), [catalog, selectedIds]);
@@ -83,39 +85,45 @@ export default function RepeatSales() {
   };
   const reset = () => {
     setSelectedIds(initialIds); setIntervals({}); setMonths(MAX_MONTHS); changeCustomers(1);
-    setRetention(100); setSearch(''); setCategory('All categories'); setSelectedOnly(false); setLastProductId(null);
+    setRetention(100); setSearch(''); setCategory('All categories'); setSelectedOnly(false); setCatalogExpanded(false); setShowPricingDetails(false); setLastProductId(null);
   };
 
   return (
     <section id="repeat-sales" className="repeat-sales" aria-labelledby="repeat-sales-heading">
       <div className="rs-container">
         <div className="rs-intro">
-          <div><h2 id="repeat-sales-heading">Everyday products.<br /><em>Decades of possibility.</em></h2><p className="rs-lesson-name">The Power of Repeat Sales</p></div>
-          <p>A customer buys once. Then comes back. Build their basket and explore the power of repeat sales — all the way to 50 years.</p>
+          <div><h1 id="repeat-sales-heading">Everyday products.<br /><em>Decades of possibility.</em></h1><p className="rs-lesson-name">The Power of Repeat Sales</p></div>
+          <p>Choose everyday products. See what repeat purchases could generate over months, years, and decades.</p>
+        </div>
+        <div className="rs-mobile-summary">
+          <div><span>{selected.length} products · {durationLabel(months)}</span><button type="button" onClick={() => document.getElementById('rs-projection')?.scrollIntoView({ behavior: 'instant', block: 'start' })}>View projection</button></div>
+          <p><span>RM</span>{formatRinggit(projection.total)}</p>
+          <span className="rs-summary-caption">Estimated revenue · {customers.toLocaleString('en-MY')} {customers === 1 ? 'customer' : 'customers'}</span>
         </div>
         <div className="rs-workspace">
           <div className="rs-basket">
-            <div className="rs-basket-heading"><div><h3>Build a repeat basket</h3><p className="rs-muted">28 real products · Malaysia · April 2026</p></div><button type="button" className="rs-text-button" onClick={reset}><RotateCcw size={13} aria-hidden="true" />Reset</button></div>
+            <div className="rs-basket-heading"><div><h3>Build a repeat basket</h3><p className="rs-muted">28 products · Retail prices in RM</p></div><button type="button" className="rs-text-button" onClick={reset}><RotateCcw size={13} aria-hidden="true" />Reset</button></div>
             <div className="rs-catalog-tools"><div className="rs-search"><Search size={15} aria-hidden="true" /><input type="search" aria-label="Find a product" placeholder="Find a product…" value={search} onChange={event => setSearch(event.target.value)} /></div><select aria-label="Filter product category" value={category} onChange={event => setCategory(event.target.value)}><option>All categories</option>{categories.map(name => <option key={name}>{name}</option>)}</select></div>
             <div className="rs-basket-actions"><button className="rs-text-button" type="button" aria-pressed={selectedOnly} onClick={() => setSelectedOnly(value => !value)}>{selectedOnly ? 'Show all products' : `Show selected (${selected.length})`}</button><button className="rs-text-button" type="button" disabled={selected.length === 0} onClick={() => { setSelectedIds([]); setLastProductId(null); }}>Clear basket</button></div>
-            <p className="rs-selected-summary" aria-live="polite">{selected.length ? `Selected (${selected.length}): ${selected.slice(0, 3).map(product => `${product.name} ${product.size}`).join(' · ')}${selected.length > 3 ? ` · +${selected.length - 3} more` : ''}` : 'No products selected yet.'}</p>
+            <div className="rs-catalog-options"><span className="rs-muted">Malaysia · Apr 2026</span><button type="button" className="rs-text-button" aria-pressed={showPricingDetails} onClick={() => setShowPricingDetails(value => !value)}>{showPricingDetails ? 'Hide price details' : 'Show price details'}</button></div>
             <p className="rs-muted">Showing {visible.length} of 28 · sorted by retail price</p>
             <div className="rs-products" data-lenis-prevent tabIndex={0} role="region" aria-label="Product catalog, scroll for more products">
-              {visible.map(product => {
+              {visible.map((product, index) => {
                 const checked = selectedIds.includes(product.id);
-                return <div key={product.id} className={`rs-product${checked ? ' rs-product-selected' : ''}`}>
+                return <div key={product.id} className={`rs-product${checked ? ' rs-product-selected' : ''}${index >= 6 && !catalogExpanded && !query && category === 'All categories' && !selectedOnly ? ' rs-product-extra' : ''}`}>
                   <input id={`rs-pick-${product.id}`} type="checkbox" checked={checked} onChange={() => toggleProduct(product.id)} aria-label={`Select ${product.name}, ${product.size}`} />
-                  <div className="rs-product-copy"><label htmlFor={`rs-pick-${product.id}`}>{product.name}</label><span className="rs-product-meta">{product.size} · {product.id} · p.{product.page}</span><select aria-label={`Purchase interval for ${product.name}, ${product.size}`} value={product.every} onChange={event => { setIntervals(previous => ({ ...previous, [product.id]: Number(event.target.value) })); setLastProductId(product.id); }}>{PURCHASE_INTERVALS.map(interval => <option key={interval} value={interval}>{cycleLabel(interval)}</option>)}</select>{product.type === 'filter' && product.every > 0 && <span className="rs-product-meta">First replacement after interval</span>}</div>
-                  <div className="rs-product-price" style={{ color: product.color }}><strong>RM{formatRinggit(product.price)}</strong><span>RP · per pack</span><span>AP RM{formatRinggit(product.ap)}</span></div>
+                  <div className="rs-product-copy"><label htmlFor={`rs-pick-${product.id}`}>{product.name}</label><span className="rs-product-meta">{product.size}{showPricingDetails && <> · {product.id} · p.{product.page}</>}</span><select aria-label={`Purchase interval for ${product.name}, ${product.size}`} value={product.every} onChange={event => { setIntervals(previous => ({ ...previous, [product.id]: Number(event.target.value) })); setLastProductId(product.id); }}>{PURCHASE_INTERVALS.map(interval => <option key={interval} value={interval}>{cycleLabel(interval)}</option>)}</select>{product.type === 'filter' && product.every > 0 && <span className="rs-product-meta">First replacement after interval</span>}</div>
+                  <div className="rs-product-price" style={{ color: product.color }}><strong>RM{formatRinggit(product.price)}</strong><span>per pack</span>{showPricingDetails && <span>AP RM{formatRinggit(product.ap)}</span>}</div>
                 </div>;
               })}
               {!visible.length && <p className="rs-no-results">No matching products. Try another name or category, or show all products.</p>}
             </div>
+            {!query && category === 'All categories' && !selectedOnly && <button className="rs-expand-products" type="button" aria-expanded={catalogExpanded} onClick={() => setCatalogExpanded(value => !value)}>{catalogExpanded ? 'Show fewer products' : 'Browse all 28 products'}</button>}
             <p className="rs-muted rs-catalog-note">Prices per pack. Purchase cycles are editable examples. Choose products suited to your customer.</p>
             <div className="rs-monthly"><span>Recurring monthly average<br /><small>Per customer, before retention</small></span><strong>RM{formatRinggit(monthlyPerCustomer)}</strong></div>
             <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Starting customers</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Starting customers, slider up to 1,000" min="1" max="1000" value={Math.min(customers, 1000)} onChange={event => changeCustomers(Number(event.target.value))} /><div className="rs-range-ends"><span>1 customer</span><span>1,000 · type up to 10,000</span></div></div>
           </div>
-          <div className="rs-result">
+          <div className="rs-result" id="rs-projection">
             <div className="rs-result-top"><h3>Estimated cumulative revenue</h3><span>Over {durationLabel(months)}</span></div>
             <p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM</span>{formatRinggit(projection.total)}</p>
             <p className="rs-context">{customers.toLocaleString('en-MY')} starting {customers === 1 ? 'customer' : 'customers'} · {selected.length} {selected.length === 1 ? 'product' : 'products'} · RP sales before costs</p>
@@ -126,7 +134,7 @@ export default function RepeatSales() {
             <div className="rs-retention"><div className="rs-label-line"><label htmlFor="rs-retention">Annual customer retention</label><strong>{retention}%</strong></div><input id="rs-retention" className="rs-range" type="range" min="0" max="100" value={retention} aria-valuetext={`${retention}% of customers return each year`} onChange={event => setRetention(Number(event.target.value))} /><div className="rs-range-ends"><span>0% return next year</span><span>100% stay</span></div><p className="rs-muted">{retention === 100 ? 'Every starting customer keeps buying for the full period. Lower retention to see the difference.' : `${retention}% of the previous year’s customers return each year. No new customers are added; fractional customers represent an expected average.`}</p></div>
           </div>
         </div>
-        <div className="rs-below"><div className="rs-lesson-note"><TrendingUp size={23} aria-hidden="true" /><h3>A small basket can go a long way.</h3><p>More products increase basket value. Repeat purchases extend customer value. Keeping customers is what connects the two.</p></div><details className="rs-assumptions"><summary>Prices, purchase cycles, and how this model works</summary><p>Malaysia AP (ABO purchase price) and RP (retail price) are transcribed from <cite>ABO Price List SA13, April 2026</cite>, pages 2 and 8–11. Each product shows its SKU and source page. Revenue uses RP; AP is shown for comparison. Actual selling prices can differ.</p><p>Purchase intervals are editable scenario assumptions, not product usage advice. Consumables are purchased at the start, then at the chosen interval. Appliances default to one purchase. Filters start after one replacement interval, avoiding an additional charge for a filter included with a new appliance. Follow product instructions and indicators for actual replacement timing.</p><p>Prices stay fixed, with no inflation, new customers, or reinvestment. Retention applies annually to the original customer group. Revenue is before costs and is not profit. A 50-year scenario explores assumptions; it is not a forecast.</p><p>Repeat sales accumulate. Compounding would also require growth, such as reinvesting profit to acquire more customers.</p></details></div>
+        <div className="rs-below"><div className="rs-lesson-note"><TrendingUp size={23} aria-hidden="true" /><h3>A small basket can go a long way.</h3><p>More products increase basket value. Repeat purchases extend customer value. Keeping customers is what connects the two.</p></div><details className="rs-assumptions"><summary>Prices, purchase cycles, and how this model works</summary><p>Malaysia AP (ABO purchase price) and RP (retail price) are transcribed from <cite>ABO Price List SA13, April 2026</cite>, pages 2 and 8–11. Turn on “Show price details” to see each product’s AP, SKU, and source page. Revenue uses RP; AP is shown for comparison. Actual selling prices can differ.</p><p>Purchase intervals are editable scenario assumptions, not product usage advice. Consumables are purchased at the start, then at the chosen interval. Appliances default to one purchase. Filters start after one replacement interval, avoiding an additional charge for a filter included with a new appliance. Follow product instructions and indicators for actual replacement timing.</p><p>Prices stay fixed, with no inflation, new customers, or reinvestment. Retention applies annually to the original customer group. Revenue is before costs and is not profit. A 50-year scenario explores assumptions; it is not a forecast.</p><p>Repeat sales accumulate. Compounding would also require growth, such as reinvesting profit to acquire more customers.</p></details></div>
       </div>
     </section>
   );
