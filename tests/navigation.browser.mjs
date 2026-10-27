@@ -33,13 +33,15 @@ try {
     await growth.check();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM241,775.00');
     assert.equal(await page.locator('#rs-repeat-rate').inputValue(), '50');
+    assert.equal(await page.locator('.rs-retention').getAttribute('open'), null, 'Advanced settings start collapsed');
+    await page.locator('.rs-retention > summary').click();
     assert.ok(await page.getByRole('radio', { name: 'Repeat purchases', exact: true }).isChecked());
     assert.equal(await page.locator('#rs-customers').getAttribute('max'), '20');
     assert.equal(await page.getByRole('slider', { name: 'Starting customers, maximum 20' }).getAttribute('max'), '20');
     if (mobile) {
-      assert.equal(await page.locator('.rs-count-mobile').innerText(), 'Showing 6 of 28');
+      assert.equal(await page.locator('.rs-count-mobile').textContent(), 'Showing 6 of 28');
       await page.getByRole('button', { name: 'Browse all 28 products' }).click();
-      assert.equal(await page.locator('.rs-count-mobile').innerText(), 'Showing 28 of 28');
+      assert.equal(await page.locator('.rs-count-mobile').textContent(), 'Showing 28 of 28');
       assert.equal(await page.locator('.rs-product:visible').count(), 28);
       await page.getByRole('button', { name: 'Show fewer products' }).click();
       await page.locator('#rs-pick-124107').check();
@@ -87,6 +89,7 @@ try {
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM89,100.00', 'Every new customer has their own joining date');
     await growth.uncheck();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM7,276.50', 'Unchecked compares the fixed starting group');
+    if (!(await page.locator('.rs-retention').evaluate(element => element.open))) await page.locator('.rs-retention > summary').click();
     await page.getByRole('radio', { name: 'Annual attrition', exact: true }).check();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM1,188.00', 'Annual customer loss is an explicitly different scenario');
     await growth.check();
