@@ -53,6 +53,8 @@ try {
       const summary = await page.locator('.rs-mobile-summary').boundingBox();
       assert.ok(Math.abs(summary.y - header.height) < 4, 'Live summary stays directly under the header');
       await page.getByRole('button', { name: 'View projection', exact: true }).click();
+      const chartTextSize = await page.locator('.rs-chart').evaluate(element => parseFloat(getComputedStyle(element.querySelector('text')).fontSize) * element.getBoundingClientRect().width / element.viewBox.baseVal.width);
+      assert.ok(chartTextSize >= 11.5, 'Mobile chart labels remain readable at their rendered size');
       await page.locator('.rs-mobile-summary').waitFor({ state: 'hidden' });
       const resultTop = (await page.locator('#rs-projection').boundingBox()).y;
       assert.ok(resultTop >= header.height, 'The summary must not cover the main projection amount');

@@ -16,13 +16,25 @@ const rangeStyle = (percentage: number): CSSProperties => ({ '--range-fill': `${
 const shortMoney = (value: number) => new Intl.NumberFormat('en-MY', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
 
 function RevenueChart({ projection, months, model, rate }: { projection: Projection; months: number; model: PurchaseModel; rate: number }) {
-  const width = 660, height = 270, left = 58, right = 20, top = 24, bottom = 35;
+  const chartRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(660);
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width > 0) setWidth(Math.max(240, Math.round(entry.contentRect.width)));
+    });
+    observer.observe(chart);
+    return () => observer.disconnect();
+  }, []);
+  const compact = width < 480;
+  const height = compact ? 210 : 270, left = compact ? 48 : 58, right = 10, top = 20, bottom = 32;
   const plotWidth = width - left - right, plotHeight = height - top - bottom;
   const magnitude = 10 ** Math.floor(Math.log10(Math.max(projection.total, 1)));
   const maximum = Math.ceil(Math.max(projection.total, 1) / magnitude * 2) / 2 * magnitude;
   const y = (value: number) => top + plotHeight - plotHeight * value / maximum;
   const steps = Math.min(months, 100);
-  const tickCount = Math.min(months + 1, 6);
+  const tickCount = Math.min(months + 1, compact ? 4 : 6);
   const sampleMonths = Array.from({ length: steps + 1 }, (_, index) => Math.round(months * index / steps));
   const areas = projection.categories.map((group, groupIndex) => {
     const lower = sampleMonths.map(month => projection.categories.slice(0, groupIndex).reduce((sum, previous) => sum + previous.cumulative[month], 0));
@@ -32,7 +44,7 @@ function RevenueChart({ projection, months, model, rate }: { projection: Project
     return { ...group, area: `M${upper.join(' L')} L${under.join(' L')} Z`, line: `M${upper.join(' L')}` };
   });
   return (
-    <div className="rs-chart-wrap">
+    <div className="rs-chart-wrap" ref={chartRef}>
       <svg className="rs-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby="repeat-chart-title repeat-chart-description">
         <title id="repeat-chart-title">Cumulative sales revenue over {durationLabel(months)}</title>
         <desc id="repeat-chart-description">Stacked revenue by product category using Malaysia ABO prices (AP). Total RM{formatRinggit(projection.total)}. The customer count starts at {projection.startingCustomers} and reaches {projection.customersAtEnd} total joined. Values reflect purchase intervals and {model === 'repeat-purchases' ? `${rate}% repeat purchasing each cycle` : `${rate}% annual retention of each joining group`}.</desc>
@@ -148,7 +160,7 @@ export default function RepeatSales() {
                 return <div key={product.id} className={`rs-product${checked ? ' rs-product-selected' : ''}${index >= 6 && collapsedCatalog ? ' rs-product-extra' : ''}`}>
                   <input id={`rs-pick-${product.id}`} type="checkbox" checked={checked} onChange={() => toggleProduct(product.id)} aria-label={`Select ${product.name}, ${product.size}`} />
                   <div className="rs-product-copy"><label htmlFor={`rs-pick-${product.id}`}>{product.name}<span className="rs-product-meta">{product.size}{showPricingDetails && <> · {product.id} · p.{product.page}</>}</span></label><select aria-label={`Purchase interval for ${product.name}, ${product.size}`} value={product.every} onChange={event => { setIntervals(previous => ({ ...previous, [product.id]: Number(event.target.value) })); setLastProductId(product.id); }}>{PURCHASE_INTERVALS.map(interval => <option key={interval} value={interval}>{cycleLabel(interval)}</option>)}</select>{product.type === 'filter' && product.every > 0 && <span className="rs-product-meta">First replacement after interval</span>}</div>
-                  <div className="rs-product-price"><strong>RM{formatRinggit(product.aboPrice)}</strong><span>ABO</span></div>
+                  <label className="rs-product-price" htmlFor={`rs-pick-${product.id}`}><strong>RM{formatRinggit(product.aboPrice)}</strong><span>ABO</span></label>
                 </div>;
               })}
               {!visible.length && <p className="rs-no-results">No matching products. Try another name or category, or show all products.</p>}

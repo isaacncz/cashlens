@@ -74,3 +74,5 @@ Tests distinguish the two scenario formulas, verify a positive year-49-to-50 rev
 ### Compact mobile interface
 
 The calculator opens with a short title, live revenue, search, and product checkboxes. On mobile, purchase intervals appear when a product is selected. Category filtering, selected-only mode, clear basket, and SKU/page references remain available under **Filters & source**. The repeat rate, annual-attrition comparison, and monthly basket average are under **Repeat settings**, collapsed by default with the current rate visible in its summary. Detailed methodology remains under **Prices & assumptions**. Starting customers and the optional yearly-customer checkbox remain visible. This removes repeated instructions without changing the projection or ABO pricing.
+
+Mobile polish keeps the existing navy/gold system. The chart measures its container, maintains readable axis text, and reduces time-axis labels on narrow screens. Product prices also act as selection labels with a minimum 44px hit area. Product rows use consistent alignment; narrow tablets stack the basket and result. The collapsed mobile catalog still shows six products until expanded.
