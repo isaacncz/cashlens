@@ -10,13 +10,13 @@ The 28 Malaysia products are transcribed from **ABO Price List SA13, April 2026*
 
 ## Model
 
-`src/lib/repeatSales.ts` contains pure projection functions. The horizon spans 1–600 months. Customer count spans 1–10,000, and the convenience slider spans 1–1,000. Annual retention spans 0–100% and shrinks the original cohort at each 12-month boundary without adding customers.
+`src/lib/repeatSales.ts` contains pure projection functions. The horizon spans 1–600 months. Both customer controls span 1–20, enforced again in the projection model. Annual retention defaults to 50% and remains adjustable from 0–100% and shrinks the original cohort at each 12-month boundary without adding customers.
 
 Purchases within `[0, horizon)` are counted: consumables first at month 0, then at the chosen interval; appliances default to one purchase at month 0; filters first after their chosen interval. At 600 months an annual filter has 49 replacement purchases, with the initial appliance filter assumed included. Selecting a standalone filter also uses this delayed schedule. Actual replacement schedules depend on product instructions/indicators. Intervals can be edited, including a one-time purchase. No source-backed usage or dosage is inferred from these examples.
 
 The chart stacks revenue by category and uses the same cumulative monthly arrays as the total. Recurring monthly average is steady-state RP divided by interval before retention, excluding one-time purchases. Values are expected averages; retain calculation precision until formatting. Fixed current prices, no inflation, new customers, or reinvestment. Revenue excludes expenses and is not profit; a 50-year scenario is not a forecast.
 
-Default basket: toothpaste 200g every 3 months, Dish Drops 1L every 3 months, shampoo 280ml every 2 months. One customer at full retention generates RM150.70 in the first month, RM742.80 in one year, and RM37,140.00 in 50 years.
+Default basket: toothpaste 200g every 3 months, Dish Drops 1L every 3 months, shampoo 280ml every 2 months. At the default 50% annual retention, one starting customer generates RM150.70 in the first month, RM742.80 in one year, and RM1,485.60 over 50 years. Reset returns to one customer and 50% retention. At an explicitly selected 100% retention, the same basket generates RM37,140.00 over 50 years.
 
 ## Interaction and accessibility
 

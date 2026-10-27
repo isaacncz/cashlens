@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { RotateCcw, Search, ShoppingBasket, TrendingUp } from 'lucide-react';
 import { repeatSalesProducts } from '../data/repeatSalesProducts';
 import type { ProductCategory } from '../data/repeatSalesProducts';
-import { durationLabel, formatRinggit, MAX_CUSTOMERS, MAX_MONTHS, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
+import { durationLabel, formatRinggit, DEFAULT_RETENTION, MAX_CUSTOMERS, MAX_MONTHS, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
 import type { Projection } from '../lib/repeatSales';
 import './RepeatSales.css';
 
@@ -55,7 +55,7 @@ export default function RepeatSales() {
   const [months, setMonths] = useState(MAX_MONTHS);
   const [customers, setCustomers] = useState(1);
   const [customerInput, setCustomerInput] = useState('1');
-  const [retention, setRetention] = useState(100);
+  const [retention, setRetention] = useState(DEFAULT_RETENTION);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All categories');
   const [selectedOnly, setSelectedOnly] = useState(false);
@@ -85,7 +85,7 @@ export default function RepeatSales() {
   };
   const reset = () => {
     setSelectedIds(initialIds); setIntervals({}); setMonths(MAX_MONTHS); changeCustomers(1);
-    setRetention(100); setSearch(''); setCategory('All categories'); setSelectedOnly(false); setCatalogExpanded(false); setShowPricingDetails(false); setLastProductId(null);
+    setRetention(DEFAULT_RETENTION); setSearch(''); setCategory('All categories'); setSelectedOnly(false); setCatalogExpanded(false); setShowPricingDetails(false); setLastProductId(null);
   };
 
   return (
@@ -121,7 +121,7 @@ export default function RepeatSales() {
             {!query && category === 'All categories' && !selectedOnly && <button className="rs-expand-products" type="button" aria-expanded={catalogExpanded} onClick={() => setCatalogExpanded(value => !value)}>{catalogExpanded ? 'Show fewer products' : 'Browse all 28 products'}</button>}
             <p className="rs-muted rs-catalog-note">Prices per pack. Purchase cycles are editable examples. Choose products suited to your customer.</p>
             <div className="rs-monthly"><span>Recurring monthly average<br /><small>Per customer, before retention</small></span><strong>RM{formatRinggit(monthlyPerCustomer)}</strong></div>
-            <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Starting customers</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Starting customers, slider up to 1,000" min="1" max="1000" value={Math.min(customers, 1000)} onChange={event => changeCustomers(Number(event.target.value))} /><div className="rs-range-ends"><span>1 customer</span><span>1,000 · type up to 10,000</span></div></div>
+            <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Starting customers</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Starting customers, maximum 20" min="1" max={MAX_CUSTOMERS} value={customers} onChange={event => changeCustomers(Number(event.target.value))} /><div className="rs-range-ends"><span>1 customer</span><span>{MAX_CUSTOMERS} customers maximum</span></div></div>
           </div>
           <div className="rs-result" id="rs-projection">
             <div className="rs-result-top"><h3>Estimated cumulative revenue</h3><span>Over {durationLabel(months)}</span></div>

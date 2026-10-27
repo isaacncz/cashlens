@@ -21,14 +21,17 @@ try {
     await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
     await page.locator('#panel-compounding:not([hidden])').waitFor();
     assert.equal(await page.locator('#panel-learn').isVisible(), false);
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM37,140.00');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM1,485.60');
     assert.equal(await page.locator('.rs-product:visible').count(), mobile ? 6 : 28);
+    assert.equal(await page.locator('#rs-retention').inputValue(), '50');
+    assert.equal(await page.locator('#rs-customers').getAttribute('max'), '20');
+    assert.equal(await page.getByRole('slider', { name: 'Starting customers, maximum 20' }).getAttribute('max'), '20');
     if (mobile) {
       await page.getByRole('button', { name: 'Browse all 28 products' }).click();
       assert.equal(await page.locator('.rs-product:visible').count(), 28);
       await page.getByRole('button', { name: 'Show fewer products' }).click();
       await page.locator('#rs-pick-124107').check();
-      assert.equal(await page.locator('.rs-mobile-summary p').innerText(), 'RM40,710.00');
+      assert.equal(await page.locator('.rs-mobile-summary p').innerText(), 'RM1,628.40');
       await page.locator('#rs-pick-124107').uncheck();
       await page.locator('.rs-product').nth(4).scrollIntoViewIfNeeded();
       const header = await page.locator('.site-header').boundingBox();
@@ -37,7 +40,8 @@ try {
     }
     await page.locator('#rs-customers').fill('100');
     await page.locator('#rs-customers').blur();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM3,714,000.00');
+    assert.equal(await page.locator('#rs-customers').inputValue(), '20', 'Excess customers are clamped to 20');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM29,712.00');
     await page.getByRole('tab', { name: 'Learn', exact: true }).click();
     await page.locator('#panel-learn:not([hidden])').waitFor();
     await page.getByRole('button', { name: 'Lessons' }).click();
@@ -46,7 +50,7 @@ try {
     assert.equal(await page.getByRole('navigation', { name: 'Financial lessons' }).isVisible(), false);
     await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
     await page.locator('#panel-compounding:not([hidden])').waitFor();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM3,714,000.00', 'Scenario survives switching tabs');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM29,712.00', 'Scenario survives switching tabs');
     await page.goBack();
     await page.locator('#panel-learn:not([hidden])').waitFor();
     await page.goForward();
@@ -55,6 +59,9 @@ try {
       await page.setViewportSize({ width, height: 844 });
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No horizontal overflow at ${width}px`);
     }
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    assert.equal(await page.locator('#rs-customers').inputValue(), '1');
+    assert.equal(await page.locator('#rs-retention').inputValue(), '50');
     await page.goto(new URL('#compounding', baseUrl).href, { waitUntil: 'networkidle' });
     await page.locator('#panel-compounding:not([hidden])').waitFor();
     await page.getByRole('tab', { name: 'Compounding', exact: true }).focus();

@@ -1,7 +1,8 @@
 import type { ProductCategory, RepeatSalesProduct } from '../data/repeatSalesProducts.ts';
 
 export const MAX_MONTHS = 600;
-export const MAX_CUSTOMERS = 10_000;
+export const MAX_CUSTOMERS = 20;
+export const DEFAULT_RETENTION = 50;
 export const PURCHASE_INTERVALS = [0, 1, 2, 3, 6, 12, 24, 60, 120] as const;
 
 export interface Projection {
@@ -19,11 +20,11 @@ export function projectRepeatSales(
   products: readonly RepeatSalesProduct[],
   requestedMonths: number,
   requestedCustomers: number,
-  annualRetention: number,
+  annualRetention: number = DEFAULT_RETENTION,
 ): Projection {
   const months = Math.min(MAX_MONTHS, Math.max(1, Math.round(Number.isFinite(requestedMonths) ? requestedMonths : 1)));
   const customers = Math.min(MAX_CUSTOMERS, Math.max(1, Math.round(Number.isFinite(requestedCustomers) ? requestedCustomers : 1)));
-  const retention = Math.min(1, Math.max(0, Number.isFinite(annualRetention) ? annualRetention / 100 : 1));
+  const retention = Math.min(1, Math.max(0, Number.isFinite(annualRetention) ? annualRetention / 100 : DEFAULT_RETENTION / 100));
   const groups = new Map<ProductCategory, { color: string; purchases: number[] }>();
   let recurringMonthly = 0;
   for (const product of products) {

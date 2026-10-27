@@ -27,7 +27,7 @@ test('starter basket uses actual RP and purchase intervals through 50 years', ()
   close(projectRepeatSales(starter, 1, 1, 100).total, 150.7);
   close(projectRepeatSales(starter, 12, 1, 100).total, 742.8);
   close(projectRepeatSales(starter, 600, 1, 100).total, 37140);
-  close(projectRepeatSales(starter, 600, 100, 100).total, 3714000);
+  close(projectRepeatSales(starter, 600, 20, 100).total, 742800);
   close(projectRepeatSales(starter, 600, 1, 100).recurringMonthly, 61.9);
 });
 test('a purchase on the horizon boundary is counted in the next month', () => {
@@ -64,6 +64,9 @@ test('editable cycles, empty basket and chart cumulative totals agree', () => {
   close(projection.total, projection.categories.reduce((s,g) => s + g.cumulative[600], 0));
 });
 test('limits and month labels cover the full supported range', () => {
+  close(projectRepeatSales(starter, 600, 100, 100).total, projectRepeatSales(starter, 600, 20, 100).total);
+  close(projectRepeatSales(starter, 600, 1).total, 1485.6);
+  close(projectRepeatSales(starter, 24, 1, NaN).total, 1114.2);
   close(projectRepeatSales(starter, 900, 1, 100).total, 37140);
   close(projectRepeatSales(starter, 1, 0, 100).total, 150.7);
   close(projectRepeatSales(starter, NaN, NaN, NaN).total, 150.7);
