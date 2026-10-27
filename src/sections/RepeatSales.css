@@ -185,3 +185,8 @@
   .rs-mobile-summary.rs-summary-hidden { visibility: hidden; pointer-events: none; }
   .rs-result { scroll-margin-top: calc(var(--site-header-height) + 16px); }
 }
+
+.rs-customer-growth { margin: 12px 0 0; color: var(--rs-gold); font-size: 12px; line-height: 1.7; }
+
+.rs-growth-option { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 16px; color: var(--rs-ink); font-size: 13px; cursor: pointer; }
+.rs-growth-option input { flex-shrink: 0; width: 22px; height: 22px; margin: 0; }

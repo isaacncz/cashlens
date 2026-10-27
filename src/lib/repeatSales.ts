@@ -3,22 +3,24 @@ import type { ProductCategory, RepeatSalesProduct } from '../data/repeatSalesPro
 export const MAX_MONTHS = 600;
 export const MAX_CUSTOMERS = 20;
 export const DEFAULT_REPEAT_RATE = 50;
+export const NEW_CUSTOMERS_PER_YEAR = 1;
 export const PURCHASE_INTERVALS = [0, 1, 2, 3, 6, 12, 24, 60, 120] as const;
 export type PurchaseModel = 'repeat-purchases' | 'annual-attrition';
 
 export interface Projection {
   total: number;
   recurringMonthly: number;
+  startingCustomers: number;
+  customersAtEnd: number;
   categories: { name: ProductCategory; color: string; cumulative: number[] }[];
 }
 
-/** Purchases within [0, months) are included. First consumable/device purchases
- * use the full chosen customer count; filters begin after their first interval.
- *
- * repeat-purchases: the same rate of the chosen group buys at each later cycle.
- * annual-attrition: a stress test where only the shrinking original cohort buys.
- * These distinct assumptions must never share an ambiguous "retention" label.
- * Fractional buyers express expected averages. Retain precision until display.
+/** Purchases within [0, months) are included. Each joining cohort has its own
+ * first purchase and repeat/replacement schedule. One new customer joins every
+ * 12 months, capped at 20 total customers introduced (not 20 per cohort).
+ * Repeat purchase rate stays constant per cycle; annual attrition is applied
+ * to each cohort's own age. Fractional buyers are expected averages.
+ * includeAnnualAcquisition=false supports fixed-group reference calculations.
  */
 export function projectRepeatSales(
   products: readonly RepeatSalesProduct[],
@@ -26,30 +28,42 @@ export function projectRepeatSales(
   requestedCustomers: number,
   ratePercent: number = DEFAULT_REPEAT_RATE,
   model: PurchaseModel = 'repeat-purchases',
+  includeAnnualAcquisition = true,
 ): Projection {
   const months = Math.min(MAX_MONTHS, Math.max(1, Math.round(Number.isFinite(requestedMonths) ? requestedMonths : 1)));
   const customers = Math.min(MAX_CUSTOMERS, Math.max(1, Math.round(Number.isFinite(requestedCustomers) ? requestedCustomers : 1)));
   const rate = Math.min(1, Math.max(0, Number.isFinite(ratePercent) ? ratePercent / 100 : DEFAULT_REPEAT_RATE / 100));
+  const cohorts = [{ joinedAt: 0, count: customers }];
+  let customersAtEnd = customers;
+  if (includeAnnualAcquisition) {
+    for (let joinedAt = 12; joinedAt < months && customersAtEnd < MAX_CUSTOMERS; joinedAt += 12) {
+      const count = Math.min(NEW_CUSTOMERS_PER_YEAR, MAX_CUSTOMERS - customersAtEnd);
+      cohorts.push({ joinedAt, count });
+      customersAtEnd += count;
+    }
+  }
   const groups = new Map<ProductCategory, { color: string; purchases: number[] }>();
   let recurringMonthly = 0;
   for (const product of products) {
+    if (!PURCHASE_INTERVALS.includes(product.every as typeof PURCHASE_INTERVALS[number])) continue;
     let group = groups.get(product.category);
     if (!group) {
       group = { color: product.color, purchases: Array<number>(months).fill(0) };
       groups.set(product.category, group);
     }
-    if (product.every === 0) {
-      group.purchases[0] += product.aboPrice * customers;
-      continue;
-    }
-    if (!PURCHASE_INTERVALS.includes(product.every as typeof PURCHASE_INTERVALS[number])) continue;
-    recurringMonthly += product.aboPrice / product.every * customers;
-    const first = product.type === 'filter' ? product.every : 0;
-    for (let t = first; t < months; t += product.every) {
-      const buyerShare = model === 'annual-attrition'
-        ? rate ** Math.floor(t / 12)
-        : t === 0 ? 1 : rate;
-      group.purchases[t] += product.aboPrice * customers * buyerShare;
+    if (product.every > 0) recurringMonthly += product.aboPrice / product.every * customers;
+    for (const cohort of cohorts) {
+      if (product.every === 0) {
+        group.purchases[cohort.joinedAt] += product.aboPrice * cohort.count;
+        continue;
+      }
+      const firstAge = product.type === 'filter' ? product.every : 0;
+      for (let age = firstAge; cohort.joinedAt + age < months; age += product.every) {
+        const buyerShare = model === 'annual-attrition'
+          ? rate ** Math.floor(age / 12)
+          : age === 0 ? 1 : rate;
+        group.purchases[cohort.joinedAt + age] += product.aboPrice * cohort.count * buyerShare;
+      }
     }
   }
   const categories = [...groups].map(([name, group]) => {
@@ -60,6 +74,8 @@ export function projectRepeatSales(
   return {
     total: categories.reduce((sum, group) => sum + group.cumulative[months], 0),
     recurringMonthly,
+    startingCustomers: customers,
+    customersAtEnd,
     categories,
   };
 }

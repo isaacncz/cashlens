@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import { ArrowDown, RotateCcw, Search, ShoppingBasket, TrendingUp } from 'lucide-react';
 import { repeatSalesProducts } from '../data/repeatSalesProducts';
 import type { ProductCategory } from '../data/repeatSalesProducts';
-import { durationLabel, formatRinggit, DEFAULT_REPEAT_RATE, MAX_CUSTOMERS, MAX_MONTHS, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
+import { durationLabel, formatRinggit, DEFAULT_REPEAT_RATE, MAX_CUSTOMERS, MAX_MONTHS, NEW_CUSTOMERS_PER_YEAR, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
 import type { Projection, PurchaseModel } from '../lib/repeatSales';
 import { getHeaderOffset } from '../lib/pageNavigation';
 import './RepeatSales.css';
@@ -35,7 +35,7 @@ function RevenueChart({ projection, months, model, rate }: { projection: Project
     <div className="rs-chart-wrap">
       <svg className="rs-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby="repeat-chart-title repeat-chart-description">
         <title id="repeat-chart-title">Cumulative sales revenue over {durationLabel(months)}</title>
-        <desc id="repeat-chart-description">Stacked revenue by product category using Malaysia ABO prices (AP). Total RM{formatRinggit(projection.total)}. Values reflect purchase intervals and {model === 'repeat-purchases' ? `${rate}% repeat purchasing each cycle` : `${rate}% annual retention of the original group`}.</desc>
+        <desc id="repeat-chart-description">Stacked revenue by product category using Malaysia ABO prices (AP). Total RM{formatRinggit(projection.total)}. The customer count starts at {projection.startingCustomers} and reaches {projection.customersAtEnd} total joined. Values reflect purchase intervals and {model === 'repeat-purchases' ? `${rate}% repeat purchasing each cycle` : `${rate}% annual retention of each joining group`}.</desc>
         {[0, 1, 2, 3, 4].map(index => {
           const value = maximum * index / 4;
           return <g key={index}><line x1={left} y1={y(value)} x2={width - right} y2={y(value)} className="rs-gridline" /><text x={left - 10} y={y(value) + 4} textAnchor="end">{shortMoney(value)}</text></g>;
@@ -60,6 +60,7 @@ export default function RepeatSales() {
   const [customerInput, setCustomerInput] = useState('1');
   const [rate, setRate] = useState(DEFAULT_REPEAT_RATE);
   const [purchaseModel, setPurchaseModel] = useState<PurchaseModel>('repeat-purchases');
+  const [addCustomerEachYear, setAddCustomerEachYear] = useState(true);
   const [projectionInView, setProjectionInView] = useState(false);
   const projectionRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -71,7 +72,7 @@ export default function RepeatSales() {
   const [lastProductId, setLastProductId] = useState<string | null>(null);
   const catalog = useMemo(() => repeatSalesProducts.map(product => ({ ...product, every: intervals[product.id] ?? product.every })), [intervals]);
   const selected = useMemo(() => catalog.filter(product => selectedIds.includes(product.id)), [catalog, selectedIds]);
-  const projection = useMemo(() => projectRepeatSales(selected, months, customers, rate, purchaseModel), [selected, months, customers, rate, purchaseModel]);
+  const projection = useMemo(() => projectRepeatSales(selected, months, customers, rate, purchaseModel, addCustomerEachYear), [selected, months, customers, rate, purchaseModel, addCustomerEachYear]);
   const query = search.trim().toLowerCase();
   const visible = catalog.filter(product => (category === 'All categories' || category === product.category)
     && (!selectedOnly || selectedIds.includes(product.id))
@@ -79,8 +80,9 @@ export default function RepeatSales() {
   const collapsedCatalog = !catalogExpanded && !query && category === 'All categories' && !selectedOnly;
   const mobileProductCount = collapsedCatalog ? Math.min(6, visible.length) : visible.length;
   const focusProduct = catalog.find(product => product.id === lastProductId) ?? selected[selected.length - 1];
-  const focusRevenue = focusProduct ? projectRepeatSales([focusProduct], months, customers, rate, purchaseModel).total : 0;
+  const focusRevenue = focusProduct ? projectRepeatSales([focusProduct], months, customers, rate, purchaseModel, addCustomerEachYear).total : 0;
   const isRemoved = focusProduct && !selectedIds.includes(focusProduct.id);
+  const customerLabel = projection.customersAtEnd === customers ? `${customers} ${customers === 1 ? 'customer' : 'customers'}` : `${customers} starting, ${projection.customersAtEnd} total customers`;
   const monthlyPerCustomer = projection.recurringMonthly / customers;
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function RepeatSales() {
   };
   const reset = () => {
     setSelectedIds(initialIds); setIntervals({}); setMonths(MAX_MONTHS); changeCustomers(1);
-    setRate(DEFAULT_REPEAT_RATE); setPurchaseModel('repeat-purchases'); setSearch(''); setCategory('All categories'); setSelectedOnly(false); setCatalogExpanded(false); setShowPricingDetails(false); setLastProductId(null);
+    setRate(DEFAULT_REPEAT_RATE); setPurchaseModel('repeat-purchases'); setAddCustomerEachYear(true); setSearch(''); setCategory('All categories'); setSelectedOnly(false); setCatalogExpanded(false); setShowPricingDetails(false); setLastProductId(null);
   };
 
   return (
@@ -130,7 +132,7 @@ export default function RepeatSales() {
           <div className="rs-mobile-summary-copy">
             <span>{selected.length} {selected.length === 1 ? 'product' : 'products'} · {durationLabel(months)}</span>
             <p><span>RM</span>{formatRinggit(projection.total)}</p>
-            <span className="rs-summary-caption">Estimated revenue · {customers.toLocaleString('en-MY')} {customers === 1 ? 'customer' : 'customers'}</span>
+            <span className="rs-summary-caption">Estimated revenue · {customerLabel}</span>
           </div>
           <button type="button" aria-label="View projection" title="View projection" tabIndex={projectionInView ? -1 : 0} onClick={viewProjection}><ArrowDown size={19} aria-hidden="true" /></button>
         </div>
@@ -157,17 +159,17 @@ export default function RepeatSales() {
             {!query && category === 'All categories' && !selectedOnly && <button className="rs-expand-products" type="button" aria-expanded={catalogExpanded} onClick={() => setCatalogExpanded(value => !value)}>{catalogExpanded ? 'Show fewer products' : 'Browse all 28 products'}</button>}
             <p className="rs-muted rs-catalog-note">Sorted by ABO price, per pack. Purchase cycles are editable examples. Choose products suited to your customer.</p>
             <div className="rs-monthly"><span>Full-basket monthly average<br /><small>{purchaseModel === 'repeat-purchases' ? 'Per customer, before the repeat-purchase rate' : 'Per customer, before annual attrition'}</small></span><strong>RM{formatRinggit(monthlyPerCustomer)}</strong></div>
-            <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Customer group</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Customer group, maximum 20" style={rangeStyle((customers - 1) / (MAX_CUSTOMERS - 1) * 100)} min="1" max={MAX_CUSTOMERS} value={customers} onChange={event => changeCustomers(Number(event.target.value))} /><div className="rs-range-ends"><span>1 customer</span><span>{MAX_CUSTOMERS} customers maximum</span></div></div>
+            <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Starting customers</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Starting customers, maximum 20" style={rangeStyle((customers - 1) / (MAX_CUSTOMERS - 1) * 100)} min="1" max={MAX_CUSTOMERS} value={customers} onChange={event => changeCustomers(Number(event.target.value))} /><div className="rs-range-ends"><span>1 customer</span><span>{MAX_CUSTOMERS} customers maximum</span></div><label className="rs-growth-option" htmlFor="rs-add-customers"><input id="rs-add-customers" type="checkbox" checked={addCustomerEachYear} onChange={event => setAddCustomerEachYear(event.target.checked)} /><span>Add {NEW_CUSTOMERS_PER_YEAR} customer each year</span></label><p className="rs-customer-growth">{addCustomerEachYear ? customers === MAX_CUSTOMERS ? 'Your starting group is already at the 20-customer maximum. No additional customers are added.' : `New customers join after each full year, up to ${MAX_CUSTOMERS} total. Each starts their own purchase schedule.` : 'Customer growth is off. Only your starting customers are counted.'}</p></div>
           </div>
           <div className="rs-result" id="rs-projection" ref={projectionRef} tabIndex={-1} aria-label="Revenue projection">
             <div className="rs-result-top"><h2>Estimated cumulative revenue</h2><span>Over {durationLabel(months)}</span></div>
             <p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM</span>{formatRinggit(projection.total)}</p>
-            <p className="rs-context">{customers.toLocaleString('en-MY')} {customers === 1 ? 'customer' : 'customers'} · {selected.length} {selected.length === 1 ? 'product' : 'products'} · ABO prices · before costs</p>
-            <p className="rs-scenario-caption">{rate}% {purchaseModel === 'repeat-purchases' ? 'repeat purchases each cycle' : 'annual retention · original group only'}</p>
+            <p className="rs-context">{customerLabel} · {selected.length} {selected.length === 1 ? 'product' : 'products'} · ABO prices · before costs</p>
+            <p className="rs-scenario-caption">{rate}% {purchaseModel === 'repeat-purchases' ? 'repeat purchases each cycle' : 'annual retention per joining group'}</p>
             <RevenueChart projection={projection} months={months} model={purchaseModel} rate={rate} />
             <div className="rs-legend">{projection.categories.map(group => <span key={group.name}><i style={{ backgroundColor: group.color }} aria-hidden="true" />{group.name}</span>)}</div>
             <div className="rs-time-controls"><div className="rs-label-line"><label htmlFor="rs-months">Let time do its work</label><strong>{durationLabel(months)}</strong></div><input id="rs-months" className="rs-range" style={rangeStyle((months - 1) / (MAX_MONTHS - 1) * 100)} type="range" min="1" max={MAX_MONTHS} value={months} aria-valuetext={durationLabel(months)} onChange={event => setMonths(Number(event.target.value))} /><div className="rs-range-ends"><span>1 month</span><span>50 years</span></div><div className="rs-presets" aria-label="Projection duration">{presets.map(preset => <button key={preset} type="button" aria-pressed={months === preset} onClick={() => setMonths(preset)}>{durationLabel(preset)}</button>)}</div></div>
-            <p className="rs-insight" role="status">{!selected.length ? 'Every repeat sale starts with a product. Choose one to begin.' : focusProduct ? <>{isRemoved ? `Removing ${focusProduct.name} reduces this scenario by ` : `${focusProduct.name} alone contributes `}<strong>RM{formatRinggit(focusRevenue)}</strong> over {durationLabel(months)}. {focusProduct.every === 0 ? 'One purchase, counted once.' : focusProduct.type === 'filter' ? 'Replacement revenue begins after its first interval.' : purchaseModel === 'repeat-purchases' ? 'Repeat buying continues at the selected rate.' : 'The original customer group shrinks each year.'}</> : null}</p>
+            <p className="rs-insight" role="status">{!selected.length ? 'Every repeat sale starts with a product. Choose one to begin.' : focusProduct ? <>{isRemoved ? `Removing ${focusProduct.name} reduces this scenario by ` : `${focusProduct.name} alone contributes `}<strong>RM{formatRinggit(focusRevenue)}</strong> over {durationLabel(months)}. {focusProduct.every === 0 ? (addCustomerEachYear ? 'One purchase per customer when they join.' : 'One purchase per customer, counted once.') : focusProduct.type === 'filter' ? 'Replacement revenue begins after its first interval.' : purchaseModel === 'repeat-purchases' ? 'Repeat buying continues at the selected rate.' : 'Annual retention applies to each group from its joining date.'}</> : null}</p>
             <div className="rs-retention">
               <fieldset className="rs-model-selector">
                 <legend>Choose a repeat-sales assumption</legend>
@@ -176,11 +178,11 @@ export default function RepeatSales() {
               <div className="rs-label-line"><label htmlFor="rs-repeat-rate">{purchaseModel === 'repeat-purchases' ? 'Repeat purchase rate' : 'Annual customer retention'}</label><strong>{rate}%</strong></div>
               <input id="rs-repeat-rate" className="rs-range" style={rangeStyle(rate)} type="range" min="0" max="100" value={rate} aria-valuetext={purchaseModel === 'repeat-purchases' ? `${rate}% expected to buy each repeat cycle` : `${rate}% of remaining customers return each year`} onChange={event => setRate(Number(event.target.value))} />
               <div className="rs-range-ends"><span>{purchaseModel === 'repeat-purchases' ? '0% buy again' : '0% return next year'}</span><span>{purchaseModel === 'repeat-purchases' ? '100% buy again' : '100% stay'}</span></div>
-              <p className="rs-muted">{purchaseModel === 'repeat-purchases' ? `The first purchase uses your full group. After that, ${rate}% of this group is expected to buy each cycle. This rate does not halve the group again every year. No new customers are added.` : `Stress test: ${rate}% of the remaining original customers return each year. Without replacement customers, this group shrinks and the revenue curve can level off.`} Fractional buyers represent an expected average.</p>
+              <p className="rs-muted">{purchaseModel === 'repeat-purchases' ? `Each new customer makes a first purchase. After that, ${rate}% of each joining group is expected to buy each cycle. ${addCustomerEachYear ? 'One new customer joins each year until the total reaches 20.' : 'Customer growth is off; no new customers are added.'}` : `Stress test: ${rate}% of each joining group’s remaining customers return each year. ${addCustomerEachYear ? 'One new customer joins each year until 20 have joined in total.' : 'Customer growth is off; only the starting group is counted.'} Each group’s retention starts when it joins.`} Fractional buyers represent an expected average.</p>
             </div>
           </div>
         </div>
-        <div className="rs-below"><div className="rs-lesson-note"><TrendingUp size={23} aria-hidden="true" /><h2>A small basket can go a long way.</h2><p>More products increase basket value. Repeat purchases extend customer value. Keeping customers is what connects the two.</p></div><details className="rs-assumptions"><summary>Prices, purchase cycles, and how this model works</summary><p>Malaysia ABO prices (the AP column) are transcribed from <cite>ABO Price List SA13, April 2026</cite>, pages 2 and 8–11. Turn on “Show source details” to see each product’s SKU and source page. All displayed prices, monthly values, chart values, and totals use the Malaysia AP column. Actual selling prices can differ.</p><p>Purchase intervals are editable scenario assumptions, not product usage advice. Consumables are purchased at the start, then at the chosen interval. Appliances default to one purchase. Filters start after one replacement interval, avoiding an additional charge for a filter included with a new appliance. Follow product instructions and indicators for actual replacement timing.</p><p>Prices stay fixed, with no inflation, new customers, or reinvestment. The default scenario applies the repeat-purchase rate to each later buying cycle, not as repeated annual customer loss. The optional annual-attrition stress test applies retention to the remaining original group each year. Revenue is before costs and is not profit. A 50-year scenario explores assumptions; it is not a forecast.</p><p>Repeat sales accumulate. Compounding would also require growth, such as reinvesting profit to acquire more customers.</p></details></div>
+        <div className="rs-below"><div className="rs-lesson-note"><TrendingUp size={23} aria-hidden="true" /><h2>A small basket can go a long way.</h2><p>More products increase basket value. Repeat purchases extend customer value. Keeping customers is what connects the two.</p></div><details className="rs-assumptions"><summary>Prices, purchase cycles, and how this model works</summary><p>Malaysia ABO prices (the AP column) are transcribed from <cite>ABO Price List SA13, April 2026</cite>, pages 2 and 8–11. Turn on “Show source details” to see each product’s SKU and source page. All displayed prices, monthly values, chart values, and totals use the Malaysia AP column. Actual selling prices can differ.</p><p>Purchase intervals are editable scenario assumptions, not product usage advice. Consumables are purchased at the start, then at the chosen interval. Appliances default to one purchase. Filters start after one replacement interval, avoiding an additional charge for a filter included with a new appliance. Follow product instructions and indicators for actual replacement timing.</p><p>Prices stay fixed, with no inflation or reinvestment. When “Add 1 customer each year” is checked, one customer joins at the start of each year after the first, up to 20 total customers introduced. Uncheck it to keep the starting group fixed. Each new customer starts its own purchase and filter-replacement schedule. The default scenario applies the repeat-purchase rate to each later buying cycle, not as repeated annual customer loss. The optional annual-attrition stress test applies retention to each joining group’s remaining customers based on its own age. Revenue is before costs and is not profit. A 50-year scenario explores assumptions; it is not a forecast.</p><p>Repeat sales accumulate, and adding customers increases the repeat-sales base. Reinvestment returns are not assumed.</p></details></div>
       </div>
     </section>
   );

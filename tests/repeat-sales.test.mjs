@@ -9,8 +9,10 @@ async function loadTypeScript(relativePath) {
   const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } });
   return import('data:text/javascript;base64,' + Buffer.from(outputText).toString('base64'));
 }
-const { projectRepeatSales, durationLabel } = await loadTypeScript('../src/lib/repeatSales.ts');
+const { projectRepeatSales: projectWithAcquisition, durationLabel } = await loadTypeScript('../src/lib/repeatSales.ts');
 const { repeatSalesProducts } = await loadTypeScript('../src/data/repeatSalesProducts.ts');
+// Reference cases isolate the fixed starting group; acquisition has separate tests below.
+const projectRepeatSales = (products, months, customers, rate, model) => projectWithAcquisition(products, months, customers, rate, model, false);
 const find = id => repeatSalesProducts.find(p => p.id === id);
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 0.000001, `${actual} != ${expected}`);
 const starter = repeatSalesProducts.filter(p => p.checked);
@@ -99,4 +101,46 @@ test('ABO price is the only calculation basis, including one-time purchases', ()
   close(projectRepeatSales([product], 1, 1, 100).total, 29.5);
   close(projectRepeatSales([{ ...product, every: 0 }], 600, 1, 50).total, 29.5);
   close(projectRepeatSales([product], 600, 1, 50).recurringMonthly, 29.5 / 3);
+});
+
+test('one customer joins each anniversary, after the boundary and before the global cap', () => {
+  const at = months => projectWithAcquisition(starter, months, 1);
+  assert.equal(at(12).customersAtEnd, 1);
+  assert.equal(at(13).customersAtEnd, 2);
+  close(at(12).total, 357.25);
+  close(at(13).total, 538);
+  close(at(24).total, 1011.5);
+  assert.equal(at(228).customersAtEnd, 19);
+  assert.equal(at(229).customersAtEnd, 20);
+  assert.equal(at(600).customersAtEnd, 20);
+});
+test('50-year totals sum 20 joining groups of ages 50 through 31 years', () => {
+  // Each full-year cohort contributes 297 * years + 60.25 at 50% repeat buying.
+  // Sum of ages 31..50 = 810. The first-purchase uplift applies once to each buyer.
+  close(projectWithAcquisition(starter, 600, 1).total, 297 * 810 + 60.25 * 20);
+  close(projectWithAcquisition(starter, 600, 1, 100).total, 594 * 810);
+  close(projectWithAcquisition(starter, 600, 20).total, 298205);
+  assert.equal(projectWithAcquisition(starter, 600, 20).customersAtEnd, 20);
+});
+test('new customers have their own first appliance purchase and delayed filter replacement', () => {
+  const device = find('122940M'), filter = find('122943M');
+  close(projectWithAcquisition([device], 12, 1).total, 4680);
+  close(projectWithAcquisition([device], 13, 1).total, 4680 * 2);
+  close(projectWithAcquisition([device], 600, 1).total, 4680 * 20);
+  close(projectWithAcquisition([filter], 13, 1).total, 595 * 0.5);
+  close(projectWithAcquisition([filter], 25, 1).total, 595 * 0.5 * 3);
+});
+test('annual attrition follows each joining group age, not the business start date', () => {
+  close(projectWithAcquisition(starter, 24, 1, 50, 'annual-attrition').total, 594 * 1.5 + 594);
+  close(projectWithAcquisition(starter, 600, 1, 0).total, 120.5 * 20);
+  const projection = projectWithAcquisition(starter, 600, 1);
+  close(projection.total, projection.categories.reduce((sum, category) => sum + category.cumulative[600], 0));
+});
+
+test('invalid purchase intervals cannot create purchases or an unbounded schedule', () => {
+  for (const every of [-1, NaN]) {
+    const projection = projectWithAcquisition([{ ...find('124106'), every }], 13, 1);
+    assert.equal(projection.total, 0);
+    assert.deepEqual(projection.categories, []);
+  }
 });
