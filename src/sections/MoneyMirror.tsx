@@ -323,26 +323,25 @@ export default function MoneyMirror() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <div>
             <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-              What Is Your Time{' '}
-              <span className="text-gold">Really Worth?</span>
+              What do you earn <span className="text-gold">per hour?</span>
             </h1>
             <p data-reveal className="text-slate text-base md:text-lg mb-8 leading-relaxed">
-              Enter monthly numbers and see where your salary actually goes.
+              See your pay after deductions, work costs and time.
             </p>
 
 
 
             <form className="money-form space-y-5 mb-8" noValidate onSubmit={viewResults}>
-              <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and employee deductions." submitted={submitted} />
-              <div>
-                <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Leave blank to use 44 hours." inputMode="numeric" submitted={submitted} />
-                <details className="hours-slider"><summary>Adjust hours with a slider</summary><input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" /></details>
+              <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and deductions." submitted={submitted} />
+              <div className="money-time-fields">
+                <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Default: 44 hours." inputMode="numeric" submitted={submitted} />
+                <NumberField id="mm-commute" label="Commute hours / day" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
               </div>
-              <NumberField id="mm-commute" label="Daily commute (hours)" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
-              <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Petrol, tolls, food, parking, and uniforms." submitted={submitted} />
+              <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Travel, meals, parking and uniforms." submitted={submitted} />
               <div className="lesson-action"><button type="submit" className="primary-button">View my results</button></div>
               <p className="field-hint">Results update as you type. No numbers are saved.</p>
             </form>
+            <details className="hours-slider"><summary>Adjust hours with a slider</summary><input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" /></details>
             <details className="example-presets mb-6"><summary>Try an example</summary>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {presets.map((preset) => (
@@ -371,6 +370,7 @@ export default function MoneyMirror() {
 
             {calculated && (
               <div ref={resultsRef} id="money-mirror-results" tabIndex={-1} aria-label="Your cashflow results" className="mt-8 space-y-4">
+                <button type="button" className="money-edit-inputs" onClick={() => { const input = document.getElementById('mm-salary'); if (input) scrollToContent(input); }}>Edit my numbers</button>
                 <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-6">
                   <p className="text-slate text-sm mb-1">True Hourly Rate</p>
                   <p className="text-gold font-mono-data text-4xl md:text-5xl font-bold">

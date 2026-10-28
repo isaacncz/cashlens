@@ -1,6 +1,6 @@
 # Pocket Coach — PR #3 UI/UX review
 
-The [mobile follow-up review](mobile-pocket-coach-review.md) records the latest phone layout and validation. Measurements below describe the initial Pocket Coach implementation at commit `02639fb`.
+The [mobile density follow-up](mobile-density-review.md) records the latest UI UX Pro Max changes and validation. The [earlier mobile review](mobile-pocket-coach-review.md) records the preceding journey redesign. Measurements below describe the initial Pocket Coach implementation at commit `02639fb`.
 
 28 October 2026. Pocket Coach is the user-selected direction from three UI UX Pro Max / Impeccable proposals. This review covers Home, Learn, Settings, the first-sale consultation, and the shared theme, with regression checks for all nine lessons and the complete consultation.
 

@@ -59,6 +59,7 @@ try {
     await page.locator('#mm-salary').waitFor();
     assert.equal(await nav.isVisible(), false, 'A lesson uses the full phone workspace');
     if (textSize === 16 && height >= 740) assert.ok(await inScrollport(page.locator('#mm-salary')), 'Salary entry is visible immediately after opening the tool');
+    if (textSize === 16 && height >= 740) assert.ok(await inScrollport(page.getByRole('button', { name: 'View my results', exact: true })), 'The complete salary form and its action fit before scrolling');
     await page.locator('#mm-salary').fill('8000');
     await page.locator('#mm-hours').fill('44');
     await page.locator('#mm-commute').fill('1.5');

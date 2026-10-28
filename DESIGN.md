@@ -292,6 +292,8 @@ The forest Home task uses coach feature colors and 16px corners and contains its
 
 Home tools are quiet link rows with horizontal rules, outline icons, and an arrow. They use no resting panel fill or rounded card shell. Grouped learning cards use a surface background, thin outer boundary, panel corners, and internal dividers. Their lesson rows use 16px padding on phones and 20px vertical / 16px horizontal padding on wider screens, with a raised hover surface. Focus draws inside the clipped group so it remains visible.
 
+Phone salary and breathing-room forms sit directly on the page rather than inside another padded panel. Money Mirror pairs work hours and commute in a responsive row (stacking when text grows), puts its primary result action before the optional slider and examples, and provides an Edit my numbers return action. Phone Compound uses concise stage introductions and an underlined Edit plan / Results switch.
+
 Money Mirror's secondary result facts become full-width rows on phones, with wrapping labels and values that remain readable at enlarged text sizes. Wealth Thermometer's empty result is one useful sentence prompting monthly expenses; zone labels use text and semantic color.
 
 ### Inputs / Fields

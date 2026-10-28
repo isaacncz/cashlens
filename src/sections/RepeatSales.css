@@ -299,3 +299,16 @@
   .rs-mobile-summary > button { font-size: var(--text-body); }
   .rs-picker-content::before { display: none; }
 }
+
+@media (max-width: 767px) {
+  .rs-intro { margin-bottom: 12px; }
+  .rs-intro h1 { font-size: 1.25rem; }
+  .rs-intro p { font-size: var(--text-small); line-height: 1.4; margin-top: 4px; }
+  .rs-step-select { margin-bottom: 12px; }
+  .rs-view-switch { gap: 0; margin-bottom: 16px; border-bottom: 1px solid var(--rs-line); }
+  .rs-view-switch button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: transparent; }
+  .rs-view-switch button[aria-pressed=true] { border-bottom-color: var(--rs-gold); background: transparent; }
+  .rs-plan-panel > .rs-scenario > h3 { margin: 0; font-size: var(--text-small); color: var(--rs-muted); }
+  .rs-duration { margin-top: 12px; }
+  .rs-plan-panel .rs-scenario-grid { gap: 16px; }
+}

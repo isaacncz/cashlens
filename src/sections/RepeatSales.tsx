@@ -131,7 +131,7 @@ export default function RepeatSales() {
   </>);
 
   return <section id="repeat-sales" className={`repeat-sales${step === 0 ? ' rs-opening' : ''}`} aria-labelledby="repeat-sales-heading">
-    <header className="rs-intro"><div><h1 id="repeat-sales-heading" ref={headingRef} tabIndex={-1}>{titles[step]}</h1><p>{descriptions[step]}</p></div><button type="button" className="rs-text-button rs-reset" aria-label="Reset" title="Restart consultation" onClick={reset}><RotateCcw size={16} aria-hidden="true" />Reset</button></header>
+    <header className="rs-intro"><div><h1 id="repeat-sales-heading" ref={headingRef} tabIndex={-1}>{isPhone ? ['Start with one sale', 'Turn sales into a habit', 'Build your basket', 'Plan your growth'][step] : titles[step]}</h1><p>{isPhone ? ['One product. One customer.', 'See what repeat purchases can add up to.', 'Add products from year 2.', 'Adjust your customers, timing and repeat rate.'][step] : descriptions[step]}</p></div><button type="button" className="rs-text-button rs-reset" aria-label="Reset" title="Restart consultation" onClick={reset}><RotateCcw size={16} aria-hidden="true" />Reset</button></header>
     <div className="rs-step-select"><label htmlFor="rs-step">Step {step + 1} of 4</label><select id="rs-step" value={step} onChange={event => goToStep(Number(event.target.value), false)}>{steps.map((label, index) => <option key={label} value={index}>{label}</option>)}</select></div>
     <nav className="rs-steps" aria-label="Consultation steps"><ol>{steps.map((label, index) => <li key={label}><button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => goToStep(index)}><span aria-hidden="true">{index + 1}</span><span className="rs-step-label">{label}</span></button></li>)}</ol></nav>
 
