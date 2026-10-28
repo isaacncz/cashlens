@@ -76,8 +76,8 @@ export default function App() {
     return () => { observer.disconnect(); media.removeEventListener('change', syncSvgMotion); };
   }, [preferences.reduceMotion]);
   const changePreferences = (value: Preferences) => { savePreferences(value); setPreferences(value); };
-  return <div className="app-shell">
-    <Navigation active={destination} />
+  return <div className="app-shell" data-focus-mode={isLesson(route) || route === 'compounding'}>
+    <Navigation active={destination} route={route} />
     <main id="main-content" data-route={route} ref={mainRef} tabIndex={-1}>
       {visited.includes('learn') && <div hidden={route !== 'learn'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening lessons…</div>}><LessonLibrary lastLesson={lastLesson} /></Suspense></ScreenBoundary></div>}
       {visited.includes('settings') && <div hidden={route !== 'settings'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening settings…</div>}><Settings value={preferences} onChange={changePreferences} /></Suspense></ScreenBoundary></div>}
@@ -92,8 +92,8 @@ export default function App() {
         const next = lessons.find(item => item.id === nextId);
         return <div key={key} hidden={route !== key} className={lesson ? 'lesson-screen' : 'compound-screen'}>
           {lesson && <header className="lesson-top"><a href={routeHref('learn')}><ArrowLeft size={18} aria-hidden="true" />All lessons</a><span>{position + 1} of 9</span></header>}
-          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`} data-expanded={!!expandedPaths[key]}><span>{path.title}</span><button className="lesson-path-toggle" type="button" aria-expanded={!!expandedPaths[key]} aria-controls={`lesson-path-${key}`} onClick={() => setExpandedPaths(previous => ({ ...previous, [key]: !previous[key] }))}><span>{path.title}<small>Lesson {path.lessonIds.findIndex(id => id === key) + 1} of 3 · View path</small></span><ChevronDown size={20} aria-hidden="true" /></button><ol id={`lesson-path-${key}`}>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined}><span>{step + 1}</span>{' '}{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
           <ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status"><div className="loading-line" /><p>Opening your tool…</p></div>}><Screen /></Suspense></ScreenBoundary>
+          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`} data-expanded={!!expandedPaths[key]}><span>{path.title}</span><button className="lesson-path-toggle" type="button" aria-expanded={!!expandedPaths[key]} aria-controls={`lesson-path-${key}`} onClick={() => setExpandedPaths(previous => ({ ...previous, [key]: !previous[key] }))}><span>{path.title}<small>Lesson {path.lessonIds.findIndex(id => id === key) + 1} of 3 · View path</small></span><ChevronDown size={20} aria-hidden="true" /></button><ol id={`lesson-path-${key}`}>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined}><span>{step + 1}</span>{' '}{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
           {lesson && <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a>{next ? <a href={routeHref(next.id)}>Next: {next.title}<ArrowRight size={18} aria-hidden="true" /></a> : <a href={routeHref('learn')}>Choose another path<ArrowRight size={18} aria-hidden="true" /></a>}</nav>}
         </div>;
       })}

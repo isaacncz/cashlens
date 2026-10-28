@@ -7,8 +7,8 @@ import { chromium } from 'playwright';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const currentWorker = readFileSync(resolve(dist, 'sw.js'), 'utf8');
-assert.ok(currentWorker.includes('cashlens-pocket-coach-v4'), 'Build the mobile redesign before testing its worker update');
-const oldWorker = currentWorker.replace('cashlens-pocket-coach-v4', 'cashlens-pocket-coach-v3');
+assert.ok(currentWorker.includes('cashlens-pocket-coach-v5'), 'Build the mobile redesign before testing its worker update');
+const oldWorker = currentWorker.replace('cashlens-pocket-coach-v5', 'cashlens-pocket-coach-v4');
 const manifest = JSON.parse(readFileSync(resolve(dist, 'manifest.webmanifest'), 'utf8'));
 let previousVersion = true;
 const mime = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };
@@ -50,8 +50,8 @@ try {
   const readManifest = () => page.evaluate(async () => (await fetch('./manifest.webmanifest')).json());
   const readMarker = () => page.evaluate(async () => (await fetch('./mobile-update-marker.txt')).text());
   assert.equal(await readMarker(), 'previous Pocket Coach');
-  await page.waitForFunction(async () => (await caches.open('cashlens-pocket-coach-v3')).match('./mobile-update-marker.txt'));
-  assert.ok((await page.evaluate(() => caches.keys())).includes('cashlens-pocket-coach-v3'));
+  await page.waitForFunction(async () => (await caches.open('cashlens-pocket-coach-v4')).match('./mobile-update-marker.txt'));
+  assert.ok((await page.evaluate(() => caches.keys())).includes('cashlens-pocket-coach-v4'));
 
   previousVersion = false;
   await page.evaluate(async () => {
@@ -65,8 +65,8 @@ try {
   assert.equal(updated.theme_color, '#f7f4eb');
   assert.equal(updated.background_color, '#f7f4eb');
   const cacheNames = await page.evaluate(() => caches.keys());
-  assert.ok(cacheNames.includes('cashlens-pocket-coach-v4'));
-  assert.ok(!cacheNames.includes('cashlens-pocket-coach-v3'), 'Updating the worker clears the previous design cache');
+  assert.ok(cacheNames.includes('cashlens-pocket-coach-v5'));
+  assert.ok(!cacheNames.includes('cashlens-pocket-coach-v4'), 'Updating the worker clears the previous design cache');
   assert.equal(await readMarker(), 'mobile Pocket Coach', 'Previously cached resources are refreshed after activation');
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -76,8 +76,8 @@ try {
   await context.setOffline(true);
   await page.reload({ waitUntil: 'networkidle' });
   assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 29.50');
-  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Home', exact: true }).click();
-  await page.getByRole('heading', { level: 1, name: /A little clarity/ }).waitFor();
+  await page.getByRole('link', { name: 'Back to home', exact: true }).click();
+  await page.getByRole('heading', { level: 1, name: /Make sense of your money/ }).waitFor();
   console.log('Existing Pocket Coach PWA clears its previous cache, refreshes a cached resource, retains the ivory manifest, and restores visited Home and Compound screens offline.');
   await context.close();
 } finally {

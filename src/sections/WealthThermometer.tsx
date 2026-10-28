@@ -25,10 +25,10 @@ interface ExampleProfile {
 }
 
 const zoneConfig = {
-  crisis: { label: 'Crisis', color: 'var(--ledger-negative)', message: 'One retrenchment away from disaster.', icon: '🔴' },
-  precarious: { label: 'Precarious', color: 'var(--ledger-accent)', message: 'Can survive, can\'t thrive.', icon: '🟡' },
-  freedom: { label: 'Freedom Money', color: 'var(--ledger-positive)', message: 'You can quit your job.', icon: '🟢' },
-  infinite: { label: 'Financially Free', color: 'var(--ledger-accent)', message: 'Dah cukup. Enough.', icon: '✨' },
+  crisis: { label: 'Crisis', color: 'var(--ledger-negative)', message: 'One retrenchment away from disaster.' },
+  precarious: { label: 'Precarious', color: 'var(--ledger-accent)', message: 'Can survive, can\'t thrive.' },
+  freedom: { label: 'Freedom Money', color: 'var(--ledger-positive)', message: 'You can quit your job.' },
+  infinite: { label: 'Financially Free', color: 'var(--ledger-accent)', message: 'Dah cukup. Enough.' },
 };
 
 const actionSteps: Record<string, string[]> = {
@@ -139,7 +139,12 @@ export default function WealthThermometer() {
   const viewResults = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(true);
-    if (!valid) { event.currentTarget.querySelector<HTMLElement>('[aria-invalid=true], input:invalid')?.focus(); return; }
+    if (!valid) {
+      const invalid = event.currentTarget.querySelector<HTMLElement>('[aria-invalid=true], input:invalid');
+      invalid?.closest('details')?.setAttribute('open', '');
+      invalid?.focus();
+      return;
+    }
     const target = resultRef.current;
     if (target) {
       scrollToContent(target);
@@ -183,6 +188,22 @@ export default function WealthThermometer() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calculator Form */}
           <div data-reveal>
+
+            <form className="wealth-form space-y-5" noValidate onSubmit={viewResults}>
+              <h2 className="form-group-heading">Liquid assets</h2>
+              <NumberField id="wt-asb" label="ASB / ASNB balance (RM)" value={asb} onChange={setAsb} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-unit-trust" label="Unit trusts (RM)" value={unitTrust} onChange={setUnitTrust} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-savings" label="Savings account (RM)" value={savings} onChange={setSavings} placeholder="0" hint="Exclude EPF and other funds you cannot access now." submitted={submitted} />
+              <h2 className="form-group-heading">Monthly spending</h2>
+              <NumberField id="wt-expenses" label="Total monthly expenses (RM)" value={expenses} onChange={setExpenses} min={.01} required placeholder="3500" submitted={submitted} />
+              <details className="optional-income"><summary>Monthly passive income<span>{[dividends, rental, stockDividends].some(value => Number(value) !== 0) ? `RM ${formatMoney((Number(dividends) || 0) + (Number(rental) || 0) + (Number(stockDividends) || 0))} / month` : 'Optional'}</span></summary><div>
+              <NumberField id="wt-dividends" label="ASB / ASN dividends (RM)" value={dividends} onChange={setDividends} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-rental" label="Rental income (RM)" value={rental} onChange={setRental} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-stock" label="Stock dividends (RM)" value={stockDividends} onChange={setStockDividends} placeholder="0" submitted={submitted} />
+</div></details>
+              <div className="lesson-action"><button type="submit" className="primary-button">View my breathing room</button></div>
+              <p className="field-hint">Results update as you type. No numbers are saved.</p>
+            </form>
             <details className="example-presets mb-6"><summary>Try an example profile</summary>
               <div className="flex flex-wrap gap-2">
                 {exampleProfiles.map((profile) => (
@@ -204,20 +225,6 @@ export default function WealthThermometer() {
                 <p className="text-slate text-sm mt-3">{selectedProfileMeta.description}</p>
               )}
             </details>
-            <form className="wealth-form space-y-5" noValidate onSubmit={viewResults}>
-              <h2 className="form-group-heading">Liquid assets</h2>
-              <NumberField id="wt-asb" label="ASB / ASNB balance (RM)" value={asb} onChange={setAsb} placeholder="0" submitted={submitted} />
-              <NumberField id="wt-unit-trust" label="Unit trusts (RM)" value={unitTrust} onChange={setUnitTrust} placeholder="0" submitted={submitted} />
-              <NumberField id="wt-savings" label="Savings account (RM)" value={savings} onChange={setSavings} placeholder="0" hint="Exclude EPF and other funds you cannot access now." submitted={submitted} />
-              <h2 className="form-group-heading">Monthly passive income</h2>
-              <NumberField id="wt-dividends" label="ASB / ASN dividends (RM)" value={dividends} onChange={setDividends} placeholder="0" submitted={submitted} />
-              <NumberField id="wt-rental" label="Rental income (RM)" value={rental} onChange={setRental} placeholder="0" submitted={submitted} />
-              <NumberField id="wt-stock" label="Stock dividends (RM)" value={stockDividends} onChange={setStockDividends} placeholder="0" submitted={submitted} />
-              <h2 className="form-group-heading">Monthly spending</h2>
-              <NumberField id="wt-expenses" label="Total monthly expenses (RM)" value={expenses} onChange={setExpenses} min={.01} required placeholder="3500" submitted={submitted} />
-              <div className="lesson-action"><button type="submit" className="primary-button">View my breathing room</button></div>
-              <p className="field-hint">Results update as you type. No numbers are saved.</p>
-            </form>
           </div>
 
           {/* Result Display */}
@@ -305,7 +312,7 @@ export default function WealthThermometer() {
                 {/* Zone Message */}
                 <div data-result className="rounded-xl p-5 border" style={{ borderColor: `color-mix(in srgb, ${zoneConfig[result.zone].color} 25%, transparent)`, backgroundColor: `color-mix(in srgb, ${zoneConfig[result.zone].color} 3%, transparent)` }}>
                   <p className="text-sm mb-1" style={{ color: zoneConfig[result.zone].color }}>
-                    {zoneConfig[result.zone].icon} {zoneConfig[result.zone].label} Zone
+                    {zoneConfig[result.zone].label} Zone
                   </p>
                   <p className="text-slate text-sm">{zoneConfig[result.zone].message}</p>
                 </div>
@@ -332,12 +339,7 @@ export default function WealthThermometer() {
                 )}
               </div>
             ) : (
-              <div className="bg-navy-surface/50 border border-navy-light rounded-2xl p-8 flex flex-col items-center justify-center h-full min-h-[400px]">
-                <div className="w-16 h-16 rounded-full bg-navy-light flex items-center justify-center mb-4">
-                  <span className="text-3xl">🌡️</span>
-                </div>
-                <p className="text-slate text-sm text-center">Enter your financial details or tap a sample profile to see your Wealth Thermometer update live.</p>
-              </div>
+              <p className="field-hint">Enter your monthly expenses to see your breathing room.</p>
             )}
           </div>
         </div>

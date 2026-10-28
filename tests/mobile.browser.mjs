@@ -23,91 +23,120 @@ try {
     const label = `${width}×${height}, ${textSize}px text`;
     const main = page.locator('#main-content');
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    const views = page.getByRole('group', { name: 'Consultation view' });
+    const edit = () => views.getByRole('button', { name: 'Edit plan', exact: true }).click();
+    const results = () => views.getByRole('button', { name: 'Results', exact: true }).click();
     const layout = async () => {
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Document fits: ${label}`);
       assert.ok(await main.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Content reflows: ${label} ${page.url()}`);
       const content = await main.boundingBox();
-      const navigation = await nav.boundingBox();
       assert.ok(content.height >= 120, `Useful scroll area: ${label}`);
-      assert.ok(content.y + content.height <= navigation.y + 1, `Navigation clearance: ${label}`);
-      for (const link of await nav.getByRole('link').all()) {
-        const box = await link.boundingBox();
-        assert.ok(box.height >= 44 && box.width >= 44, `Navigation touch target: ${label}`);
-        assert.ok(await link.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Navigation labels reflow: ${label}`);
+      if (await nav.isVisible()) {
+        const navigation = await nav.boundingBox();
+        assert.ok(content.y + content.height <= navigation.y + 1, `Navigation clearance: ${label}`);
+        for (const link of await nav.getByRole('link').all()) {
+          const box = await link.boundingBox();
+          assert.ok(box.height >= 44 && box.width >= 44, `Navigation touch target: ${label}`);
+          assert.ok(await link.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Navigation labels reflow: ${label}`);
+        }
+      } else {
+        assert.ok(await page.locator('.workspace-header a').isVisible(), `A visible back route replaces navigation: ${label}`);
       }
+    };
+    const inScrollport = async locator => {
+      const box = await locator.boundingBox(), area = await main.boundingBox();
+      return box.y >= area.y && box.y + box.height <= area.y + area.height + 1;
     };
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
     await page.locator('.dashboard').waitFor();
     await layout();
+    if (textSize === 16 && width >= 375 && height >= 812) {
+      for (const href of ['money-mirror', 'wealth-thermometer', 'compounding', 'learn']) {
+        assert.ok(await inScrollport(page.locator(`.dashboard a[href$="#${href}"]`)), `Every Home task is available without scrolling: ${label} ${href}`);
+      }
+    }
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
     await page.locator('#mm-salary').waitFor();
-    const toggle = page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle');
-    assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
-    await toggle.press('Enter');
-    const path = page.getByRole('navigation', { name: 'Understand your money lessons' });
-    assert.equal(await path.getByRole('link').count(), 3, 'Expanded path exposes every lesson');
-    await toggle.press('Enter');
-    assert.equal(await path.getByRole('link').count(), 0, 'Collapsed path removes links from the accessibility tree');
-    await page.locator('.hours-slider > summary').click();
-    const slider = page.getByRole('slider', { name: 'Hours worked per week', exact: true });
-    await slider.focus();
-    const sliderBox = await slider.boundingBox();
-    const formViewport = await main.boundingBox();
-    assert.ok(sliderBox.height >= 44 && sliderBox.y >= formViewport.y && sliderBox.y + sliderBox.height <= formViewport.y + formViewport.height, `Optional slider remains fully reachable: ${label}`);
-    await slider.fill('48');
-    assert.equal(await page.locator('#mm-hours').inputValue(), '48', 'Optional slider and numeric entry share the same value');
-    await page.locator('.hours-slider > summary').click();
+    assert.equal(await nav.isVisible(), false, 'A lesson uses the full phone workspace');
+    if (textSize === 16 && height >= 740) assert.ok(await inScrollport(page.locator('#mm-salary')), 'Salary entry is visible immediately after opening the tool');
+    await page.locator('#mm-salary').fill('8000');
+    await page.locator('#mm-hours').fill('44');
+    await page.locator('#mm-commute').fill('1.5');
+    await page.locator('#mm-expenses').fill('500');
+    await page.getByRole('button', { name: 'View my results', exact: true }).click();
+    assert.equal(await page.locator('#money-mirror-results').evaluate(element => element === document.activeElement), true);
     await layout();
-    await nav.getByRole('link', { name: 'Learn', exact: true }).click();
-    await page.locator('.learning-filters').waitFor();
-    const filters = await page.locator('.learning-filters button').all();
-    const filterBoxes = await Promise.all(filters.map(button => button.boundingBox()));
-    if (textSize === 16) {
-      assert.equal(filterBoxes[0].y, filterBoxes[1].y, 'First filter row stays aligned');
-      assert.equal(filterBoxes[2].y, filterBoxes[3].y, 'Second filter row stays aligned');
-    } else {
-      assert.ok(filterBoxes.every((box, index) => index === 0 || box.y > filterBoxes[index - 1].y), 'Enlarged labels use a readable single column');
-    }
-    for (const box of filterBoxes) assert.ok(box.height >= 48 && box.width >= 44);
-    await page.getByRole('button', { name: 'Practice', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to lessons', exact: true }).click();
+    await page.locator('.library-filter').waitFor();
+    assert.equal(await page.locator('.lesson-list a').count(), 9);
+    await page.getByLabel('Learning path', { exact: true }).focus();
+    await page.getByLabel('Learning path', { exact: true }).selectOption('practice');
     assert.equal(await page.locator('.lesson-list a').count(), 3);
     assert.equal(await page.locator('.library-heading [role=status]').innerText(), '3 lessons · Put it into practice');
+    assert.equal(await page.getByLabel('Learning path', { exact: true }).evaluate(element => element === document.activeElement), true);
+    await page.getByLabel('Learning path', { exact: true }).selectOption('all');
     await layout();
     await nav.getByRole('link', { name: 'Compound', exact: true }).click();
     await page.locator('.rs-first-receipt').waitFor();
+    assert.equal(await nav.isVisible(), false, 'Compound has one action bar instead of two bottom bars');
     await layout();
     const dock = page.locator('.rs-mobile-summary');
-    const dockBox = await dock.boundingBox();
-    const contentBox = await main.boundingBox();
-    assert.ok(contentBox.y + contentBox.height <= dockBox.y + 1, `Action bar clearance: ${label}`);
     assert.ok(await dock.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Action bar reflows: ${label}`);
-    if (height >= 740 && textSize === 16 && width >= 375) {
-      const receipt = await page.locator('.rs-first-receipt').boundingBox();
-      assert.ok(receipt.y + receipt.height <= contentBox.y + contentBox.height, 'Qualified first-sale amount is visible on arrival');
-    }
-    await page.getByRole('button', { name: 'Change', exact: true }).click();
+    if (height >= 740 && textSize === 16) assert.ok(await inScrollport(page.locator('.rs-first-receipt')), 'The first-sale amount is visible on arrival');
+    await page.getByRole('button', { name: 'See repeat sales', exact: true }).click();
+    await page.locator('.rs-result').waitFor();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 73.75');
+    assert.equal(await page.locator('#rs-plan-panel').isVisible(), false);
+    await edit();
+    assert.equal(await page.locator('.rs-result').isVisible(), false);
+    await page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true }).selectOption('1');
+    await page.getByRole('button', { name: 'View results', exact: true }).click();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 191.75', 'One action shows the result of an edited plan');
+    await edit();
+    await page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true }).selectOption('3');
+    await results();
+    await page.getByRole('button', { name: 'Add products in year 2', exact: true }).click();
     const picker = page.getByRole('dialog');
     await picker.waitFor();
     assert.ok(await picker.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Product sheet reflows: ${label}`);
-    await page.getByRole('searchbox', { name: 'Find a product' }).fill('Dish Drops');
-    assert.equal(await picker.locator('.rs-product').count(), 1);
-    await picker.getByRole('radio').check();
+    await picker.getByRole('searchbox', { name: 'Find a product' }).fill('Dish Drops');
+    await picker.getByRole('checkbox', { name: 'Select Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true }).check();
+    await picker.getByRole('searchbox', { name: 'Find a product' }).fill('Smooth Moisture');
+    await picker.getByRole('checkbox', { name: 'Select Satinique Smooth Moisture Shampoo, 280ml', exact: true }).check();
     await picker.getByRole('button', { name: 'Done', exact: true }).click();
     await picker.waitFor({ state: 'hidden' });
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 35.00', 'Product selection updates the first-sale amount');
-    await page.getByRole('navigation', { name: 'Consultation steps' }).getByRole('button').nth(3).click();
-    await page.locator('#rs-customers').waitFor();
-    await page.locator('#rs-customers').focus();
-    await page.locator('#rs-customers').scrollIntoViewIfNeeded();
-    const fieldBox = await page.locator('#rs-customers').boundingBox();
-    const mainBox = await main.boundingBox();
-    assert.ok(fieldBox.y >= mainBox.y && fieldBox.y + fieldBox.height <= mainBox.y + mainBox.height + 1, `Focused field stays above action bar: ${label}`);
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 416.25');
+    assert.ok(await page.locator('.rs-result').isVisible(), 'Closing product selection shows the updated result');
+    await page.getByLabel('Step 3 of 4', { exact: true }).focus();
+    await page.getByLabel('Step 3 of 4', { exact: true }).selectOption('3');
+    assert.equal(await page.locator('#rs-step').evaluate(element => element === document.activeElement), true, 'Changing consultation stages preserves selector focus');
+    await edit();
+    if (height >= 812 && textSize === 16) assert.ok(await inScrollport(page.locator('#rs-customers')), 'Long-term customer input appears before the product list and chart');
+    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('12');
+    await page.locator('#rs-customers').fill('2');
+    await page.locator('#rs-customers').blur();
+    await page.getByRole('button', { name: 'View results', exact: true }).click();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 147.50', 'Switching views retains scenario inputs and product scheduling');
+    const dockBox = await dock.boundingBox(), area = await main.boundingBox();
+    assert.ok(area.y + area.height <= dockBox.y + 1, `Action bar clearance: ${label}`);
     await layout();
-    await nav.getByRole('link', { name: 'Settings', exact: true }).click();
-    await page.locator('.theme-options').waitFor();
+    await page.getByRole('link', { name: 'Back to home', exact: true }).click();
+    await page.locator('.dashboard').waitFor();
+    await page.locator('.dashboard a[href$="#wealth-thermometer"]').click();
+    await page.locator('#wt-savings').fill('5000');
+    await page.locator('#wt-expenses').fill('1000');
+    await page.locator('.optional-income summary').click();
+    await page.locator('#wt-rental').fill('-10');
+    await page.locator('.optional-income summary').click();
+    await page.getByRole('button', { name: 'View my breathing room', exact: true }).click();
+    assert.equal(await page.locator('.optional-income').getAttribute('open'), '', 'A hidden invalid optional field is revealed on submit');
+    assert.equal(await page.locator('#wt-rental').evaluate(element => element === document.activeElement), true);
+    await page.locator('#wt-rental').fill('200');
+    await page.getByRole('button', { name: 'View my breathing room', exact: true }).click();
+    assert.equal(await page.locator('#wealth-results').evaluate(element => element === document.activeElement), true);
     await layout();
     await context.close();
-    console.log(`${label}: reflow, touch controls, learning disclosure, picker and dock clearance passed`);
+    console.log(`${label}: direct task access, visible form entry, compact learning, edit/results, retained inputs and recovery passed`);
   }
   assert.deepEqual(errors, [], 'No browser errors');
 } finally { await browser.close(); }

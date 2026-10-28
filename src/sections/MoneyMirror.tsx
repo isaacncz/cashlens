@@ -330,6 +330,19 @@ export default function MoneyMirror() {
               Enter monthly numbers and see where your salary actually goes.
             </p>
 
+
+
+            <form className="money-form space-y-5 mb-8" noValidate onSubmit={viewResults}>
+              <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and employee deductions." submitted={submitted} />
+              <div>
+                <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Leave blank to use 44 hours." inputMode="numeric" submitted={submitted} />
+                <details className="hours-slider"><summary>Adjust hours with a slider</summary><input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" /></details>
+              </div>
+              <NumberField id="mm-commute" label="Daily commute (hours)" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
+              <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Petrol, tolls, food, parking, and uniforms." submitted={submitted} />
+              <div className="lesson-action"><button type="submit" className="primary-button">View my results</button></div>
+              <p className="field-hint">Results update as you type. No numbers are saved.</p>
+            </form>
             <details className="example-presets mb-6"><summary>Try an example</summary>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {presets.map((preset) => (
@@ -356,18 +369,6 @@ export default function MoneyMirror() {
               )}
             </details>
 
-            <form className="money-form space-y-5 mb-8" noValidate onSubmit={viewResults}>
-              <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and employee deductions." submitted={submitted} />
-              <div>
-                <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Leave blank to use 44 hours." inputMode="numeric" submitted={submitted} />
-                <details className="hours-slider"><summary>Adjust hours with a slider</summary><input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" /></details>
-              </div>
-              <NumberField id="mm-commute" label="Daily commute (hours)" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
-              <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Petrol, tolls, food, parking, and uniforms." submitted={submitted} />
-              <div className="lesson-action"><button type="submit" className="primary-button">View my results</button></div>
-              <p className="field-hint">Results update as you type. No numbers are saved.</p>
-            </form>
-
             {calculated && (
               <div ref={resultsRef} id="money-mirror-results" tabIndex={-1} aria-label="Your cashflow results" className="mt-8 space-y-4">
                 <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-6">
@@ -377,7 +378,7 @@ export default function MoneyMirror() {
                   </p>
                 </div>
 
-                <div data-result className="grid grid-cols-2 gap-4">
+                <div data-result className="money-result-facts grid grid-cols-2 gap-4">
                   <div className="bg-navy-surface border border-navy-light rounded-xl p-4">
                     <p className="text-slate text-xs uppercase mb-1">Annual Hours Traded</p>
                     <p className="text-white font-mono-data text-xl font-bold">{results.annualHours.toFixed(0)}</p>
@@ -418,7 +419,6 @@ export default function MoneyMirror() {
           <div data-reveal className="bg-navy-surface/30 rounded-2xl border border-navy-light/50 p-5 md:p-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
               <div>
-                <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Salary funnel</p>
                 <h2 className="text-white text-xl font-bold">From gross income to what you actually keep</h2>
               </div>
               <div className="bg-emerald/10 border border-emerald/20 rounded-xl px-4 py-3">

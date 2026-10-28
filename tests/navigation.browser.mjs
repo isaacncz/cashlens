@@ -15,14 +15,17 @@ try {
       assert.ok(await page.locator('#main-content').evaluate(element => element.scrollWidth <= element.clientWidth + 1), `No content overflow at ${width}px: ${page.url()}`);
     };
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    const editPlan = async () => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: 'Edit plan', exact: true }).click(); };
+    const results = async () => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: 'Results', exact: true }).click(); };
     const open = async name => {
+      if (!await nav.isVisible()) await page.locator('.workspace-header a').click();
       await nav.getByRole('link', { name, exact: true }).click();
       if (name === 'Learn') await page.locator('.lesson-list').first().waitFor();
       if (name === 'Settings') await page.locator('.settings-page').waitFor();
       if (name === 'Compound') await page.locator('.rs-basket').waitFor();
     };
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
-    await page.getByRole('heading', { level: 1, name: /A little clarity/ }).waitFor();
+    await page.getByRole('heading', { level: 1, name: /Make sense of your money/ }).waitFor();
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'New visitors default to light even on a dark device');
     assert.equal(await nav.getByRole('link').count(), 4);
     assert.equal(await page.locator('.lesson-screen').count(), 0, 'Lessons are not mounted on arrival');
@@ -65,11 +68,12 @@ try {
     assert.equal(await page.locator('.learning-path').count(), 3);
     assert.equal(await page.locator('.lesson-link[data-resume] h3').innerText(), 'Money Mirror');
     assert.equal(await page.locator('.lesson-resume-badge').innerText(), 'Last opened');
-    await page.getByRole('button', { name: 'Build', exact: true }).click();
+    await page.getByLabel('Learning path', { exact: true }).focus();
+    await page.getByLabel('Learning path', { exact: true }).selectOption('build');
     assert.equal(await page.locator('.lesson-list a').count(), 3, 'Path filters limit choices');
     assert.equal(await page.locator('.library-heading [role=status]').innerText(), '3 lessons · Build breathing room');
-    assert.equal(await page.getByRole('button', { name: 'Build', exact: true }).evaluate(element => element === document.activeElement), true, 'Filtering announces results without moving focus');
-    await page.getByRole('button', { name: 'All', exact: true }).click();
+    assert.equal(await page.getByLabel('Learning path', { exact: true }).evaluate(element => element === document.activeElement), true, 'Filtering announces results without moving focus');
+    await page.getByLabel('Learning path', { exact: true }).selectOption('all');
     assert.equal(await page.locator('.library-heading [role=status]').innerText(), '9 lessons · explore in any order');
     for (const id of lessonIds) {
       await page.locator(`.lesson-list a[href$="#${id}"]`).click();
@@ -109,10 +113,12 @@ try {
     assert.equal(await page.locator('.rs-plan-product').count(), 1);
     assert.equal(await page.locator('.rs-chart [data-series="total"]').count(), 1);
     assert.equal(await page.locator('.rs-chart [data-category]').count(), 0, 'Total revenue is the default chart');
+    await editPlan();
     const toothpasteCycle = page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true });
     await toothpasteCycle.selectOption('1');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 191.75');
     await toothpasteCycle.selectOption('3');
+    await results();
     await page.getByRole('button', { name: 'Add products in year 2', exact: true }).click();
     await picker.waitFor();
     assert.equal(await picker.locator('.rs-product').count(), 28);
@@ -121,6 +127,7 @@ try {
     assert.ok(await picker.evaluate(element => element.contains(document.activeElement)), 'Native picker contains keyboard focus');
     await page.keyboard.press('Escape');
     await picker.waitFor({ state: 'hidden' });
+    await editPlan();
     await page.getByRole('button', { name: 'Add products', exact: true }).click();
     await page.getByRole('searchbox', { name: 'Find a product' }).fill('no-such-product');
     assert.ok(await page.getByText('No matching products.', { exact: true }).isVisible());
@@ -134,13 +141,16 @@ try {
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 416.25');
     assert.ok((await page.locator('.rs-context').innerText()).includes('1 customer'));
     assert.equal(await page.locator('.rs-basket-value strong').innerText(), 'RM 29.50');
+    await editPlan();
     const shampooYear = page.getByRole('combobox', { name: 'Start year for Satinique Smooth Moisture Shampoo, 280ml', exact: true });
     const dishYear = page.getByRole('combobox', { name: 'Start year for Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true });
     await shampooYear.selectOption('3');
     await page.waitForFunction(() => document.activeElement.id === 'rs-start-126449');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 220.25', 'A year-3 product cannot affect year-2 revenue');
     await shampooYear.selectOption('2');
+    await results();
     await page.getByRole('button', { name: 'Explore long term', exact: true }).click();
+    await editPlan();
     await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('600');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 14,672.25');
     const growth = page.getByRole('checkbox', { name: 'Add customers each year', exact: true });
@@ -151,13 +161,11 @@ try {
     await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('12');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 73.75', 'Later products never change year 1');
     await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('600');
+    await results();
     if (width < 1200) {
-      await page.locator('#main-content').evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }));
-      await page.getByRole('button', { name: 'View projection', exact: true }).click();
-      await page.getByRole('button', { name: 'Edit basket', exact: true }).waitFor();
       const dock = await page.locator('.rs-mobile-summary').boundingBox();
       const usable = await page.locator('#main-content').boundingBox();
-      assert.ok(usable.y + usable.height <= dock.y + 1, 'The live total never overlays calculator content');
+      assert.ok(usable.y + usable.height <= dock.y + 1, 'The action bar never overlays calculator content');
     }
     await page.locator('.rs-chart').scrollIntoViewIfNeeded();
     const chart = await page.locator('.rs-chart').boundingBox();
@@ -170,6 +178,7 @@ try {
     await page.getByRole('slider', { name: 'Chart month', exact: true }).fill('12');
     assert.equal(await page.locator('.rs-chart-reading').innerText(), '1 year · RM 73.75');
     // Restoring all start years to 1 preserves the original calculator's reference totals.
+    await editPlan();
     await shampooYear.selectOption('1');
     await dishYear.selectOption('1');
     await growth.check();
@@ -209,11 +218,20 @@ try {
     await page.locator('html[data-theme=dark]').waitFor();
     await open('Compound');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 29.50', 'Consultation restarts with one product and one customer after reload');
-    await open('Learn');
-    await page.goBack();
-    await page.locator('#repeat-sales').waitFor();
-    await page.goForward();
-    await page.getByRole('heading', { name: 'Build your money sense.', exact: true }).waitFor();
+    if (width < 768) {
+      await page.getByRole('link', { name: 'Back to home', exact: true }).click();
+      await page.locator('.dashboard').waitFor();
+      await page.goBack();
+      await page.locator('#repeat-sales').waitFor();
+      await page.goForward();
+      await page.locator('.dashboard').waitFor();
+    } else {
+      await open('Learn');
+      await page.goBack();
+      await page.locator('#repeat-sales').waitFor();
+      await page.goForward();
+      await page.getByRole('heading', { name: 'Learn at your pace.', exact: true }).waitFor();
+    }
     await checkLayout();
     await context.close();
   }

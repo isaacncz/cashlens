@@ -18,7 +18,7 @@ React, TypeScript, Vite and Tailwind. No new application dependencies. Malaysia 
 CashflowLens.MY; Pocket Coach. The user selected proposal 2 from three UI UX Pro Max / Impeccable directions on 28 October 2026. Use warm ivory, forest task panels, sage actions, readable type and a guided learning flow. Preserve light/dark themes, familiar navigation and all existing educational tools.
 
 ## Accessibility & Inclusion
-WCAG AA contrast, semantic navigation and forms, visible keyboard focus, 44px touch targets, 16px body/input text, safe-area insets, system color scheme and reduced motion. Bottom navigation on phones and sidebar navigation on desktop. Target Lighthouse mobile performance and accessibility scores of at least 90, measured against production.
+WCAG AA contrast, semantic navigation and forms, visible keyboard focus, 44px touch targets, 16px body/input text, safe-area insets, system color scheme and reduced motion. Bottom navigation on phone destination screens and sidebar navigation on desktop. Phone tools use a back header and a full-height workspace, with a single action bar for Compound. Target Lighthouse mobile performance and accessibility scores of at least 90, measured against production.
 
 Light is the default theme for new visitors, including dark-mode devices. Explicit stored Light, Dark and Device selections are respected. Learning offers three ordered paths with three lessons each and a session-only last-opened lesson shortcut.
 
