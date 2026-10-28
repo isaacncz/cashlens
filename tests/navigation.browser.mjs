@@ -37,7 +37,9 @@ try {
     } else assert.equal(navBox.x, 0, 'Desktop uses a sidebar');
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
     await page.locator('#mm-salary').waitFor();
+    if (width < 768) await page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle').click();
     assert.equal(await page.getByRole('navigation', { name: 'Understand your money lessons' }).getByRole('link', { name: '1 Money Mirror', exact: true }).getAttribute('aria-current'), 'step', 'Lesson navigation uses its visible label as the accessible name');
+    if (width < 768) await page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle').click();
     await page.getByRole('button', { name: 'View my results', exact: true }).click();
     await page.locator('#mm-salary[aria-invalid=true]').waitFor();
     assert.ok(await page.locator('.money-form .inline-error').count());

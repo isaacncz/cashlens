@@ -103,16 +103,15 @@ export default function RepeatSales() {
 
   return <section id="repeat-sales" className={`repeat-sales${step === 0 ? ' rs-opening' : ''}`} aria-labelledby="repeat-sales-heading">
     <header className="rs-intro"><div><h1 id="repeat-sales-heading" ref={headingRef} tabIndex={-1}>{step === 0 ? <>One product.<br />One customer.</> : titles[step]}</h1><p>{descriptions[step]}</p></div><button type="button" className="rs-text-button rs-reset" aria-label="Reset" title="Restart consultation" onClick={reset}><RotateCcw size={16} aria-hidden="true" />Reset</button></header>
-    <nav className="rs-steps" aria-label="Consultation steps"><ol>{steps.map((label, index) => <li key={label}><button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => setStep(index)}><span aria-hidden="true">{index + 1}</span>{label}</button></li>)}</ol></nav>
+    <nav className="rs-steps" aria-label="Consultation steps"><ol>{steps.map((label, index) => <li key={label}><button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => setStep(index)}><span aria-hidden="true">{index + 1}</span><span className="rs-step-label">{label}</span></button></li>)}</ol></nav>
 
     {step === 0 ? <div className="rs-first-sale rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
       <div className="rs-sale-story">
         <div className="rs-sale-product"><ShoppingBasket size={28} strokeWidth={1.5} aria-hidden="true" /><div><h2>{firstProduct.name}</h2><p>{firstProduct.size} · RM {formatRinggit(firstProduct.aboPrice)} ABO</p></div><button type="button" className="rs-text-button" onClick={() => openPicker('first')}>Change</button></div>
         <div className="rs-one-customer"><UserRound size={20} aria-hidden="true" /><span>1 customer buys 1 item</span></div>
-        <p className="rs-sale-question">What if this customer comes back?<span>Next, explore a year of repeat sales.</span></p>
-        <button type="button" className="primary-button rs-desktop-next" onClick={advance}>{nextLabel}<ArrowRight size={18} aria-hidden="true" /></button>
       </div>
       <div className="rs-first-receipt"><h2>Your first sale</h2><p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM </span>{formatRinggit(projection.total)}</p><p className="rs-muted">Malaysia ABO price · before costs</p><dl className="rs-first-facts"><div><dt>Product quantity</dt><dd>1 item</dd></div><div><dt>Customer</dt><dd>1 person</dd></div><div><dt>Price source</dt><dd>Apr 2026 · ABO</dd></div></dl></div>
+      <div className="rs-sale-next"><p className="rs-sale-question">What if this customer comes back?<span>Next, explore a year of repeat sales.</span></p><button type="button" className="primary-button rs-desktop-next" onClick={advance}>{nextLabel}<ArrowRight size={18} aria-hidden="true" /></button></div>
     </div> : <div className="rs-workspace">
       <div className="rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
         <div className="rs-basket-heading"><div><h2>{step === 1 ? 'Your one product' : 'Your product plan'}</h2><p className="rs-muted">Malaysia ABO prices · Apr 2026</p></div>{step === 1 && <button type="button" className="rs-text-button" onClick={() => openPicker('first')}>Change</button>}</div>

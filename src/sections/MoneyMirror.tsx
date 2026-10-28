@@ -360,7 +360,7 @@ export default function MoneyMirror() {
               <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and employee deductions." submitted={submitted} />
               <div>
                 <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Leave blank to use 44 hours." inputMode="numeric" submitted={submitted} />
-                <input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" />
+                <details className="hours-slider"><summary>Adjust hours with a slider</summary><input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" /></details>
               </div>
               <NumberField id="mm-commute" label="Daily commute (hours)" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
               <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Petrol, tolls, food, parking, and uniforms." submitted={submitted} />

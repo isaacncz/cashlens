@@ -62,6 +62,8 @@
   --radius: 0.75rem;
   --header-height: 64px;
   --bottom-nav-height: 68px;
+  --consultation-dock-height: 104px;
+  --lesson-dock-height: 84px;
   --site-header-height: calc(var(--header-height) + env(safe-area-inset-top));
   --site-bg: var(--ledger-ground);
   --site-surface: var(--ledger-surface);

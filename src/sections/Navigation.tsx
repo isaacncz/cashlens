@@ -22,7 +22,7 @@ export default function Navigation({ active }: { active: Destination }) {
     <header className="site-header">
       <a className="site-brand" href={routeHref('home')} onClick={() => resetScroll('#home')} aria-label="CashflowLens.MY home"><span className="brand-mark" aria-hidden="true"><Sprout size={22} strokeWidth={1.8} /></span><span>CashflowLens<span className="brand-domain">.MY</span></span></a>
       <span className="header-note">A little clarity, every day.</span>
-      <span className="header-currency">MYR <span>·</span> Malaysia</span>
+      <span className="header-currency">MYR <span>·</span> <span className="currency-country">Malaysia</span></span>
     </header>
     <nav className="app-navigation" aria-label="Main navigation">
       <div className="nav-heading">Your space</div>

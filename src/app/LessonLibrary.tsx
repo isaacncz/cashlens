@@ -9,9 +9,9 @@ export default function LessonLibrary({ lastLesson }: { lastLesson: LessonId | n
   const groups = learningPaths.filter(path => filter === 'all' || path.id === filter);
   const visibleCount = groups.reduce((count, path) => count + path.lessonIds.length, 0);
   return <div className="app-page library-page">
-    <header className="page-heading"><h1>Build your money sense.</h1><p>Three paths. Nine hands-on lessons. Start where you are.</p></header>
+    <header className="page-heading"><h1>Build your money sense.</h1><p>Nine lessons. Three paths. Your pace.</p></header>
     <a className="learning-start" href={routeHref(resume?.id ?? 'money-mirror')}>
-      <div><h2>{resume ? `Continue ${resume.title}` : 'Start with Money Mirror'}</h2><p>{resume ? 'Your inputs are still here in this session.' : 'See what an hour of work really earns you.'}</p></div>
+      <div><h2>{resume ? `Continue ${resume.title}` : 'Start with Money Mirror'}</h2><p>{resume ? 'Your inputs are still here in this session.' : 'See your real hourly pay.'}</p></div>
       <ArrowRight size={22} aria-hidden="true" />
     </a>
     <div className="learning-filters" role="group" aria-label="Filter learning paths">{[{ id: 'all', label: 'All' }, { id: 'understand', label: 'Understand' }, { id: 'build', label: 'Build' }, { id: 'practice', label: 'Practice' }].map(({ id, label }) => <button key={id} type="button" aria-pressed={filter === id} onClick={() => setFilter(id)}>{label}</button>)}</div>

@@ -7,8 +7,8 @@ import { chromium } from 'playwright';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const currentWorker = readFileSync(resolve(dist, 'sw.js'), 'utf8');
-assert.ok(currentWorker.includes('cashlens-pocket-coach-v3'), 'Build Pocket Coach before testing its worker update');
-const oldWorker = currentWorker.replace('cashlens-pocket-coach-v3', 'cashlens-calm-v2');
+assert.ok(currentWorker.includes('cashlens-pocket-coach-v4'), 'Build the mobile redesign before testing its worker update');
+const oldWorker = currentWorker.replace('cashlens-pocket-coach-v4', 'cashlens-pocket-coach-v3');
 const manifest = JSON.parse(readFileSync(resolve(dist, 'manifest.webmanifest'), 'utf8'));
 let previousVersion = true;
 const mime = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };
@@ -22,7 +22,12 @@ const server = createServer((request, response) => {
   }
   if (pathname === '/manifest.webmanifest') {
     response.setHeader('Content-Type', mime['.webmanifest']);
-    response.end(JSON.stringify(previousVersion ? { ...manifest, background_color: '#f6f8fa', theme_color: '#f6f8fa' } : manifest));
+    response.end(JSON.stringify(manifest));
+    return;
+  }
+  if (pathname === '/mobile-update-marker.txt') {
+    response.setHeader('Content-Type', 'text/plain');
+    response.end(previousVersion ? 'previous Pocket Coach' : 'mobile Pocket Coach');
     return;
   }
   const filename = resolve(dist, `.${pathname === '/' ? '/index.html' : pathname}`);
@@ -43,8 +48,10 @@ try {
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
   await page.reload({ waitUntil: 'networkidle' });
   const readManifest = () => page.evaluate(async () => (await fetch('./manifest.webmanifest')).json());
-  assert.equal((await readManifest()).theme_color, '#f6f8fa', 'An existing controlled installation has the previous cached manifest');
-  assert.ok((await page.evaluate(() => caches.keys())).includes('cashlens-calm-v2'));
+  const readMarker = () => page.evaluate(async () => (await fetch('./mobile-update-marker.txt')).text());
+  assert.equal(await readMarker(), 'previous Pocket Coach');
+  await page.waitForFunction(async () => (await caches.open('cashlens-pocket-coach-v3')).match('./mobile-update-marker.txt'));
+  assert.ok((await page.evaluate(() => caches.keys())).includes('cashlens-pocket-coach-v3'));
 
   previousVersion = false;
   await page.evaluate(async () => {
@@ -58,8 +65,9 @@ try {
   assert.equal(updated.theme_color, '#f7f4eb');
   assert.equal(updated.background_color, '#f7f4eb');
   const cacheNames = await page.evaluate(() => caches.keys());
-  assert.ok(cacheNames.includes('cashlens-pocket-coach-v3'));
-  assert.ok(!cacheNames.includes('cashlens-calm-v2'), 'Updating the worker clears the previous manifest cache');
+  assert.ok(cacheNames.includes('cashlens-pocket-coach-v4'));
+  assert.ok(!cacheNames.includes('cashlens-pocket-coach-v3'), 'Updating the worker clears the previous design cache');
+  assert.equal(await readMarker(), 'mobile Pocket Coach', 'Previously cached resources are refreshed after activation');
 
   await page.reload({ waitUntil: 'networkidle' });
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Compound', exact: true }).click();
@@ -70,7 +78,7 @@ try {
   assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 29.50');
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Home', exact: true }).click();
   await page.getByRole('heading', { level: 1, name: /A little clarity/ }).waitFor();
-  console.log('Existing controlled PWA receives the ivory manifest, clears the old cache, and restores visited Home and Compound screens offline.');
+  console.log('Existing Pocket Coach PWA clears its previous cache, refreshes a cached resource, retains the ivory manifest, and restores visited Home and Compound screens offline.');
   await context.close();
 } finally {
   await browser.close();

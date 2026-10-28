@@ -200,7 +200,7 @@ Forest and sage establish the action hierarchy within warm ivory and sand neutra
 
 - **Forest Accent:** primary controls, selected navigation, meaningful icons, chart emphasis, and keyboard focus. Its dark-mode counterpart is pale sage.
 - **On Accent:** the foreground paired with accent-filled controls; dark mode uses dark ink.
-- **Coach Feature / On Feature / Feature Muted:** a forest task surface, warm light headings, and pale supporting text. Home and Learn share these roles. Dark mode deepens the feature surface while preserving both foreground roles.
+- **Coach Feature / On Feature / Feature Muted:** a forest task surface, warm light headings, and pale supporting text. Home, Learn and the phone first-sale receipt share these roles. Dark mode deepens the feature surface while preserving both foreground roles.
 - **Coach Button / On Button:** the sage action and dark forest foreground inside the Home task panel. These roles remain stable across themes.
 
 Positive, negative, warning, and information colors retain financial and chart meaning. Always carry that meaning in a label or explanation as well as color.
@@ -209,7 +209,7 @@ Positive, negative, warning, and information colors retain financial and chart m
 
 - **Warm Ground:** the app canvas, top bar, and desktop sidebar; dark mode uses a deep green-black ground.
 - **Surface:** warm light forms, grouped lessons, mobile navigation, consultation panels, and projection summaries.
-- **Raised:** selected options, navigation markers, hover surfaces, and the mobile first-sale amount panel.
+- **Raised:** selected options, navigation markers, and hover surfaces. The phone first-sale amount uses the forest feature role.
 - **Coach Guide:** sand-toned guidance on Home and the privacy panel in Settings. Its dark override is muted olive-green.
 - **Ink / Muted:** primary reading text and supporting explanations. Placeholders use the muted role at full opacity.
 - **Line / Control:** thin dividers and quiet panel boundaries versus stronger field and selection boundaries.
@@ -230,7 +230,7 @@ The local Latin variable font lives at `public/fonts/inter-latin-variable.woff2`
 
 ### Hierarchy
 
-- **Display:** the Home introduction, responsive from 32px to 42px with weight 600 and compact leading. Its two-line composition stays within 19ch.
+- **Display:** the Home introduction, 1.875rem on phones and responsive from 32px to 42px above 767px with weight 600 and compact leading. Its two-line composition stays within 19ch.
 - **Feature:** Home task headings, responsive from 24px to 30px with weight 600 and leading 1.25.
 - **Consultation:** Compound titles, responsive from 28px to 32px with weight 600 and leading 1.25.
 - **Title:** ordinary page headings. Existing lesson headings retain their separate responsive 24–32px range and leading 1.25.
@@ -248,17 +248,17 @@ Introductory prose is capped at 50ch and task descriptions at 42ch; longer assum
 
 The rhythm starts at 4px. Reused gaps and insets come from the frontmatter scale; observed control and page insets also include 20px and 28px. App pages center within 1100px; Settings narrows to 840px from 768px. Phone gutters are 20px, narrowing to 16px below 381px. At 768px, page padding becomes 40px vertically and 32px horizontally; desktop app pages begin 44px below the scrollport top.
 
-A fixed header occupies 64px plus the top safe area. Below 1024px, Home, Learn, Compound, and Settings form four equal labeled destinations in a 68px bottom bar plus the bottom safe area. From 1024px, a 232px sidebar replaces the bottom bar. Header, navigation, dialogs, and fixed actions account for safe-area insets.
+On phones below 768px, a fixed header occupies 3.5rem (56px at default text size) plus the top safe area. Home, Learn, Compound, and Settings form four equal labeled destinations in a 4.5rem (72px) bottom bar plus the bottom safe area. These reservations grow with text size. Short phone viewports use a 3rem header and 3.5rem navigation with icons beside labels. From 768–1023px, the header and navigation retain their 64px and 68px sizes. From 1024px, a 232px sidebar replaces the bottom bar. Header, navigation, dialogs, and fixed actions account for safe-area insets.
 
-The main element is the vertical scroll container, ending above mobile navigation. Home has no fixed action dock: its sage action remains inside the forest task panel. Money Mirror and Wealth Thermometer reserve an additional 84px for their existing lesson actions. Compound reserves 104px for its 88px summary, positioned 8px above navigation. At 1024px, ordinary lesson actions return to document flow; Compound retains its summary until 1200px, then uses inline next actions.
+The main element is the vertical scroll container, ending above mobile navigation. Home has no fixed action dock: its sage action remains inside the forest task panel. Money Mirror and Wealth Thermometer reserve 5.25rem for lesson actions on phones (84px above 767px). Compound reserves 5.5rem for a full-width action bar directly above phone navigation. The bar pairs the live amount and before-costs qualification with a next action of at least 52px. From 768px, Compound reserves 104px for its 88px summary positioned 8px above navigation. At 1024px, ordinary lesson actions return to document flow; Compound retains its summary until 1200px, then uses inline next actions.
 
-Home stacks its task copy and full-width action on phones; from 768px, they share a row. Task padding grows from 24px to 32px and then 36px 40px at desktop; below 381px it is 20px. Tool links form two columns from 768px, and the three path links form a row. The sand guide gains its explanatory paragraph at that same breakpoint.
+Home stacks its task copy and full-width action on phones; from 768px, they share a row. Task padding grows from 20px on phones to 32px and then 36px 40px at desktop. A labeled Money Mirror introduction identifies the starting tool. Secondary tools use 44px sage icon tiles and short descriptions. Tool links form two columns from 768px, and the three path links form a row inside a single sand guide. The guide includes path titles, lesson counts, and an All lessons link.
 
 Learning groups compact lesson rows inside three ordered path containers. Paths become three columns at 1200px; filtering to one path keeps a single column within 720px. Continue and Last opened identify session context, never completion.
 
-Compound's first-sale panel uses the app's 1100px maximum. Product story and a raised amount panel stack below 1200px. At 1200px, a 1.15:1 composition places story beside the amount; a vertical divider replaces the raised amount fill and a compact facts list becomes visible. The four numbered consultation steps remain directly accessible at every width. Later stages use the wider 1280px workspace: a 360px product plan beside flexible results from 1200px, growing to 400px with a 32px gap at 1440px. Results and controls remain in normal flow.
+Compound's first-sale panel uses the app's 1100px maximum. Product story and amount stack below 1200px. On phones, a full-width Change control and customer context sit in a light product panel, followed by a forest amount panel and the next question. At 768–1199px the amount uses a raised panel. At 1200px, a 1.15:1 composition places story beside the amount; a vertical divider replaces the raised amount fill and a compact facts list becomes visible. The four numbered consultation steps remain directly accessible at every width. Later stages use the wider 1280px workspace: a 360px product plan beside flexible results from 1200px, growing to 400px with a 32px gap at 1440px. Results and controls remain in normal flow.
 
-The searchable native product dialog is a bottom sheet on phones and a centered panel up to 720px from 768px. Its list scrolls between stable controls and footer. Charts grow from 210px to 270px high when their own container reaches 480px.
+The searchable native product dialog is a bottom sheet on phones and a centered panel up to 720px from 768px. Its list scrolls between stable controls and footer. Phone product rows place the price beneath the name and size; the 44px selection target spans the row. A subtle handle marks the sheet edge without suggesting a required drag gesture. Charts grow from 210px to 270px high when their own container reaches 480px.
 
 **The Protected Scrollport Rule.** End the content viewport above every fixed action dock and navigation bar; adding bottom padding alone does not establish this relationship.
 
@@ -270,7 +270,7 @@ Flat tonal surfaces and thin boundaries carry the visual structure. Forest task 
 
 ## Shapes
 
-Controls use restrained corners (8px); task panels, guides, grouped lessons, consultation panels, and results use softer corners (16px). The legacy radius base remains 12px for Tailwind compatibility. Thin borders (1px) separate panels and strengthen around fields. Circles belong to radio controls, numbered consultation markers, chart keys, status dots, and range handles. Mobile navigation uses a rounded marker around its active icon.
+Controls use restrained corners (8px); task panels, guides, grouped lessons, consultation panels, and results use softer corners (16px). The legacy radius base remains 12px for Tailwind compatibility. Thin borders (1px) separate panels and strengthen around fields. Circles belong to radio controls, numbered consultation markers, chart keys, status dots, and range handles. Phone navigation uses a raised full-link current marker; tablet navigation uses a marker around the active icon.
 
 ## Components
 
@@ -287,7 +287,7 @@ Legible, familiar actions with generous touch space.
 
 Learning filters use surface fill, control boundaries, 8px corners, and a 44px minimum target. The active filter uses accent fill and paired on-accent text with `aria-pressed`. A Last opened badge uses the raised surface and accent foreground; it reports session context rather than progress.
 
-Compound's four step controls use a numbered circle and visible label, with `aria-current="step"` on the current stage. They stack number above label on phones and align horizontally from 768px. All four are direct buttons rather than locked stages.
+Compound's four step controls use a numbered circle and visible label, with `aria-current="step"` on the current stage. They stack number above label on phones, with a raised surface behind the current step, and align horizontally from 768px. All four are direct buttons rather than locked stages.
 
 ### Cards / Containers
 
@@ -301,7 +301,7 @@ Number fields have associated labels, surface fill, control boundaries, tabular 
 
 ### Navigation
 
-The mobile bar shows four icon-and-label links. Inactive destinations use muted text; the current destination uses accent text and a raised icon marker. Desktop uses the same destinations in rows with a raised full-row current state. Use semantic navigation and `aria-current="page"`. A visible-on-focus skip link reaches the focusable main scroll container; route changes reset that container and move focus to it.
+The mobile bar shows four icon-and-label links. Inactive destinations use muted text; the current destination uses accent text and a raised full-link marker on phones (an icon marker at tablet widths). Desktop uses the same destinations in rows with a raised full-row current state. Use semantic navigation and `aria-current="page"`. A visible-on-focus skip link reaches the focusable main scroll container; route changes reset that container and move focus to it.
 
 ### Appearance Choices
 
@@ -309,9 +309,9 @@ Three equal native radio labels offer Device, Light, and Dark. Surface fill, con
 
 ### First-sale Consultation
 
-A light, flat panel pairs one product and one customer with a qualified first-sale amount. The product story retains its Change action and conversational next question. On phones, the raised receipt follows the story. From 1200px, it becomes a side-by-side amount area with a divider and a facts list; those redundant facts stay hidden on smaller screens. Monetary amounts remain tabular and the Malaysia ABO / before-costs qualification stays adjacent.
+A light, flat panel pairs one product and one customer with a qualified first-sale amount. The product story retains its Change action and conversational next question. On phones, the forest receipt follows the light product story, before the next question. The Change action spans the product panel width. From 1200px, it becomes a side-by-side amount area with a divider and a facts list; those redundant facts stay hidden on smaller screens. Monetary amounts remain tabular and the Malaysia ABO / before-costs qualification stays adjacent.
 
-The protected mobile summary carries the live amount, its qualification, and a labeled action at least 56px high. It advances the early stages; the final stage switches between View projection and Edit basket according to the visible panel. At 1200px, inline next actions replace this summary. The product picker uses native radio selection for changing the first product and checkbox selection for growing a basket.
+The protected mobile summary carries the live amount, its qualification, and a labeled action at least 52px high on phones (56px on tablets). It advances the early stages; the final stage switches between View projection and Edit basket according to the visible panel. At 1200px, inline next actions replace this summary. The product picker uses native radio selection for changing the first product and checkbox selection for growing a basket.
 
 ### Learning Paths and Motion
 
@@ -338,3 +338,9 @@ State changes use color, boundary, or brightness rather than layout movement. Sh
 - **Don't** add decorative panel shadows or hard offset shadows to these flat tonal surfaces.
 - **Don't** substitute an invented account balance or completion metric for educational examples and session context.
 - **Don't** persist calculator inputs alongside appearance preferences.
+
+## Mobile refinement — 28 October 2026
+
+UI UX Pro Max touch-spacing, text-reflow, safe-area and content-priority guidance informs the phone layout. Learning filters form two equal columns at default text size and stack when enlarged text needs more room. Money Mirror keeps numeric hour entry primary, with an optional slider disclosure that stays synchronized. Within a lesson, a labeled View path disclosure starts collapsed on phones and exposes all three lesson links on demand; desktop retains the visible path sequence. The same lessons, scenario values, navigation history, native product selection and saved preferences remain available.
+
+Phone rules live in `src/styles/mobile.css`; consultation-specific rules remain in `src/sections/RepeatSales.css`. Shared spacing reservations remain named tokens. Both light and dark themes use the existing semantic palette. No new application dependencies are required.
