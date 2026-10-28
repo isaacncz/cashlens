@@ -492,13 +492,6 @@
       "description": "A direct path to an existing financial tool.",
       "html": "<a class=\"ds-tool\" href=\"#wealth-thermometer\"><strong>How long could it last?</strong><span>Find your financial breathing room.</span></a>",
       "css": ".ds-tool{display:block;padding:20px;border:1px solid var(--ledger-line);border-radius:var(--radius-panel);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px var(--ledger-font);text-decoration:none}.ds-tool strong{display:block;font-weight:600}.ds-tool span{display:block;margin-top:6px;color:var(--ledger-muted)}.ds-tool:hover{background:var(--ledger-raised);border-color:var(--ledger-control)}.ds-tool:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
-    },
-    {
-      "name": "Duration preset",
-      "kind": "chip",
-      "description": "A clear pressed state for projection durations.",
-      "html": "<button class=\"ds-preset\" aria-pressed=\"true\">50 years</button>",
-      "css": ".ds-preset{min-height:44px;padding:8px 12px;border:1px solid var(--ledger-control);border-radius:var(--radius-control);background:var(--ledger-surface);color:var(--ledger-ink);font:400 14px var(--ledger-font);cursor:pointer}.ds-preset[aria-pressed=true]{background:var(--ledger-accent);border-color:var(--ledger-accent);color:var(--ledger-on-accent)}.ds-preset:hover{border-color:var(--ledger-accent)}.ds-preset:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
     }
   ],
   "narrative": {
@@ -539,6 +532,11 @@
       {
         "name": "Learning paths",
         "body": "Three paths group nine tools. Order is instructional; visits are not completion. Keep lesson controls available and use disclosure for detail.",
+        "section": "components"
+      },
+      {
+        "name": "Basket and projection",
+        "body": "Keep product selection and scenario inputs findable. Use a visible catalog/basket switch and a native period select. Plot before fine-grained controls; no tall sticky result pane.",
         "section": "components"
       }
     ],

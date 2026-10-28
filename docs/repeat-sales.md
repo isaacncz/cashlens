@@ -1,6 +1,6 @@
 # The Power of Repeat Sales
 
-A client-side calculator for people exploring an FMCG business, available in its own **Compounding** tab. **Learn** contains the original nine financial lessons. The calculator retains the approved navy/gold basket-and-chart design and stores no customer data.
+A client-side calculator for people exploring an FMCG business, available in its own **Compounding** tab. **Learn** contains the original nine financial lessons. The calculator uses the Calm Ledger light/dark theme and stores no customer data.
 
 ## Catalog provenance
 
@@ -59,20 +59,22 @@ The optional sixth `projectRepeatSales` argument disables annual acquisition for
 
 ## Mobile, navigation, and accessibility
 
-The mobile catalog initially shows six products, with an option to browse all 28. Its count reflects the actual visible rows. A compact sticky total remains available while browsing products. An IntersectionObserver hides that extra total when the projection enters the main viewing area, so it cannot cover the projection heading, amount, or chart as in the reported screenshot. Space remains reserved to avoid a scroll jump. “View projection” scrolls below the measured header and moves focus to the result; a hiding summary cannot retain keyboard focus.
+The mobile catalog initially shows six products, with an option to browse all 28. Its count reflects the actual visible rows. A fixed action dock shows the current revenue while browsing, then offers “Edit basket” when the projection is visible. The main scrollport reserves space for the dock and bottom navigation, including safe-area insets, so neither covers the calculator. Basket/projection jump actions scroll and move focus to their destination.
 
-The header publishes its actual height through a ResizeObserver, including safe-area padding. Anchor scrolling uses that measurement. Controls have labels, visible focus, and 44px control areas; mobile text-entry controls use 16px text. Product names and pack sizes share a checkbox label. Price details remain available on demand. Scoped slider tracks prevent style leakage from the older learning modules.
+Controls have associated labels, visible focus, and 44px control areas; mobile text-entry and select controls use 16px text. Product names and pack sizes share a checkbox label. Source details remain available on demand. Scoped slider tracks prevent style leakage from the learning modules. Charts resize to their container and support touch and keyboard inspection.
 
-Learn and Compounding use hash links (`#learn`, `#compounding`, legacy alias `#repeat-sales`), browser history, and arrow-key tab navigation. Both panels remain mounted so inputs survive tab changes. The learning menu dismisses with Escape or outside click. Touch and reduced-motion users get native scrolling. Desktop Lenis is resized when switching tabs.
+Home, Learn, Compound, and Settings use hash routes and browser history. The four-item bottom navigation becomes a sidebar from 1024px. Screens load on demand and retain inputs when switching destinations within a session. Light is the default; saved Light, Dark, and Device preferences remain respected. Reduced-motion users get native scrolling.
 
 ## Validation
 
-Run `npm test`, `npm run build`, and targeted ESLint on changed files. `npm run lint` also reports existing unrelated repository issues. For UI regression checks, start `npm run dev`, then run `npm run test:browser`. Install Chromium with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `CASHLENS_TEST_URL` optionally changes the default `http://localhost:3000/`.
+Run `npm test`, `npm run build`, and targeted ESLint on changed files. `npm run lint` also reports existing unrelated repository issues. For UI regression checks, start `npm run dev`, then run `npm run test:browser`. Install Chromium with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `CASHLENS_TEST_URL` optionally changes the default `http://localhost:3010/`.
 
 Tests distinguish the two scenario formulas, verify a positive year-49-to-50 revenue increment, preserve legitimate flat one-time/zero-repeat cases, and check ABO-only prices (including a regression that injects an ignored retail-price property), purchase boundaries, filters, limits, and chart totals. Additional tests cover the checkbox, anniversary boundary, 20-customer global cap, new customers’ independent purchase/filter schedules, and retention by joining-group age. Browser checks cover the exact screenshot horizon, both scenario labels, cap/default/reset behavior, navigation, touch layouts, and the summary/projection overlap regression.
 
-### Compact mobile interface
+### Basket and projection workbench
 
-The calculator opens with a short title, live revenue, search, and product checkboxes. On mobile, purchase intervals appear when a product is selected. Category filtering, selected-only mode, clear basket, and SKU/page references remain available under **Filters & source**. The repeat rate, annual-attrition comparison, and monthly basket average are under **Repeat settings**, collapsed by default with the current rate visible in its summary. Detailed methodology remains under **Prices & assumptions**. Starting customers and the optional yearly-customer checkbox remain visible. This removes repeated instructions without changing the projection or ABO pricing.
+The catalog has visible **All products / My basket** controls, search, category filtering, and an ABO-per-pack column. My basket exposes purchase-cycle editors; All products shows a concise cycle hint for selected products. The basket header shows the computed first order for one customer (filters are excluded until their replacement interval). A separate Price source disclosure retains each SKU/page reference. Empty baskets and searches have a direct browse action.
 
-Mobile polish keeps the existing navy/gold system. The chart measures its container, maintains readable axis text, and reduces time-axis labels on narrow screens. Product prices also act as selection labels with a minimum 44px hit area. Product rows use consistent alignment; narrow tablets stack the basket and result. The collapsed mobile catalog still shows six products until expanded.
+The projection period is a native select in the result header with the six existing horizon presets. The chart is shown before the fine-duration slider and scenario controls. Customer count, optional yearly acquisition, and repeat rate appear together under Your scenario. The annual-attrition comparison and monthly basket average remain under Advanced assumptions. Nothing in the calculation model changes.
+
+Selection feedback reports the changed product’s contribution over the chosen horizon. The chart supports a tap/drag crosshair and a keyboard-accessible monthly-value slider. The result panel uses normal page flow so lower controls remain reachable; the catalog scrolls within a framed region on desktop. Mobile retains the reserved bottom summary and basket/projection jump controls.

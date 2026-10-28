@@ -213,7 +213,7 @@ The fixed top bar is 64px plus the top safe-area inset. Below 1024px, four equal
 
 The main element is the vertical scroll container. Its bottom edge stops above navigation, rather than letting the document scroll underneath it. Home, Money Mirror, and Wealth Thermometer reserve an additional 84px for their action dock. Compound reserves 104px for its summary. Primary action buttons sit 12px above bottom navigation; the 88px Compound summary sits 8px above it. At desktop size, ordinary action docks return to document flow; Compound retains its summary reserve until 1200px.
 
-Home tools become two columns at 768px. Learning uses three ordered paths, each with three compact lesson rows; path groups become three columns at 1200px. Topic filters keep any one path available on its own. The illustrative salary breakdown also appears alongside the task description. At 1200px, Compound uses a 360px basket beside a flexible result panel, separated by 32px; the result is sticky, the product list can scroll within 560px, and the mobile summary disappears. The chart grows from 210px to 270px high when its own container reaches 480px.
+Home tools become two columns at 768px. Learning uses three ordered paths, each with three compact lesson rows; path groups become three columns at 1200px. Topic filters keep any one path available on its own. The illustrative salary breakdown also appears alongside the task description. At 1200px, Compound uses a 390px basket beside a flexible result panel, separated by 24px; from 1440px the basket grows to 400px with a 32px gap. The result flows normally so scenario controls stay reachable, the product list scrolls within 536px, and the mobile summary disappears. The chart grows from 210px to 270px high when its own container reaches 480px.
 
 **The Protected Scrollport Rule.** End the content viewport above every fixed action dock and navigation bar; adding bottom padding alone does not establish this relationship.
 
@@ -239,7 +239,7 @@ Calm, legible actions with generous touch space.
 
 ### Chips
 
-Compound filter toggles and horizon presets use compact outlined controls, not decorative tags. Filters pair accent text with a control border and a raised selected surface. Presets use a filled accent state. Expose selection with `aria-pressed`; retain at least a 44px target.
+Compound exposes All products / My basket as a two-choice control with counts and aria-pressed. Category filtering and search remain visible. The horizon presets are a labeled native select beside Your projection; a range input below the chart supports any month.
 
 ### Cards / Containers
 

@@ -85,6 +85,19 @@ try {
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 241,775.00');
     assert.equal(await page.locator('.rs-product:visible').count(), width >= 1200 ? 28 : 6);
     assert.equal(await page.locator('.rs-product-price strong').first().innerText(), 'RM 9.50');
+    assert.equal(await page.locator('.rs-basket-value strong').innerText(), 'RM 120.50');
+    await page.getByRole('button', { name: /^My basket/ }).click();
+    assert.equal(await page.locator('.rs-product').count(), 3);
+    const toothpasteCycle = page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true });
+    await toothpasteCycle.selectOption('1');
+    assert.notEqual(await page.locator('.rs-revenue').innerText(), 'RM 241,775.00');
+    await toothpasteCycle.selectOption('3');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 241,775.00');
+    await page.getByRole('button', { name: /^All products/ }).click();
+    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('12');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 357.25');
+    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('600');
+
     const growth = page.getByRole('checkbox', { name: 'Add 1 customer each year', exact: true });
     assert.ok(await growth.isChecked());
     await growth.uncheck();
