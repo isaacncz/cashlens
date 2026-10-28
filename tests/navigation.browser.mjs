@@ -1,114 +1,147 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-// Start the app with `npm run dev` before running this script.
-const baseUrl = process.env.CASHLENS_TEST_URL ?? 'http://localhost:3000/';
-const browser = await chromium.launch({
-  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
-});
+const baseUrl = process.env.CASHLENS_TEST_URL ?? 'http://localhost:3010/';
+const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
 const errors = [];
+const lessonIds = ['money-mirror', 'asset-liability', 'cashflow-quadrant', 'income-engine', 'rat-race', 'debt', 'salary-wealth', 'wealth-thermometer', 'literacy-playbook'];
 try {
-  for (const mobile of [false, true]) {
-    const context = await browser.newContext({
-      viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
-      isMobile: mobile,
-      hasTouch: mobile,
-      reducedMotion: 'reduce',
-    });
+  for (const width of [360, 390, 768, 1280]) {
+    const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: true, reducedMotion: 'reduce', colorScheme: 'light' });
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
+    const checkLayout = async () => {
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No document overflow at ${width}px`);
+      assert.ok(await page.locator('#main-content').evaluate(element => element.scrollWidth <= element.clientWidth + 1), `No content overflow at ${width}px: ${page.url()}`);
+    };
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    const open = async name => {
+      await nav.getByRole('link', { name, exact: true }).click();
+      if (name === 'Learn') await page.locator('.lesson-list').waitFor();
+      if (name === 'Settings') await page.locator('.settings-page').waitFor();
+      if (name === 'Compound') await page.locator('.rs-basket').waitFor();
+    };
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
-    await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
-    await page.locator('#panel-compounding:not([hidden])').waitFor();
-    assert.equal(await page.locator('#panel-learn').isVisible(), false);
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM241,775.00');
-    assert.equal(await page.locator('.rs-product:visible').count(), mobile ? 6 : 28);
-    assert.equal(await page.locator('.rs-product-price strong').first().innerText(), 'RM9.50', 'Catalog shows the Malaysia ABO price');
-    assert.ok((await page.locator('.rs-context').innerText()).includes('ABO prices'));
+    await page.getByRole('heading', { level: 1, name: /Make sense/ }).waitFor();
+    assert.equal(await nav.getByRole('link').count(), 4);
+    assert.equal(await page.locator('.lesson-screen').count(), 0, 'Lessons are not mounted on arrival');
+    const navBox = await nav.boundingBox();
+    const scrollBox = await page.locator('#main-content').boundingBox();
+    if (width < 1024) {
+      assert.ok(navBox.y > 700, 'Primary navigation is in the bottom thumb zone');
+      const actionBox = await page.locator('.thumb-action').boundingBox();
+      assert.ok(scrollBox.y + scrollBox.height <= actionBox.y, 'Primary action never overlays scrollable content');
+      for (const link of await nav.getByRole('link').all()) assert.ok((await link.boundingBox()).height >= 44);
+    } else assert.equal(navBox.x, 0, 'Desktop uses a sidebar');
+    await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
+    await page.locator('#mm-salary').waitFor();
+    await page.getByRole('button', { name: 'View my results', exact: true }).click();
+    await page.locator('#mm-salary[aria-invalid=true]').waitFor();
+    assert.ok(await page.locator('.money-form .inline-error').count());
+    await page.locator('#mm-salary').fill('8000');
+    await page.locator('#mm-hours').fill('44');
+    await page.locator('#mm-commute').fill('1.5');
+    await page.locator('#mm-expenses').fill('500');
+    await page.locator('#money-mirror-results').waitFor();
+    for (const input of await page.locator('.money-form input[type=number]').all()) {
+      assert.equal(await input.getAttribute('type'), 'number');
+      assert.ok(['numeric', 'decimal'].includes(await input.getAttribute('inputmode')));
+      assert.ok(await input.evaluate(element => parseFloat(getComputedStyle(element).fontSize) >= 16));
+    }
+    await page.locator('#mm-expenses').fill('-5');
+    await page.locator('#mm-expenses[aria-invalid=true]').waitFor();
+    assert.equal(await page.locator('#money-mirror-results').isVisible(), false, 'Invalid expenses cannot generate a result');
+    await page.locator('#mm-expenses').fill('500');
+    await page.getByRole('button', { name: 'View my results', exact: true }).click();
+    assert.equal(await page.locator('#money-mirror-results').evaluate(element => document.activeElement === element), true);
+    await checkLayout();
+    await open('Learn');
+    assert.equal(await page.locator('.lesson-list > a').count(), 9);
+    for (const id of lessonIds) {
+      await page.locator(`.lesson-list a[href$="#${id}"]`).click();
+      await page.locator(`section#${id}`).waitFor();
+      await checkLayout();
+      await open('Learn');
+    }
+    await page.locator('.lesson-list a[href$="#money-mirror"]').click();
+    assert.equal(await page.locator('#mm-salary').inputValue(), '8000', 'Inputs survive changing destinations');
+    await open('Learn');
+    await page.locator('.lesson-list a[href$="#wealth-thermometer"]').click();
+    await page.locator('#wt-asb').fill('10000');
+    await page.locator('#wt-expenses').fill('3500');
+    await page.getByRole('button', { name: 'View my breathing room', exact: true }).click();
+    await page.locator('#wealth-results').waitFor();
+    assert.ok((await page.locator('#wealth-results').innerText()).includes('RM 10,000.00'));
+    await page.locator('#wt-expenses').fill('0');
+    assert.equal(await page.locator('#wealth-results [data-result]').count(), 0, 'Zero expenses cannot produce infinite freedom');
+    assert.equal(await page.locator('#wt-expenses').getAttribute('aria-invalid'), 'true');
+    await open('Compound');
+    await page.locator('.rs-chart').waitFor();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 241,775.00');
+    assert.equal(await page.locator('.rs-product:visible').count(), width >= 1200 ? 28 : 6);
+    assert.equal(await page.locator('.rs-product-price strong').first().innerText(), 'RM 9.50');
     const growth = page.getByRole('checkbox', { name: 'Add 1 customer each year', exact: true });
     assert.ok(await growth.isChecked());
-    assert.ok((await page.locator('.rs-context').innerText()).includes('20 total customers'));
     await growth.uncheck();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM14,910.25');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 14,910.25');
     await growth.check();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM241,775.00');
-    assert.equal(await page.locator('#rs-repeat-rate').inputValue(), '50');
-    assert.equal(await page.locator('.rs-retention').getAttribute('open'), null, 'Advanced settings start collapsed');
-    await page.locator('.rs-retention > summary').click();
-    assert.ok(await page.getByRole('radio', { name: 'Repeat purchases', exact: true }).isChecked());
-    assert.equal(await page.locator('#rs-customers').getAttribute('max'), '20');
-    assert.equal(await page.getByRole('slider', { name: 'Starting customers, maximum 20' }).getAttribute('max'), '20');
-    if (mobile) {
-      assert.equal(await page.locator('.rs-count-mobile').textContent(), 'Showing 6 of 28');
-      await page.getByRole('button', { name: 'Browse all 28 products' }).click();
-      assert.equal(await page.locator('.rs-count-mobile').textContent(), 'Showing 28 of 28');
-      assert.equal(await page.locator('.rs-product:visible').count(), 28);
-      await page.getByRole('button', { name: 'Show fewer products' }).click();
-      await page.locator('#rs-pick-124107').check();
-      assert.equal(await page.locator('.rs-mobile-summary p').innerText(), 'RM264,955.00');
-      await page.locator('#rs-pick-124107').uncheck();
-      await page.locator('.rs-product').nth(4).scrollIntoViewIfNeeded();
-      await page.locator('.rs-mobile-summary').waitFor({ state: 'visible' });
-      const header = await page.locator('.site-header').boundingBox();
-      const summary = await page.locator('.rs-mobile-summary').boundingBox();
-      assert.ok(Math.abs(summary.y - header.height) < 4, 'Live summary stays directly under the header');
-      await page.getByRole('button', { name: 'View projection', exact: true }).click();
-      const chartTextSize = await page.locator('.rs-chart').evaluate(element => parseFloat(getComputedStyle(element.querySelector('text')).fontSize) * element.getBoundingClientRect().width / element.viewBox.baseVal.width);
-      assert.ok(chartTextSize >= 11.5, 'Mobile chart labels remain readable at their rendered size');
-      await page.locator('.rs-mobile-summary').waitFor({ state: 'hidden' });
-      const resultTop = (await page.locator('#rs-projection').boundingBox()).y;
-      assert.ok(resultTop >= header.height, 'The summary must not cover the main projection amount');
-    }
     await page.locator('#rs-customers').fill('100');
     await page.locator('#rs-customers').blur();
-    assert.equal(await page.locator('#rs-customers').inputValue(), '20', 'Excess customers are clamped to 20');
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM298,205.00');
-    await page.getByRole('tab', { name: 'Learn', exact: true }).click();
-    await page.locator('#panel-learn:not([hidden])').waitFor();
-    await page.getByRole('button', { name: 'Lessons' }).click();
-    await page.getByRole('navigation', { name: 'Financial lessons' }).waitFor();
-    await page.keyboard.press('Escape');
-    assert.equal(await page.getByRole('navigation', { name: 'Financial lessons' }).isVisible(), false);
-    await page.getByRole('tab', { name: 'Compounding', exact: true }).click();
-    await page.locator('#panel-compounding:not([hidden])').waitFor();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM298,205.00', 'Scenario survives switching tabs');
-    await page.goBack();
-    await page.locator('#panel-learn:not([hidden])').waitFor();
-    await page.goForward();
-    await page.locator('#panel-compounding:not([hidden])').waitFor();
-    for (const width of mobile ? [320, 390, 760] : [768, 1024, 1280, 1440]) {
-      await page.setViewportSize({ width, height: 844 });
-      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No horizontal overflow at ${width}px`);
+    assert.equal(await page.locator('#rs-customers').inputValue(), '20');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 298,205.00');
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    await page.locator('.rs-product-price').first().click();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 264,955.00');
+    await page.locator('.rs-product-price').first().click();
+    if (width < 1200) {
+      await page.getByRole('button', { name: 'Browse all 28 products' }).click();
+      assert.equal(await page.locator('.rs-product:visible').count(), 28);
+      await page.getByRole('button', { name: 'Show fewer products' }).click();
+      await page.locator('#main-content').evaluate(element => element.scrollTo({ top: 0, behavior: 'instant' }));
+      await page.getByRole('button', { name: 'View projection', exact: true }).click();
+      await page.getByRole('button', { name: 'Edit basket', exact: true }).waitFor();
+      const dock = await page.locator('.rs-mobile-summary').boundingBox();
+      const usable = await page.locator('#main-content').boundingBox();
+      assert.ok(usable.y + usable.height <= dock.y + 1, 'The live total never overlays calculator content');
     }
-    await page.getByRole('button', { name: 'Reset', exact: true }).click();
-    assert.equal(await page.locator('#rs-customers').inputValue(), '1');
-    assert.ok(await growth.isChecked(), 'Reset restores annual customer acquisition');
-    assert.equal(await page.locator('#rs-repeat-rate').inputValue(), '50');
-    await page.goto(new URL('#compounding', baseUrl).href, { waitUntil: 'networkidle' });
-    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    await page.locator('.rs-chart').scrollIntoViewIfNeeded();
+    const chart = await page.locator('.rs-chart').boundingBox();
+    await page.mouse.click(chart.x + chart.width * .6, chart.y + chart.height * .45);
+    assert.ok((await page.locator('.rs-chart-reading').innerText()).includes('RM '), 'Tap reveals chart revenue');
+    await page.locator('.rs-chart-inspect > summary').click();
+    await page.getByRole('slider', { name: 'Chart month', exact: true }).fill('12');
+    assert.equal(await page.locator('.rs-chart-reading').innerText(), '1 year · RM 357.25');
+    await page.locator('.rs-retention > summary').click();
     await page.locator('#rs-months').fill('291');
-    await page.locator('#rs-months').dispatchEvent('input');
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM89,100.00', 'Every new customer has their own joining date');
-    await growth.uncheck();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM7,276.50', 'Unchecked compares the fixed starting group');
-    if (!(await page.locator('.rs-retention').evaluate(element => element.open))) await page.locator('.rs-retention > summary').click();
     await page.getByRole('radio', { name: 'Annual attrition', exact: true }).check();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM1,188.00', 'Annual customer loss is an explicitly different scenario');
-    await growth.check();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM23,696.78', 'Annual retention applies separately to new arrivals');
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 23,696.78');
     await page.getByRole('radio', { name: 'Repeat purchases', exact: true }).check();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM89,100.00');
-    await page.getByRole('button', { name: 'Reset', exact: true }).click();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM241,775.00');
-    await page.getByRole('tab', { name: 'Compounding', exact: true }).focus();
-    await page.keyboard.press('ArrowLeft');
-    await page.locator('#panel-learn:not([hidden])').waitFor();
-    await page.keyboard.press('ArrowRight');
-    await page.locator('#panel-compounding:not([hidden])').waitFor();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 89,100.00');
+    await checkLayout();
+    await open('Settings');
+    await page.getByRole('radio', { name: 'Dark', exact: true }).check();
+    assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
+    await page.getByRole('checkbox', { name: /Reduce motion/ }).check();
+    assert.equal(await page.locator('html').getAttribute('data-reduce-motion'), 'true');
+    await page.reload({ waitUntil: 'networkidle' });
+    assert.ok(await page.getByRole('radio', { name: 'Dark', exact: true }).isChecked());
+    assert.ok(await page.getByRole('checkbox', { name: /Reduce motion/ }).isChecked());
+    await page.getByRole('radio', { name: 'Device', exact: true }).check();
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.locator('html[data-theme=light]').waitFor();
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.locator('html[data-theme=dark]').waitFor();
+    await open('Compound');
+    await page.locator('.rs-chart').waitFor();
+    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 241,775.00', 'Calculator inputs are not persisted across reload');
+    await open('Learn');
+    await page.goBack();
+    await page.locator('#repeat-sales').waitFor();
+    await page.goForward();
+    await page.getByRole('heading', { name: 'All lessons', exact: true }).waitFor();
+    await checkLayout();
     await context.close();
   }
   assert.deepEqual(errors, [], 'No browser errors');
-  console.log('Desktop and touch-mobile tab, basket, history, keyboard, menu, sticky-total, and responsive checks passed.');
-} finally {
-  await browser.close();
-}
+  console.log('360, 390, 768, 1280px: navigation, all nine lessons, validated forms, ABO projections, touch chart, safe docks, history, themes and preference persistence passed.');
+} finally { await browser.close(); }

@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import NumberField from '../app/NumberField';
+import { numberError } from '../lib/numericInput';
+import { scrollToContent } from '../lib/pageNavigation';
+import { formatMoney } from '../lib/currency';
+import { useState, useRef } from 'react';
 
 interface ThermometerResult {
   totalLiquid: number;
@@ -25,10 +25,10 @@ interface ExampleProfile {
 }
 
 const zoneConfig = {
-  crisis: { label: 'Crisis', color: '#DC2626', message: 'One retrenchment away from disaster.', icon: '🔴' },
-  precarious: { label: 'Precarious', color: '#FFD700', message: 'Can survive, can\'t thrive.', icon: '🟡' },
-  freedom: { label: 'Freedom Money', color: '#10B981', message: 'You can quit your job.', icon: '🟢' },
-  infinite: { label: 'Financially Free', color: '#FFD700', message: 'Dah cukup. Enough.', icon: '✨' },
+  crisis: { label: 'Crisis', color: 'var(--ledger-negative)', message: 'One retrenchment away from disaster.', icon: '🔴' },
+  precarious: { label: 'Precarious', color: 'var(--ledger-accent)', message: 'Can survive, can\'t thrive.', icon: '🟡' },
+  freedom: { label: 'Freedom Money', color: 'var(--ledger-positive)', message: 'You can quit your job.', icon: '🟢' },
+  infinite: { label: 'Financially Free', color: 'var(--ledger-accent)', message: 'Dah cukup. Enough.', icon: '✨' },
 };
 
 const actionSteps: Record<string, string[]> = {
@@ -130,32 +130,21 @@ export default function WealthThermometer() {
   const [rental, setRental] = useState('');
   const [stockDividends, setStockDividends] = useState('');
   const [expenses, setExpenses] = useState('');
-  const [result, setResult] = useState<ThermometerResult | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const els = sectionRef.current.querySelectorAll('[data-reveal]');
-    gsap.fromTo(els, { opacity: 0, y: 40 }, {
-      opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-    });
-  }, []);
-
-  const revealResult = (res: ThermometerResult) => {
-    setResult(res);
-    setShowResult(true);
-    setTimeout(() => {
-      if (resultRef.current) {
-        const els = resultRef.current.querySelectorAll('[data-result]');
-        gsap.fromTo(els, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 });
-      }
-    }, 100);
+  const [submitted, setSubmitted] = useState(false);
+  const values = [asb, unitTrust, savings, dividends, rental, stockDividends, expenses];
+  const valid = !values.some(value => numberError(value)) && !numberError(expenses, .01, undefined, true);
+  const result = valid ? calculateThermometerResult(asb, unitTrust, savings, dividends, rental, stockDividends, expenses) : null;
+  const showResult = valid;
+  const viewResults = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitted(true);
+    if (!valid) { event.currentTarget.querySelector<HTMLElement>('[aria-invalid=true], input:invalid')?.focus(); return; }
+    const target = resultRef.current;
+    if (target) {
+      scrollToContent(target);
+    }
   };
-
-  const inputClass = "w-full bg-navy-surface border border-navy-light rounded-lg px-4 py-3 text-white font-mono-data text-sm focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(255,215,0,0.15)] transition-all placeholder:text-slate";
-  const labelClass = "block text-xs font-medium uppercase tracking-wider text-slate mb-2";
 
   const fillPercent = result
     ? result.zone === 'infinite'
@@ -163,8 +152,6 @@ export default function WealthThermometer() {
       : Math.min(100, (result.monthsFreedom / 60) * 100)
     : 0;
   const selectedProfileMeta = exampleProfiles.find((profile) => profile.name === selectedProfile);
-  const hasAnyInput = [asb, unitTrust, savings, dividends, rental, stockDividends, expenses].some((value) => value.trim().length > 0);
-  const hasEnoughInput = expenses.trim().length > 0 || selectedProfile !== null;
   const freedomScore = result
     ? result.zone === 'infinite'
       ? 100
@@ -180,39 +167,15 @@ export default function WealthThermometer() {
     setRental(profile.rental);
     setStockDividends(profile.stockDividends);
     setExpenses(profile.expenses);
-    revealResult(
-      calculateThermometerResult(
-        profile.asb,
-        profile.unitTrust,
-        profile.savings,
-        profile.dividends,
-        profile.rental,
-        profile.stockDividends,
-        profile.expenses,
-      ),
-    );
   };
 
-  useEffect(() => {
-    if (!hasAnyInput || !hasEnoughInput) {
-      setShowResult(false);
-      return;
-    }
-
-    setResult(calculateThermometerResult(asb, unitTrust, savings, dividends, rental, stockDividends, expenses));
-    setShowResult(true);
-  }, [asb, unitTrust, savings, dividends, rental, stockDividends, expenses, hasAnyInput, hasEnoughInput]);
-
   return (
-    <section id="wealth-thermometer" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
+    <section id="wealth-thermometer" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <p data-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 08 / Wealth Thermometer
-        </p>
-        <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
+        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
           Wealth Is Not A Number.{' '}
           <span className="text-gold">It Is A Countdown.</span>
-        </h2>
+        </h1>
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
           How many months could you survive without working? Let's find out.
         </p>
@@ -220,12 +183,12 @@ export default function WealthThermometer() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calculator Form */}
           <div data-reveal>
-            <div className="mb-6">
-              <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Try an example profile</p>
+            <details className="example-presets mb-6"><summary>Try an example profile</summary>
               <div className="flex flex-wrap gap-2">
                 {exampleProfiles.map((profile) => (
                   <button
                     key={profile.name}
+                    aria-pressed={selectedProfile === profile.name}
                     onClick={() => applyProfile(profile)}
                     className={`px-3 py-2 rounded-full text-sm border transition-all duration-200 ${
                       selectedProfile === profile.name
@@ -240,72 +203,25 @@ export default function WealthThermometer() {
               {selectedProfileMeta && (
                 <p className="text-slate text-sm mt-3">{selectedProfileMeta.description}</p>
               )}
-            </div>
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-white font-semibold text-sm mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-gold" /> Liquid Assets (excludes EPF — locked until 55)
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>ASB/ASNB Balance (RM)</label>
-                    <input type="number" value={asb} onChange={e => setAsb(e.target.value)} placeholder="20000" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Unit Trust (RM)</label>
-                    <input type="number" value={unitTrust} onChange={e => setUnitTrust(e.target.value)} placeholder="10000" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Savings Account (RM)</label>
-                    <input type="number" value={savings} onChange={e => setSavings(e.target.value)} placeholder="5000" className={inputClass} />
-                  </div>
-                  <div className="flex items-end">
-                    <p className="text-slate text-xs pb-3">EPF is NOT liquid — locked until 55/60</p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-emerald font-semibold text-sm mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald" /> Monthly Passive Income
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>ASB/ASN Dividends (RM/mo)</label>
-                    <input type="number" value={dividends} onChange={e => setDividends(e.target.value)} placeholder="150" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Rental Income (RM/mo)</label>
-                    <input type="number" value={rental} onChange={e => setRental(e.target.value)} placeholder="0" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Dividend Stocks (RM/mo)</label>
-                    <input type="number" value={stockDividends} onChange={e => setStockDividends(e.target.value)} placeholder="0" className={inputClass} />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-crimson font-semibold text-sm mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-crimson" /> Monthly Expenses
-                </h3>
-                <div>
-                  <label className={labelClass}>Total Monthly Expenses (RM)</label>
-                  <input type="number" value={expenses} onChange={e => setExpenses(e.target.value)} placeholder="3500" className={inputClass} />
-                </div>
-              </div>
-
-              <div className={`w-full py-4 px-5 rounded-xl border ${hasEnoughInput ? 'border-emerald/30 bg-emerald/10' : 'border-navy-light bg-navy-surface/40'}`}>
-                <p className={`text-sm font-semibold ${hasEnoughInput ? 'text-emerald' : 'text-slate'}`}>
-                  {hasEnoughInput ? 'Live mode on — your freedom score updates automatically.' : 'Add your monthly expenses to unlock live freedom tracking.'}
-                </p>
-                <p className="text-slate text-xs mt-1">Tap a profile or type values. No extra calculate step needed.</p>
-              </div>
-            </div>
+            </details>
+            <form className="wealth-form space-y-5" noValidate onSubmit={viewResults}>
+              <h2 className="form-group-heading">Liquid assets</h2>
+              <NumberField id="wt-asb" label="ASB / ASNB balance (RM)" value={asb} onChange={setAsb} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-unit-trust" label="Unit trusts (RM)" value={unitTrust} onChange={setUnitTrust} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-savings" label="Savings account (RM)" value={savings} onChange={setSavings} placeholder="0" hint="Exclude EPF and other funds you cannot access now." submitted={submitted} />
+              <h2 className="form-group-heading">Monthly passive income</h2>
+              <NumberField id="wt-dividends" label="ASB / ASN dividends (RM)" value={dividends} onChange={setDividends} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-rental" label="Rental income (RM)" value={rental} onChange={setRental} placeholder="0" submitted={submitted} />
+              <NumberField id="wt-stock" label="Stock dividends (RM)" value={stockDividends} onChange={setStockDividends} placeholder="0" submitted={submitted} />
+              <h2 className="form-group-heading">Monthly spending</h2>
+              <NumberField id="wt-expenses" label="Total monthly expenses (RM)" value={expenses} onChange={setExpenses} min={.01} required placeholder="3500" submitted={submitted} />
+              <div className="lesson-action"><button type="submit" className="primary-button">View my breathing room</button></div>
+              <p className="field-hint">Results update as you type. No numbers are saved.</p>
+            </form>
           </div>
 
           {/* Result Display */}
-          <div ref={resultRef}>
+          <div ref={resultRef} id="wealth-results" tabIndex={-1} aria-label="Your financial breathing room">
             {showResult && result ? (
               <div className="space-y-6">
                 {/* Thermometer */}
@@ -328,8 +244,8 @@ export default function WealthThermometer() {
                             height: `${fillPercent}%`,
                             transitionDuration: '2000ms',
                             background: result.zone === 'infinite'
-                              ? 'linear-gradient(to top, #10B981, #FFD700, #FFD700)'
-                              : 'linear-gradient(to top, #DC2626, #FFD700, #10B981)',
+                              ? 'linear-gradient(to top, var(--ledger-positive), var(--ledger-accent), var(--ledger-accent))'
+                              : 'linear-gradient(to top, var(--ledger-negative), var(--ledger-accent), var(--ledger-positive))',
                           }}
                         >
                           {/* Wave effect at top */}
@@ -348,20 +264,20 @@ export default function WealthThermometer() {
                     {/* Zone Labels */}
                     <div className="flex flex-col justify-between h-[300px] py-2">
                       {[
-                        { label: 'Infinite', sub: 'Financially Free', color: '#FFD700', threshold: Infinity },
-                        { label: '5 years', sub: 'Freedom Money', color: '#10B981', threshold: 60 },
-                        { label: '12 months', sub: 'Precarious', color: '#FFD700', threshold: 12 },
-                        { label: '3 months', sub: 'Crisis', color: '#DC2626', threshold: 3 },
+                        { label: 'Infinite', sub: 'Financially Free', color: 'var(--ledger-accent)', threshold: Infinity },
+                        { label: '5 years', sub: 'Freedom Money', color: 'var(--ledger-positive)', threshold: 60 },
+                        { label: '12 months', sub: 'Precarious', color: 'var(--ledger-accent)', threshold: 12 },
+                        { label: '3 months', sub: 'Crisis', color: 'var(--ledger-negative)', threshold: 3 },
                       ].map((z, i) => {
                         const isActive = result.zone === 'infinite'
                           ? z.threshold === Infinity
                           : result.monthsFreedom >= z.threshold;
                         return (
-                          <div key={i} className={`flex items-center gap-2 transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
+                          <div key={i} className={`flex items-center gap-2 transition-opacity duration-500 ${isActive ? 'font-medium' : 'text-slate'}`}>
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: z.color }} />
                             <div>
                               <p className="text-white text-xs font-medium">{z.label}</p>
-                              <p className="text-slate text-[10px]">{z.sub}</p>
+                              <p className="text-slate text-sm">{z.sub}</p>
                             </div>
                           </div>
                         );
@@ -373,21 +289,21 @@ export default function WealthThermometer() {
                   <div data-result className="grid grid-cols-3 gap-4 mt-8 w-full">
                     <div className="text-center">
                       <p className="text-slate text-xs uppercase">Liquid Assets</p>
-                      <p className="text-gold font-mono-data text-lg font-bold">RM {result.totalLiquid.toLocaleString()}</p>
+                      <p className="text-gold font-mono-data text-lg font-bold">RM {formatMoney(result.totalLiquid)}</p>
                     </div>
                     <div className="text-center">
                       <p className="text-slate text-xs uppercase">Passive Income</p>
-                      <p className="text-emerald font-mono-data text-lg font-bold">RM {result.monthlyPassive.toFixed(0)}</p>
+                      <p className="text-emerald font-mono-data text-lg font-bold">RM {formatMoney(result.monthlyPassive)}</p>
                     </div>
                     <div className="text-center">
                       <p className="text-slate text-xs uppercase">Expenses</p>
-                      <p className="text-crimson font-mono-data text-lg font-bold">RM {result.monthlyExpenses.toFixed(0)}</p>
+                      <p className="text-crimson font-mono-data text-lg font-bold">RM {formatMoney(result.monthlyExpenses)}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Zone Message */}
-                <div data-result className="rounded-xl p-5 border" style={{ borderColor: zoneConfig[result.zone].color + '40', backgroundColor: zoneConfig[result.zone].color + '08' }}>
+                <div data-result className="rounded-xl p-5 border" style={{ borderColor: `color-mix(in srgb, ${zoneConfig[result.zone].color} 25%, transparent)`, backgroundColor: `color-mix(in srgb, ${zoneConfig[result.zone].color} 3%, transparent)` }}>
                   <p className="text-sm mb-1" style={{ color: zoneConfig[result.zone].color }}>
                     {zoneConfig[result.zone].icon} {zoneConfig[result.zone].label} Zone
                   </p>

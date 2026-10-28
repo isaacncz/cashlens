@@ -25,7 +25,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -37,7 +37,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -49,7 +49,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -61,7 +61,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -73,7 +73,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -85,7 +85,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": true
   },
   {
@@ -97,7 +97,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -109,7 +109,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -121,7 +121,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": true
   },
   {
@@ -133,7 +133,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 9,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -145,7 +145,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -157,7 +157,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 9,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -169,7 +169,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -181,7 +181,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -193,7 +193,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": true
   },
   {
@@ -205,7 +205,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Personal care",
     "page": 8,
     "type": "consumable",
-    "color": "#f4cf75",
+    "color": "var(--ledger-accent)",
     "checked": false
   },
   {
@@ -217,7 +217,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Nutrition",
     "page": 2,
     "type": "consumable",
-    "color": "#82b8ed",
+    "color": "var(--ledger-warning)",
     "checked": false
   },
   {
@@ -229,7 +229,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Nutrition",
     "page": 2,
     "type": "consumable",
-    "color": "#82b8ed",
+    "color": "var(--ledger-warning)",
     "checked": false
   },
   {
@@ -241,7 +241,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Home care",
     "page": 11,
     "type": "consumable",
-    "color": "#8ed8b4",
+    "color": "var(--ledger-info)",
     "checked": false
   },
   {
@@ -253,7 +253,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Nutrition",
     "page": 2,
     "type": "consumable",
-    "color": "#82b8ed",
+    "color": "var(--ledger-warning)",
     "checked": false
   },
   {
@@ -265,7 +265,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Nutrition",
     "page": 2,
     "type": "consumable",
-    "color": "#82b8ed",
+    "color": "var(--ledger-warning)",
     "checked": false
   },
   {
@@ -277,7 +277,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Filters",
     "page": 10,
     "type": "filter",
-    "color": "#b5a4e3",
+    "color": "var(--ledger-negative)",
     "checked": false
   },
   {
@@ -289,7 +289,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Filters",
     "page": 10,
     "type": "filter",
-    "color": "#b5a4e3",
+    "color": "var(--ledger-negative)",
     "checked": false
   },
   {
@@ -301,7 +301,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Filters",
     "page": 9,
     "type": "filter",
-    "color": "#b5a4e3",
+    "color": "var(--ledger-negative)",
     "checked": false
   },
   {
@@ -313,7 +313,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Appliances",
     "page": 8,
     "type": "device",
-    "color": "#d9a58c",
+    "color": "var(--ledger-muted)",
     "checked": false
   },
   {
@@ -325,7 +325,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Appliances",
     "page": 10,
     "type": "device",
-    "color": "#d9a58c",
+    "color": "var(--ledger-muted)",
     "checked": false
   },
   {
@@ -337,7 +337,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Appliances",
     "page": 9,
     "type": "device",
-    "color": "#d9a58c",
+    "color": "var(--ledger-muted)",
     "checked": false
   },
   {
@@ -349,7 +349,7 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "category": "Appliances",
     "page": 10,
     "type": "device",
-    "color": "#d9a58c",
+    "color": "var(--ledger-muted)",
     "checked": false
   }
 ];

@@ -1,8 +1,8 @@
+import NumberField from '../app/NumberField';
+import { numberError } from '../lib/numericInput';
+import { scrollToContent } from '../lib/pageNavigation';
+import { formatMoney } from '../lib/currency';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface MoneyMirrorPreset {
   name: string;
@@ -93,8 +93,6 @@ function calculatePCB(monthlySalary: number, epfEmployee: number): number {
 
 const SALARY_MIN = 1000;
 const SALARY_MAX = 50000;
-const SALARY_TYPICAL_MIN = 1500;
-const SALARY_TYPICAL_MAX = 15000;
 const HOURS_MIN = 20;
 const HOURS_MAX = 100;
 
@@ -165,81 +163,40 @@ export default function MoneyMirror() {
   const [hours, setHours] = useState('');
   const [commute, setCommute] = useState('');
   const [expenses, setExpenses] = useState('');
-  const [calculated, setCalculated] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [highlightedFlow, setHighlightedFlow] = useState<FlowKey>('net');
   const [activeInsight, setActiveInsight] = useState<InsightKey>('rate');
-  const [supportsHover, setSupportsHover] = useState(false);
-  const [results, setResults] = useState<MoneyMirrorResult>({
-    trueHourly: 0,
-    annualHours: 0,
-    monthsSurvival: 0,
-    grossMonthly: 0,
-    epfEmployee: 0,
-    epfEmployer: 0,
-    pcbMonthly: 0,
-    socsoEmployee: 0,
-    eisEmployee: 0,
-    workExpenses: 0,
-    netIncome: 0,
-  });
-
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const els = sectionRef.current.querySelectorAll('[data-reveal]');
-    gsap.fromTo(els, { opacity: 0, y: 40 }, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: 'power3.out',
-      stagger: 0.1,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-    });
-  }, []);
-
+  const [supportsHover, setSupportsHover] = useState(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches);
   useEffect(() => {
     const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
     const updateHoverSupport = () => setSupportsHover(mediaQuery.matches);
-    updateHoverSupport();
     mediaQuery.addEventListener('change', updateHoverSupport);
     return () => mediaQuery.removeEventListener('change', updateHoverSupport);
   }, []);
 
-  const inputClass = 'w-full bg-navy-surface border border-navy-light rounded-lg px-4 py-3 text-white font-mono-data text-sm focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(255,215,0,0.15)] transition-all placeholder:text-slate';
-  const labelClass = 'block text-xs font-medium uppercase tracking-wider text-slate mb-2';
-
   const salaryValue = salary === '' ? Number.NaN : parseFloat(salary);
   const salaryHasInput = salary.trim().length > 0;
   const salaryIsValid = salaryHasInput && salaryValue >= SALARY_MIN && salaryValue <= SALARY_MAX;
-  const salaryIsTypical = salaryHasInput && salaryValue >= SALARY_TYPICAL_MIN && salaryValue <= SALARY_TYPICAL_MAX;
   const hoursValue = hours === '' ? 44 : Math.min(HOURS_MAX, Math.max(HOURS_MIN, parseFloat(hours) || 44));
-  const salaryInputClass = `${inputClass} ${salaryHasInput ? (salaryIsValid ? 'border-emerald/60' : 'border-crimson') : ''}`;
   const selectedPresetMeta = presets.find((preset) => preset.name === selectedPreset);
 
-  useEffect(() => {
-    if (!salaryIsValid) {
-      setCalculated(false);
+  const calculated = salaryIsValid && !numberError(hours, HOURS_MIN, HOURS_MAX) && !numberError(commute, 0, 24) && !numberError(expenses);
+  const results = useMemo(() => computeMoneyMirrorResults(
+    calculated ? Number(salary) : 0, hours === '' ? 44 : Number(hours), Number(commute) || 0, Number(expenses) || 0,
+  ), [calculated, salary, hours, commute, expenses]);
+  const viewResults = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitted(true);
+    if (!calculated) {
+      event.currentTarget.querySelector<HTMLElement>('[aria-invalid=true], input:invalid')?.focus();
       return;
     }
-
-    const gross = parseFloat(salary) || 0;
-    const hrs = parseFloat(hours) || 44;
-    const comm = parseFloat(commute) || 0;
-    const exp = parseFloat(expenses) || 0;
-    setResults(computeMoneyMirrorResults(gross, hrs, comm, exp));
-    setCalculated(true);
-  }, [salary, hours, commute, expenses, salaryIsValid]);
-
-  useEffect(() => {
-    if (!calculated || !resultsRef.current) return;
-    const timeoutId = window.setTimeout(() => {
-      if (!resultsRef.current) return;
-      const els = resultsRef.current.querySelectorAll('[data-result]');
-      gsap.fromTo(els, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out', stagger: 0.06 });
-    }, 100);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [calculated, results]);
+    const target = resultsRef.current;
+    if (target) {
+      scrollToContent(target);
+    }
+  };
 
   const applyPreset = (preset: MoneyMirrorPreset) => {
     setSelectedPreset(preset.name);
@@ -275,7 +232,7 @@ export default function MoneyMirror() {
         label: 'PCB tax',
         amount: results.pcbMonthly,
         percent: (results.pcbMonthly / gross) * 100,
-        color: '#DC2626',
+        color: 'var(--ledger-negative)',
         accent: 'text-crimson',
         description: 'Estimated monthly tax deduction (PCB).',
       },
@@ -284,7 +241,7 @@ export default function MoneyMirror() {
         label: 'EPF',
         amount: results.epfEmployee,
         percent: (results.epfEmployee / gross) * 100,
-        color: '#FFD700',
+        color: 'var(--ledger-accent)',
         accent: 'text-gold',
         description: 'Employee EPF contribution.',
       },
@@ -293,7 +250,7 @@ export default function MoneyMirror() {
         label: 'SOCSO',
         amount: results.socsoEmployee,
         percent: (results.socsoEmployee / gross) * 100,
-        color: '#60A5FA',
+        color: 'var(--ledger-info)',
         accent: 'text-white',
         description: 'PERKESO employee contribution.',
       },
@@ -302,7 +259,7 @@ export default function MoneyMirror() {
         label: 'EIS',
         amount: results.eisEmployee,
         percent: (results.eisEmployee / gross) * 100,
-        color: '#94A3B8',
+        color: 'var(--ledger-muted)',
         accent: 'text-slate',
         description: 'Employment Insurance System contribution.',
       },
@@ -311,7 +268,7 @@ export default function MoneyMirror() {
         label: 'Work costs',
         amount: results.workExpenses,
         percent: (results.workExpenses / gross) * 100,
-        color: '#DC2626',
+        color: 'var(--ledger-negative)',
         accent: 'text-crimson',
         description: 'Petrol, tolls, food, parking, uniforms, commute friction.',
       },
@@ -320,7 +277,7 @@ export default function MoneyMirror() {
         label: 'Keep',
         amount: results.netIncome,
         percent: (results.netIncome / gross) * 100,
-        color: '#10B981',
+        color: 'var(--ledger-positive)',
         accent: 'text-emerald',
         description: 'This is what is truly left for living, saving, or investing.',
       },
@@ -335,7 +292,7 @@ export default function MoneyMirror() {
     {
       key: 'rate' as const,
       label: 'Real rate',
-      value: `RM ${results.trueHourly.toFixed(2)}/hr`,
+      value: `RM ${formatMoney(results.trueHourly)}/hr`,
       detail: hourlyInsight.body,
       tone: hourlyInsight.tone,
     },
@@ -343,7 +300,7 @@ export default function MoneyMirror() {
       key: 'keep' as const,
       label: 'Keep rate',
       value: `${netItem.percent.toFixed(1)}%`,
-      detail: `From RM ${results.grossMonthly.toFixed(0)}, you keep RM ${netItem.amount.toFixed(0)} after PCB, EPF, SOCSO, EIS, and work costs.`,
+      detail: `From RM ${formatMoney(results.grossMonthly)}, you keep RM ${formatMoney(netItem.amount)} after PCB, EPF, SOCSO, EIS, and work costs.`,
       tone: 'text-emerald',
     },
     {
@@ -361,27 +318,24 @@ export default function MoneyMirror() {
   const handleFlowSelect = (key: FlowKey) => setHighlightedFlow(key);
 
   return (
-    <section id="money-mirror" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
+    <section id="money-mirror" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <div>
-            <p data-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-4">
-              Module 01 / The Money Mirror
-            </p>
-            <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
+            <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
               What Is Your Time{' '}
               <span className="text-gold">Really Worth?</span>
-            </h2>
+            </h1>
             <p data-reveal className="text-slate text-base md:text-lg mb-8 leading-relaxed">
               Enter monthly numbers and see where your salary actually goes.
             </p>
 
-            <div data-reveal className="mb-6">
-              <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Try a learning preset first</p>
+            <details className="example-presets mb-6"><summary>Try an example</summary>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {presets.map((preset) => (
                   <button
                     key={preset.name}
+                    aria-pressed={selectedPreset === preset.name}
                     onClick={() => applyPreset(preset)}
                     className={`text-left rounded-xl border p-3 transition-all duration-200 min-h-[82px] ${
                       selectedPreset === preset.name
@@ -390,8 +344,8 @@ export default function MoneyMirror() {
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <span className="text-xl">{preset.icon}</span>
-                      <span className="text-[10px] uppercase tracking-[0.12em] text-slate">{preset.badge}</span>
+                      <span className="preset-mark" aria-hidden="true" />
+                      <span className="text-sm uppercase tracking-[0.12em] text-slate">{preset.badge}</span>
                     </div>
                     <p className={`mt-2 text-sm font-semibold ${selectedPreset === preset.name ? 'text-gold' : 'text-white'}`}>{preset.name}</p>
                   </button>
@@ -400,96 +354,26 @@ export default function MoneyMirror() {
               {selectedPresetMeta && (
                 <p className="text-slate text-sm mt-3 rounded-xl border border-navy-light bg-navy-surface/40 px-3 py-2">{selectedPresetMeta.description}</p>
               )}
-            </div>
+            </details>
 
-            <div data-reveal className="space-y-5 mb-8">
+            <form className="money-form space-y-5 mb-8" noValidate onSubmit={viewResults}>
+              <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and employee deductions." submitted={submitted} />
               <div>
-                <label className={labelClass}>Gross Monthly Salary (RM)</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gold text-sm font-semibold">RM</span>
-                  <input
-                    type="number"
-                    min={SALARY_MIN}
-                    max={SALARY_MAX}
-                    value={salary}
-                    onChange={(event) => setSalary(event.target.value)}
-                    placeholder="8000"
-                    className={`${salaryInputClass} pl-12`}
-                    aria-invalid={salaryHasInput && !salaryIsValid}
-                  />
-                </div>
-                <div className="mt-2 space-y-1">
-                  <p className={`text-xs ${salaryIsTypical ? 'text-emerald' : 'text-slate'}`}>
-                    {salaryIsTypical ? '✓' : '•'} Typical range: RM 1,500 - RM 15,000
-                  </p>
-                  <p className={`text-xs ${salaryHasInput && !salaryIsValid ? 'text-crimson' : 'text-slate'}`}>
-                    {salaryHasInput && !salaryIsValid ? '⚠' : '•'} Enter amount between RM 1,000 and RM 50,000
-                  </p>
-                </div>
+                <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Leave blank to use 44 hours." inputMode="numeric" submitted={submitted} />
+                <input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" />
               </div>
-
-              <div>
-                <label className={labelClass}>Hours Worked Per Week</label>
-                <div className="bg-navy-surface/50 border border-navy-light rounded-xl p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                    <input
-                      type="range"
-                      min={HOURS_MIN}
-                      max={HOURS_MAX}
-                      step="1"
-                      value={hoursValue}
-                      onChange={(event) => setHours(event.target.value)}
-                      className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
-                      style={{ background: `linear-gradient(to right, #FFD700 ${((hoursValue - HOURS_MIN) / (HOURS_MAX - HOURS_MIN)) * 100}%, #233554 ${((hoursValue - HOURS_MIN) / (HOURS_MAX - HOURS_MIN)) * 100}%)` }}
-                      aria-label="Hours worked per week"
-                    />
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate text-sm">hrs</span>
-                      <input
-                        type="number"
-                        min={HOURS_MIN}
-                        max={HOURS_MAX}
-                        value={hours === '' ? '' : hours}
-                        onChange={(event) => setHours(event.target.value)}
-                        placeholder="44"
-                        className="w-24 bg-navy border border-navy-light rounded-lg px-3 py-2 text-white font-mono-data text-sm focus:outline-none focus:border-gold"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-between text-xs text-slate">
-                    <span>20 hrs</span>
-                    <span className="text-white font-medium">{hoursValue.toFixed(0)} hrs/week</span>
-                    <span>100 hrs</span>
-                  </div>
-                </div>
-                <p className="text-slate text-xs mt-2">Use the slider for quick adjustment, or type an exact value.</p>
-              </div>
-
-              <div>
-                <label className={labelClass}>Daily Commute (hours)</label>
-                <input type="number" value={commute} onChange={(event) => setCommute(event.target.value)} placeholder="2" className={inputClass} />
-              </div>
-
-              <div>
-                <label className={labelClass}>Work-Related Expenses (RM/month)</label>
-                <input type="number" value={expenses} onChange={(event) => setExpenses(event.target.value)} placeholder="500" className={inputClass} />
-                <p className="text-slate text-xs mt-1">Petrol, toll, food, uniforms, parking</p>
-              </div>
-            </div>
-
-            <div data-reveal className={`w-full py-4 px-5 rounded-xl border ${salaryIsValid ? 'border-emerald/30 bg-emerald/10' : 'border-navy-light bg-navy-surface/40'}`}>
-              <p className={`text-sm font-semibold ${salaryIsValid ? 'text-emerald' : 'text-slate'}`}>
-                {salaryIsValid ? 'Live mode on — your real rate updates automatically.' : 'Enter a valid salary to unlock the live calculation.'}
-              </p>
-              <p className="text-slate text-xs mt-1">Fewer clicks, faster learning.</p>
-            </div>
+              <NumberField id="mm-commute" label="Daily commute (hours)" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
+              <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Petrol, tolls, food, parking, and uniforms." submitted={submitted} />
+              <div className="lesson-action"><button type="submit" className="primary-button">View my results</button></div>
+              <p className="field-hint">Results update as you type. No numbers are saved.</p>
+            </form>
 
             {calculated && (
-              <div ref={resultsRef} className="mt-8 space-y-4">
+              <div ref={resultsRef} id="money-mirror-results" tabIndex={-1} aria-label="Your cashflow results" className="mt-8 space-y-4">
                 <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-6">
                   <p className="text-slate text-sm mb-1">True Hourly Rate</p>
                   <p className="text-gold font-mono-data text-4xl md:text-5xl font-bold">
-                    RM {results.trueHourly.toFixed(2)}
+                    RM {formatMoney(results.trueHourly)}
                   </p>
                 </div>
 
@@ -511,6 +395,7 @@ export default function MoneyMirror() {
                       <button
                         key={item.key}
                         type="button"
+                        aria-pressed={activeInsight === item.key}
                         onClick={() => setActiveInsight(item.key)}
                         className={`min-h-9 px-3 rounded-full border text-xs font-semibold transition-all ${
                           activeInsight === item.key
@@ -533,7 +418,7 @@ export default function MoneyMirror() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
               <div>
                 <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Salary funnel</p>
-                <h3 className="text-white text-xl font-bold">From gross income to what you actually keep</h3>
+                <h2 className="text-white text-xl font-bold">From gross income to what you actually keep</h2>
               </div>
               <div className="bg-emerald/10 border border-emerald/20 rounded-xl px-4 py-3">
                 <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">You keep</p>
@@ -546,15 +431,15 @@ export default function MoneyMirror() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="rounded-xl border border-gold/25 bg-gold/10 p-4">
                     <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Gross</p>
-                    <p className="text-white font-mono-data text-xl font-bold">RM {results.grossMonthly.toFixed(0)}</p>
+                    <p className="text-white font-mono-data text-xl font-bold">RM {formatMoney(results.grossMonthly)}</p>
                   </div>
                   <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
                     <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Statutory</p>
-                    <p className="text-white font-mono-data text-xl font-bold">RM {(results.pcbMonthly + results.epfEmployee + results.socsoEmployee + results.eisEmployee).toFixed(0)}</p>
+                    <p className="text-white font-mono-data text-xl font-bold">RM {formatMoney(results.pcbMonthly + results.epfEmployee + results.socsoEmployee + results.eisEmployee)}</p>
                   </div>
                   <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
                     <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Total outflow</p>
-                    <p className="text-white font-mono-data text-xl font-bold">RM {totalOutflow.toFixed(0)}</p>
+                    <p className="text-white font-mono-data text-xl font-bold">RM {formatMoney(totalOutflow)}</p>
                   </div>
                   <div className="rounded-xl border border-emerald/25 bg-emerald/10 p-4">
                     <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">You keep</p>
@@ -563,13 +448,14 @@ export default function MoneyMirror() {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="rounded-2xl border border-navy-light bg-[#0B1830] p-4">
+                  <div className="rounded-2xl border border-navy-light bg-navy-surface p-4">
                     <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow breakdown</p>
                     <div className="md:hidden flex flex-wrap gap-2 mb-3">
                       {flowItems.map((item) => (
                         <button
                           key={`chip-${item.key}`}
                           type="button"
+                          aria-pressed={highlightedFlow === item.key}
                           onClick={() => handleFlowSelect(item.key)}
                           className={`min-h-10 px-3 rounded-full border text-xs font-semibold transition-all ${
                             highlightedFlow === item.key
@@ -596,9 +482,10 @@ export default function MoneyMirror() {
                             type="button"
                             onMouseEnter={() => handleFlowHover(item.key)}
                             onFocus={() => handleFlowSelect(item.key)}
-                            onClick={() => handleFlowSelect(item.key)}
+                            aria-pressed={highlightedFlow === item.key}
+                          onClick={() => handleFlowSelect(item.key)}
                             className={`w-full text-left rounded-lg border px-3 py-3 transition-all duration-200 ${
-                              isHighlighted ? 'border-gold/40 bg-[#10264a]' : 'border-navy-light/80 bg-[#0B1E3C] md:hover:border-gold/20'
+                              isHighlighted ? 'border-gold/40 bg-navy-light' : 'border-navy-light/80 bg-navy-surface md:hover:border-gold/20'
                             }`}
                           >
                             <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 mb-2">
@@ -606,7 +493,7 @@ export default function MoneyMirror() {
                                 <span className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
                                 <p className={`text-sm font-semibold truncate ${item.key === 'net' ? 'text-emerald' : 'text-white'}`}>{item.label}</p>
                               </div>
-                              <span className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {item.amount.toFixed(0)}</span>
+                              <span className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {formatMoney(item.amount)}</span>
                               <span className="text-white font-mono-data text-sm font-bold">{item.percent.toFixed(1)}%</span>
                             </div>
                             <div className="h-2 rounded-full bg-navy-light overflow-hidden">
@@ -616,7 +503,7 @@ export default function MoneyMirror() {
                               />
                             </div>
                             <div className="mt-1 flex items-center justify-end">
-                              <p className="text-slate text-[11px]">{item.key === 'net' ? 'kept' : 'deduction'}</p>
+                              <p className="text-slate text-sm">{item.key === 'net' ? 'kept' : 'deduction'}</p>
                             </div>
                           </button>
                         );
@@ -628,7 +515,7 @@ export default function MoneyMirror() {
                       <p className="text-slate text-xs uppercase mb-1">Focused explanation</p>
                       <p className={`text-base font-bold mb-1 ${highlightedItem.accent}`}>{highlightedItem.label} — {highlightedItem.percent.toFixed(1)}%</p>
                       <p className="text-slate text-sm leading-relaxed">{highlightedItem.description}</p>
-                      <p className="text-white font-mono-data text-sm mt-2">RM {highlightedItem.amount.toFixed(0)} / month</p>
+                      <p className="text-white font-mono-data text-sm mt-2">RM {formatMoney(highlightedItem.amount)} / month</p>
                     </div>
                     <div className="rounded-xl border border-navy-light bg-navy-surface/70 p-4">
                       <p className="text-slate text-xs uppercase mb-2">Tax model note</p>

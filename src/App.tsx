@@ -1,78 +1,93 @@
-import { useEffect, useState } from 'react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useLenis } from './hooks/useLenis';
-import { getHeaderOffset } from './lib/pageNavigation';
+import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Navigation from './sections/Navigation';
-import type { AppTab } from './sections/Navigation';
-import Hero from './sections/Hero';
-import MoneyMirror from './sections/MoneyMirror';
-import AssetLiability from './sections/AssetLiability';
-import CashflowQuadrant from './sections/CashflowQuadrant';
-import IncomeEngine from './sections/IncomeEngine';
-import RepeatSales from './sections/RepeatSales';
-import RatRace from './sections/RatRace';
-import DebtVisualizer from './sections/DebtVisualizer';
-import SalaryWealth from './sections/SalaryWealth';
-import WealthThermometer from './sections/WealthThermometer';
-import LiteracyPlaybook from './sections/LiteracyPlaybook';
-import Footer from './sections/Footer';
+import { applyPreferences, readPreferences, savePreferences } from './app/preferences';
+import type { Preferences } from './app/preferences';
+import { isLesson, lessons, routeFromHash, routeHref } from './app/lessons';
+import type { Destination, Route } from './app/lessons';
+import './styles/app.css';
 
-const tabFromHash = (): AppTab => ['#compounding', '#repeat-sales'].includes(window.location.hash) ? 'compounding' : 'learn';
-
+const Settings = lazy(() => import('./app/Settings'));
+const screens = {
+  home: lazy(() => import('./app/Dashboard')),
+  learn: lazy(() => import('./app/LessonLibrary')),
+  'money-mirror': lazy(() => import('./sections/MoneyMirror')),
+  'asset-liability': lazy(() => import('./sections/AssetLiability')),
+  'cashflow-quadrant': lazy(() => import('./sections/CashflowQuadrant')),
+  'income-engine': lazy(() => import('./sections/IncomeEngine')),
+  'rat-race': lazy(() => import('./sections/RatRace')),
+  'debt': lazy(() => import('./sections/DebtVisualizer')),
+  'salary-wealth': lazy(() => import('./sections/SalaryWealth')),
+  'wealth-thermometer': lazy(() => import('./sections/WealthThermometer')),
+  'literacy-playbook': lazy(() => import('./sections/LiteracyPlaybook')),
+  compounding: lazy(() => import('./sections/RepeatSales')),
+};
+class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    return this.state.failed ? <div className="screen-error" role="alert"><h2>This tool couldn’t load.</h2><p>Check your connection and try again.</p><button className="primary-button" onClick={() => window.location.reload()}>Reload this tool</button></div> : this.props.children;
+  }
+}
 export default function App() {
-  const lenis = useLenis();
-  const [activeTab, setActiveTab] = useState<AppTab>(tabFromHash);
-
+  const [route, setRoute] = useState<Route>(routeFromHash);
+  const [visited, setVisited] = useState<Route[]>(() => [routeFromHash()]);
+  const [preferences, setPreferences] = useState(readPreferences);
+  const mainRef = useRef<HTMLElement>(null);
+  const destination: Destination = isLesson(route) ? 'learn' : route;
   useEffect(() => {
-    const followHash = () => {
-      setActiveTab(tabFromHash());
+    const navigate = () => {
+      const next = routeFromHash();
+      setRoute(next);
+      setVisited(previous => previous.includes(next) ? previous : [...previous, next]);
       requestAnimationFrame(() => {
-        const hash = window.location.hash.slice(1);
-        const target = !['learn', 'compounding', 'repeat-sales'].includes(hash) ? document.getElementById(hash) : null;
-        const offset = getHeaderOffset();
-        const top = target ? target.getBoundingClientRect().top + window.scrollY - offset : 0;
-        window.scrollTo({ top, behavior: 'instant' });
-        lenis.current?.scrollTo(top, { immediate: true, force: true });
+        mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+        mainRef.current?.focus({ preventScroll: true });
       });
     };
-    window.addEventListener('hashchange', followHash);
-    return () => window.removeEventListener('hashchange', followHash);
-  }, [lenis]);
-
+    window.addEventListener('hashchange', navigate);
+    return () => window.removeEventListener('hashchange', navigate);
+  }, []);
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      lenis.current?.resize();
-      ScrollTrigger.refresh();
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [activeTab, lenis]);
-
-  const changeTab = (tab: AppTab) => {
-    if (window.location.hash === `#${tab}`) {
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      lenis.current?.scrollTo(0, { immediate: true, force: true });
-    } else window.location.hash = tab;
-  };
-
-  return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: '#0A192F' }}>
-      <Navigation activeTab={activeTab} onTabChange={changeTab} />
-      <main id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" hidden={activeTab !== 'learn'} tabIndex={-1}>
-        <Hero />
-        <MoneyMirror />
-        <AssetLiability />
-        <CashflowQuadrant />
-        <IncomeEngine />
-        <RatRace />
-        <DebtVisualizer />
-        <SalaryWealth />
-        <WealthThermometer />
-        <LiteracyPlaybook />
-        <Footer />
-      </main>
-      <main id="panel-compounding" role="tabpanel" aria-labelledby="tab-compounding" hidden={activeTab !== 'compounding'} tabIndex={-1}>
-        <RepeatSales />
-      </main>
-    </div>
-  );
+    applyPreferences(preferences);
+    const media = matchMedia('(prefers-color-scheme: dark)');
+    const update = () => applyPreferences(preferences);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [preferences]);
+  useEffect(() => {
+    const media = matchMedia('(prefers-reduced-motion: reduce)');
+    const syncSvgMotion = () => {
+      const reduce = preferences.reduceMotion || media.matches;
+      mainRef.current?.querySelectorAll('svg').forEach(svg => {
+        if (reduce) svg.pauseAnimations();
+        else svg.unpauseAnimations();
+      });
+    };
+    syncSvgMotion();
+    const observer = new MutationObserver(syncSvgMotion);
+    if (mainRef.current) observer.observe(mainRef.current, { childList: true, subtree: true });
+    media.addEventListener('change', syncSvgMotion);
+    return () => { observer.disconnect(); media.removeEventListener('change', syncSvgMotion); };
+  }, [preferences.reduceMotion]);
+  const changePreferences = (value: Preferences) => { savePreferences(value); setPreferences(value); };
+  return <div className="app-shell">
+    <Navigation active={destination} />
+    <main id="main-content" data-route={route} ref={mainRef} tabIndex={-1}>
+      {visited.includes('settings') && <div hidden={route !== 'settings'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening settings…</div>}><Settings value={preferences} onChange={changePreferences} /></Suspense></ScreenBoundary></div>}
+      {visited.map(key => {
+        if (!(key in screens)) return null;
+        const Screen = screens[key as keyof typeof screens];
+        const index = lessons.findIndex(lesson => lesson.id === key);
+        const lesson = lessons[index];
+        const next = lessons[(index + 1) % lessons.length];
+        return <div key={key} hidden={route !== key} className={lesson ? 'lesson-screen' : 'compound-screen'}>
+          {lesson && <header className="lesson-top"><a href={routeHref('learn')}><ArrowLeft size={18} aria-hidden="true" />All lessons</a><span>{index + 1} of 9</span></header>}
+          <ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status"><div className="loading-line" /><p>Opening your tool…</p></div>}><Screen /></Suspense></ScreenBoundary>
+          {lesson && <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a><a href={routeHref(next.id)}>{next.title}<ArrowRight size={18} aria-hidden="true" /></a></nav>}
+        </div>;
+      })}
+    </main>
+  </div>;
 }

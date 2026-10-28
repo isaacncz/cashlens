@@ -1,0 +1,557 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T00:17:06.636201+00:00",
+  "title": "Design System: CashflowLens.MY \u2014 Calm Ledger",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "rgb(245 247 243)",
+        "tonalRamp": [
+          "oklch(0.150 0.0023 128.53)",
+          "oklch(0.260 0.0048 128.53)",
+          "oklch(0.380 0.0057 128.53)",
+          "oklch(0.500 0.0057 128.53)",
+          "oklch(0.620 0.0057 128.53)",
+          "oklch(0.740 0.0057 128.53)",
+          "oklch(0.860 0.0039 128.53)",
+          "oklch(0.950 0.0018 128.53)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "rgb(255 255 255)",
+        "tonalRamp": [
+          "oklch(0.150 0.0000 89.88)",
+          "oklch(0.260 0.0000 89.88)",
+          "oklch(0.380 0.0000 89.88)",
+          "oklch(0.500 0.0000 89.88)",
+          "oklch(0.620 0.0000 89.88)",
+          "oklch(0.740 0.0000 89.88)",
+          "oklch(0.860 0.0000 89.88)",
+          "oklch(0.950 0.0000 89.88)"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "canonical": "rgb(235 240 233)",
+        "tonalRamp": [
+          "oklch(0.150 0.0043 136.56)",
+          "oklch(0.260 0.0090 136.56)",
+          "oklch(0.380 0.0107 136.56)",
+          "oklch(0.500 0.0107 136.56)",
+          "oklch(0.620 0.0107 136.56)",
+          "oklch(0.740 0.0107 136.56)",
+          "oklch(0.860 0.0073 136.56)",
+          "oklch(0.950 0.0034 136.56)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "rgb(30 45 36)",
+        "tonalRamp": [
+          "oklch(0.150 0.0105 157.87)",
+          "oklch(0.260 0.0220 157.87)",
+          "oklch(0.380 0.0261 157.87)",
+          "oklch(0.500 0.0261 157.87)",
+          "oklch(0.620 0.0261 157.87)",
+          "oklch(0.740 0.0261 157.87)",
+          "oklch(0.860 0.0178 157.87)",
+          "oklch(0.950 0.0084 157.87)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "rgb(84 101 89)",
+        "tonalRamp": [
+          "oklch(0.150 0.0112 154.50)",
+          "oklch(0.260 0.0236 154.50)",
+          "oklch(0.380 0.0281 154.50)",
+          "oklch(0.500 0.0281 154.50)",
+          "oklch(0.620 0.0281 154.50)",
+          "oklch(0.740 0.0281 154.50)",
+          "oklch(0.860 0.0191 154.50)",
+          "oklch(0.950 0.0090 154.50)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Accent",
+        "canonical": "rgb(43 98 73)",
+        "tonalRamp": [
+          "oklch(0.150 0.0288 161.79)",
+          "oklch(0.260 0.0605 161.79)",
+          "oklch(0.380 0.0721 161.79)",
+          "oklch(0.500 0.0721 161.79)",
+          "oklch(0.620 0.0721 161.79)",
+          "oklch(0.740 0.0721 161.79)",
+          "oklch(0.860 0.0490 161.79)",
+          "oklch(0.950 0.0231 161.79)"
+        ]
+      },
+      "positive": {
+        "role": "semantic",
+        "displayName": "Positive",
+        "canonical": "rgb(35 106 71)",
+        "tonalRamp": [
+          "oklch(0.150 0.0364 158.22)",
+          "oklch(0.260 0.0764 158.22)",
+          "oklch(0.380 0.0910 158.22)",
+          "oklch(0.500 0.0910 158.22)",
+          "oklch(0.620 0.0910 158.22)",
+          "oklch(0.740 0.0910 158.22)",
+          "oklch(0.860 0.0619 158.22)",
+          "oklch(0.950 0.0291 158.22)"
+        ]
+      },
+      "negative": {
+        "role": "semantic",
+        "displayName": "Negative",
+        "canonical": "rgb(171 48 48)",
+        "tonalRamp": [
+          "oklch(0.150 0.0639 25.10)",
+          "oklch(0.260 0.1341 25.10)",
+          "oklch(0.380 0.1597 25.10)",
+          "oklch(0.500 0.1597 25.10)",
+          "oklch(0.620 0.1597 25.10)",
+          "oklch(0.740 0.1597 25.10)",
+          "oklch(0.860 0.1086 25.10)",
+          "oklch(0.950 0.0511 25.10)"
+        ]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Warning",
+        "canonical": "rgb(131 89 17)",
+        "tonalRamp": [
+          "oklch(0.150 0.0394 74.68)",
+          "oklch(0.260 0.0827 74.68)",
+          "oklch(0.380 0.0984 74.68)",
+          "oklch(0.500 0.0984 74.68)",
+          "oklch(0.620 0.0984 74.68)",
+          "oklch(0.740 0.0984 74.68)",
+          "oklch(0.860 0.0669 74.68)",
+          "oklch(0.950 0.0315 74.68)"
+        ]
+      },
+      "info": {
+        "role": "semantic",
+        "displayName": "Info",
+        "canonical": "rgb(40 94 124)",
+        "tonalRamp": [
+          "oklch(0.150 0.0300 236.01)",
+          "oklch(0.260 0.0629 236.01)",
+          "oklch(0.380 0.0749 236.01)",
+          "oklch(0.500 0.0749 236.01)",
+          "oklch(0.620 0.0749 236.01)",
+          "oklch(0.740 0.0749 236.01)",
+          "oklch(0.860 0.0509 236.01)",
+          "oklch(0.950 0.0240 236.01)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "rgb(211 222 212)",
+        "tonalRamp": [
+          "oklch(0.150 0.0072 148.08)",
+          "oklch(0.260 0.0151 148.08)",
+          "oklch(0.380 0.0179 148.08)",
+          "oklch(0.500 0.0179 148.08)",
+          "oklch(0.620 0.0179 148.08)",
+          "oklch(0.740 0.0179 148.08)",
+          "oklch(0.860 0.0122 148.08)",
+          "oklch(0.950 0.0057 148.08)"
+        ]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Control",
+        "canonical": "rgb(121 140 126)",
+        "tonalRamp": [
+          "oklch(0.150 0.0121 153.50)",
+          "oklch(0.260 0.0254 153.50)",
+          "oklch(0.380 0.0302 153.50)",
+          "oklch(0.500 0.0302 153.50)",
+          "oklch(0.620 0.0302 153.50)",
+          "oklch(0.740 0.0302 153.50)",
+          "oklch(0.860 0.0206 153.50)",
+          "oklch(0.950 0.0097 153.50)"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "On Accent",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(0.150 0.0000 89.88)",
+          "oklch(0.260 0.0000 89.88)",
+          "oklch(0.380 0.0000 89.88)",
+          "oklch(0.500 0.0000 89.88)",
+          "oklch(0.620 0.0000 89.88)",
+          "oklch(0.740 0.0000 89.88)",
+          "oklch(0.860 0.0000 89.88)",
+          "oklch(0.950 0.0000 89.88)"
+        ]
+      },
+      "dark-ground": {
+        "role": "neutral",
+        "displayName": "Dark Ground",
+        "canonical": "rgb(18 28 23)",
+        "tonalRamp": [
+          "oklch(0.150 0.0070 162.78)",
+          "oklch(0.260 0.0147 162.78)",
+          "oklch(0.380 0.0175 162.78)",
+          "oklch(0.500 0.0175 162.78)",
+          "oklch(0.620 0.0175 162.78)",
+          "oklch(0.740 0.0175 162.78)",
+          "oklch(0.860 0.0119 162.78)",
+          "oklch(0.950 0.0056 162.78)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark Surface",
+        "canonical": "rgb(26 39 31)",
+        "tonalRamp": [
+          "oklch(0.150 0.0094 157.30)",
+          "oklch(0.260 0.0197 157.30)",
+          "oklch(0.380 0.0234 157.30)",
+          "oklch(0.500 0.0234 157.30)",
+          "oklch(0.620 0.0234 157.30)",
+          "oklch(0.740 0.0234 157.30)",
+          "oklch(0.860 0.0159 157.30)",
+          "oklch(0.950 0.0075 157.30)"
+        ]
+      },
+      "dark-raised": {
+        "role": "neutral",
+        "displayName": "Dark Raised",
+        "canonical": "rgb(36 53 42)",
+        "tonalRamp": [
+          "oklch(0.150 0.0119 155.88)",
+          "oklch(0.260 0.0250 155.88)",
+          "oklch(0.380 0.0298 155.88)",
+          "oklch(0.500 0.0298 155.88)",
+          "oklch(0.620 0.0298 155.88)",
+          "oklch(0.740 0.0298 155.88)",
+          "oklch(0.860 0.0203 155.88)",
+          "oklch(0.950 0.0095 155.88)"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Dark Ink",
+        "canonical": "rgb(238 244 239)",
+        "tonalRamp": [
+          "oklch(0.150 0.0037 150.69)",
+          "oklch(0.260 0.0077 150.69)",
+          "oklch(0.380 0.0092 150.69)",
+          "oklch(0.500 0.0092 150.69)",
+          "oklch(0.620 0.0092 150.69)",
+          "oklch(0.740 0.0092 150.69)",
+          "oklch(0.860 0.0062 150.69)",
+          "oklch(0.950 0.0029 150.69)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Dark Muted",
+        "canonical": "rgb(182 201 187)",
+        "tonalRamp": [
+          "oklch(0.150 0.0113 153.77)",
+          "oklch(0.260 0.0238 153.77)",
+          "oklch(0.380 0.0283 153.77)",
+          "oklch(0.500 0.0283 153.77)",
+          "oklch(0.620 0.0283 153.77)",
+          "oklch(0.740 0.0283 153.77)",
+          "oklch(0.860 0.0193 153.77)",
+          "oklch(0.950 0.0091 153.77)"
+        ]
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Dark Accent",
+        "canonical": "rgb(160 209 178)",
+        "tonalRamp": [
+          "oklch(0.150 0.0269 156.82)",
+          "oklch(0.260 0.0564 156.82)",
+          "oklch(0.380 0.0672 156.82)",
+          "oklch(0.500 0.0672 156.82)",
+          "oklch(0.620 0.0672 156.82)",
+          "oklch(0.740 0.0672 156.82)",
+          "oklch(0.860 0.0457 156.82)",
+          "oklch(0.950 0.0215 156.82)"
+        ]
+      },
+      "dark-positive": {
+        "role": "semantic",
+        "displayName": "Dark Positive",
+        "canonical": "rgb(142 218 171)",
+        "tonalRamp": [
+          "oklch(0.150 0.0403 156.27)",
+          "oklch(0.260 0.0847 156.27)",
+          "oklch(0.380 0.1008 156.27)",
+          "oklch(0.500 0.1008 156.27)",
+          "oklch(0.620 0.1008 156.27)",
+          "oklch(0.740 0.1008 156.27)",
+          "oklch(0.860 0.0685 156.27)",
+          "oklch(0.950 0.0323 156.27)"
+        ]
+      },
+      "dark-negative": {
+        "role": "semantic",
+        "displayName": "Dark Negative",
+        "canonical": "rgb(255 168 163)",
+        "tonalRamp": [
+          "oklch(0.150 0.0415 23.19)",
+          "oklch(0.260 0.0871 23.19)",
+          "oklch(0.380 0.1037 23.19)",
+          "oklch(0.500 0.1037 23.19)",
+          "oklch(0.620 0.1037 23.19)",
+          "oklch(0.740 0.1037 23.19)",
+          "oklch(0.860 0.0705 23.19)",
+          "oklch(0.950 0.0332 23.19)"
+        ]
+      },
+      "dark-warning": {
+        "role": "semantic",
+        "displayName": "Dark Warning",
+        "canonical": "rgb(232 198 129)",
+        "tonalRamp": [
+          "oklch(0.150 0.0382 84.25)",
+          "oklch(0.260 0.0802 84.25)",
+          "oklch(0.380 0.0955 84.25)",
+          "oklch(0.500 0.0955 84.25)",
+          "oklch(0.620 0.0955 84.25)",
+          "oklch(0.740 0.0955 84.25)",
+          "oklch(0.860 0.0649 84.25)",
+          "oklch(0.950 0.0305 84.25)"
+        ]
+      },
+      "dark-info": {
+        "role": "semantic",
+        "displayName": "Dark Info",
+        "canonical": "rgb(154 203 232)",
+        "tonalRamp": [
+          "oklch(0.150 0.0262 234.60)",
+          "oklch(0.260 0.0551 234.60)",
+          "oklch(0.380 0.0656 234.60)",
+          "oklch(0.500 0.0656 234.60)",
+          "oklch(0.620 0.0656 234.60)",
+          "oklch(0.740 0.0656 234.60)",
+          "oklch(0.860 0.0446 234.60)",
+          "oklch(0.950 0.0210 234.60)"
+        ]
+      },
+      "dark-line": {
+        "role": "neutral",
+        "displayName": "Dark Line",
+        "canonical": "rgb(61 82 68)",
+        "tonalRamp": [
+          "oklch(0.150 0.0139 155.42)",
+          "oklch(0.260 0.0293 155.42)",
+          "oklch(0.380 0.0349 155.42)",
+          "oklch(0.500 0.0349 155.42)",
+          "oklch(0.620 0.0349 155.42)",
+          "oklch(0.740 0.0349 155.42)",
+          "oklch(0.860 0.0237 155.42)",
+          "oklch(0.950 0.0112 155.42)"
+        ]
+      },
+      "dark-control": {
+        "role": "neutral",
+        "displayName": "Dark Control",
+        "canonical": "rgb(123 151 131)",
+        "tonalRamp": [
+          "oklch(0.150 0.0173 153.99)",
+          "oklch(0.260 0.0363 153.99)",
+          "oklch(0.380 0.0432 153.99)",
+          "oklch(0.500 0.0432 153.99)",
+          "oklch(0.620 0.0432 153.99)",
+          "oklch(0.740 0.0432 153.99)",
+          "oklch(0.860 0.0294 153.99)",
+          "oklch(0.950 0.0138 153.99)"
+        ]
+      },
+      "dark-on-accent": {
+        "role": "primary",
+        "displayName": "Dark On Accent",
+        "canonical": "#122018",
+        "tonalRamp": [
+          "oklch(0.150 0.0100 158.59)",
+          "oklch(0.260 0.0210 158.59)",
+          "oklch(0.380 0.0250 158.59)",
+          "oklch(0.500 0.0250 158.59)",
+          "oklch(0.620 0.0250 158.59)",
+          "oklch(0.740 0.0250 158.59)",
+          "oklch(0.860 0.0170 158.59)",
+          "oklch(0.950 0.0080 158.59)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Dashboard headline"
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Screen titles"
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Task titles"
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Body text and inputs, at least 16px"
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Associated form labels"
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Supporting metadata"
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Compact navigation and chart context"
+      }
+    },
+    "shadows": [
+      {
+        "name": "thumb-dock",
+        "value": "0 4px 16px rgb(var(--ledger-ink-rgb) / .12)",
+        "purpose": "Primary mobile action separation only"
+      }
+    ],
+    "motion": [
+      {
+        "name": "reduced",
+        "value": ".01ms",
+        "purpose": "Device or saved reduced motion; SVG animations are paused"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tablet",
+        "value": "768px"
+      },
+      {
+        "name": "sidebar",
+        "value": "1024px"
+      },
+      {
+        "name": "compound-columns",
+        "value": "1200px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main task, with a 52px target.",
+      "html": "<button class=\"ds-primary\">Check my cashflow</button>",
+      "css": ".ds-primary{min-height:52px;padding:12px 20px;border:0;border-radius:var(--radius-control);font:600 16px var(--ledger-font);background:var(--ledger-accent);color:var(--ledger-on-accent);cursor:pointer}.ds-primary:hover{filter:brightness(.92)}.ds-primary:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    },
+    {
+      "name": "Text button",
+      "kind": "button",
+      "refersTo": "button-link",
+      "description": "Secondary actions retain a 44px target.",
+      "html": "<button class=\"ds-link\">Reset</button>",
+      "css": ".ds-link{min-height:44px;padding:4px 0;border:0;background:none;color:var(--ledger-accent);font:400 14px var(--ledger-font);cursor:pointer;text-underline-offset:4px}.ds-link:hover{text-decoration:underline}.ds-link:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    },
+    {
+      "name": "Number field",
+      "kind": "input",
+      "refersTo": "number-field",
+      "description": "An associated label, decimal keyboard and readable input.",
+      "html": "<label class=\"ds-label\" for=\"ds-amount\">Monthly salary (RM)</label><input class=\"ds-number\" id=\"ds-amount\" type=\"number\" inputmode=\"decimal\" min=\"0\" step=\"any\" placeholder=\"8000\">",
+      "css": ".ds-label{display:block;margin-bottom:8px;color:var(--ledger-ink);font:500 16px var(--ledger-font)}.ds-number{width:100%;min-height:52px;padding:12px 14px;border:1px solid var(--ledger-control);border-radius:var(--radius-control);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px var(--ledger-font);font-variant-numeric:tabular-nums}.ds-number[aria-invalid=true]{border-color:var(--ledger-negative)}.ds-number:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    },
+    {
+      "name": "Destination navigation",
+      "kind": "nav",
+      "description": "Four visible destinations; current state stays explicit.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Example destinations\"><a href=\"#home\" aria-current=\"page\">Home</a><a href=\"#learn\">Learn</a><a href=\"#compounding\">Compound</a><a href=\"#settings\">Settings</a></nav>",
+      "css": ".ds-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--ledger-surface);border-top:1px solid var(--ledger-line)}.ds-nav a{display:grid;place-items:center;min-height:60px;padding:6px 2px;color:var(--ledger-muted);text-decoration:none;font:500 12px var(--ledger-font)}.ds-nav a[aria-current]{background:var(--ledger-raised);color:var(--ledger-accent);font-weight:650}.ds-nav a:hover{background:var(--ledger-raised)}.ds-nav a:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    },
+    {
+      "name": "Tool card",
+      "kind": "card",
+      "description": "A direct path to an existing financial tool.",
+      "html": "<a class=\"ds-tool\" href=\"#wealth-thermometer\"><strong>How long could it last?</strong><span>Find your financial breathing room.</span></a>",
+      "css": ".ds-tool{display:block;padding:20px;border:1px solid var(--ledger-line);border-radius:var(--radius-panel);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px var(--ledger-font);text-decoration:none}.ds-tool strong{display:block;font-weight:600}.ds-tool span{display:block;margin-top:6px;color:var(--ledger-muted)}.ds-tool:hover{background:var(--ledger-raised);border-color:var(--ledger-control)}.ds-tool:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    },
+    {
+      "name": "Duration preset",
+      "kind": "chip",
+      "description": "A clear pressed state for projection durations.",
+      "html": "<button class=\"ds-preset\" aria-pressed=\"true\">50 years</button>",
+      "css": ".ds-preset{min-height:44px;padding:8px 12px;border:1px solid var(--ledger-control);border-radius:var(--radius-control);background:var(--ledger-surface);color:var(--ledger-ink);font:400 14px var(--ledger-font);cursor:pointer}.ds-preset[aria-pressed=true]{background:var(--ledger-accent);border-color:var(--ledger-accent);color:var(--ledger-on-accent)}.ds-preset:hover{border-color:var(--ledger-accent)}.ds-preset:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Calm Ledger",
+    "overview": "**Creative North Star: \"Calm Ledger\"**\n\nCalm Ledger makes financial education feel like a usable personal space. Green-tinted paper, forest ink, aligned monetary figures, and quiet surface steps give calculators the readability of a well-kept notebook. Direct titles introduce the task; short explanations and familiar controls keep the next action clear.\n\nThe system is mobile first. Its signature is a protected scrolling area above a reachable action dock: a primary action must never cover the content it acts on. Desktop adds a persistent sidebar and room for side-by-side tools while keeping the same hierarchy. Light and dark themes preserve these roles rather than introducing a separate visual identity.\n\n**Key Characteristics:**\n\n- Paper-like tonal surfaces with restrained forest accents.\n- Direct headings, readable controls, and aligned monetary figures.\n- Protected content above thumb actions and persistent navigation.\n- Quiet state changes that respect device and user motion preferences.\n\nImplementation authority: `src/styles/theme.css` owns palette, type sizes, spacing, and radii. `src/styles/app.css`, `src/sections/Navigation.css`, and `src/sections/RepeatSales.css` apply those roles. The YAML above records the shipped values; it does not introduce a second implementation theme.",
+    "keyCharacteristics": [
+      "Paper-like tonal surfaces with restrained forest accents.",
+      "Direct headings, readable controls, and aligned monetary figures.",
+      "Protected content above thumb actions and persistent navigation.",
+      "Quiet state changes that respect device and user motion preferences."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Pair Rule.",
+        "body": "Resolve every foreground and surface through the current theme; never carry a light-mode fill or its foreground into dark mode on its own.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reading Floor Rule.",
+        "body": "Body text and inputs stay at 16px; reserve 14px and 12px for metadata and compact supporting labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Direct Heading Rule.",
+        "body": "Begin a screen or section with its useful title; do not prepend decorative eyebrow labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Protected Scrollport Rule.",
+        "body": "End the content viewport above every fixed action dock and navigation bar; adding bottom padding alone does not establish this relationship.",
+        "section": "layout"
+      },
+      {
+        "name": "The Quiet Depth Rule.",
+        "body": "Use surface tone and borders for structure; reserve the soft dock shadow for a floating primary action.",
+        "section": "elevation-depth"
+      }
+    ],
+    "dos": [
+      "use the ledger theme properties for every foreground, surface, boundary, and state.",
+      "keep body and input text at 16px and interactive targets at least 44px.",
+      "preserve the protected scrollport when adding or resizing a fixed action.",
+      "align monetary figures with tabular numerals and show their currency context.",
+      "pair semantic color with text and label examples and estimates clearly.",
+      "respect device theme and reduced-motion preferences alongside the user's settings."
+    ],
+    "donts": [
+      "add decorative eyebrow labels above useful headings.",
+      "treat legacy gold, navy, or white utility names as literal brand colors.",
+      "place fixed actions over scrollable content or remove safe-area allowances.",
+      "introduce decorative panel shadows or hard offset shadows into this quiet surface system.",
+      "present an illustrative financial value as a user's balance.",
+      "persist calculator inputs alongside appearance preferences."
+    ]
+  }
+}

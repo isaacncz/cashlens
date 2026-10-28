@@ -1,0 +1,11 @@
+# CashflowLens.MY app
+
+Mode: Operate. Build: code-led. User delegated design decisions and requested Calm Ledger, preserving the stack and features. No image comp or additional approval round was requested; delegation takes precedence over the skill's optional presentation workflow.
+
+THESIS: Financial education should feel like a usable personal space on a phone, with one clear action and the numbers within reach.
+OWN-WORLD: Calm Ledger. A green-tinted paper ground, forest ink, a systematic type scale, aligned monetary amounts and quiet surface steps. The visual signature is the relationship between the protected scrollport and the thumb dock: no primary action covers its own content.
+STORY: Home introduces the task, Learn gives nine direct tools, Compound carries the repeat-sales basket, and Settings makes the space comfortable. Each tool opens individually and retains its state while visited.
+FIRST VIEWPORT: At 390px, a 64px top bar, a compact introduction, a cashflow task card, and four bottom destinations. Primary actions live above navigation, with the content viewport reserving their entire footprint. At 1280px, the same information uses a 232px sidebar and a wider two-column canvas.
+FORM: 16px body and inputs, 44px minimum targets, 4px spacing scale, 8px controls, 16px panels. All theme values live in src/styles/theme.css. Direction exploration recorded seed:a17162b76c24f32a; the user's Calm Ledger direction and delegated choice override the dealt alternatives. The seven grounded systems considered were a bank statement, a household envelope system, an ASNB booklet, a neighborhood community library, a grocery receipt, a transit guide, and a public-service form. Calm Ledger draws restraint and approachability from the community-library system, translated into standard app navigation and controls. Catalog challengers were not adopted because navigation and finance clarity are pinned by the brief.
+
+Constraints: no transaction tracker invented; nine lessons and Compounding retained. No new application dependencies. No Co-Authored-By trailers or AI footers. Numeric inputs are ephemeral; only theme and motion preferences persist locally. No invented financial balances or commercial proof.
