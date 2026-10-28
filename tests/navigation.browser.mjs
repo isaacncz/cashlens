@@ -134,7 +134,7 @@ try {
     await page.getByRole('button', { name: 'Explore long term', exact: true }).click();
     await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('600');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 14,672.25');
-    const growth = page.getByRole('checkbox', { name: 'Add 1 customer each year', exact: true });
+    const growth = page.getByRole('checkbox', { name: 'Add customers each year', exact: true });
     assert.equal(await growth.isChecked(), false, 'The consultation keeps one customer until growth is selected');
     await growth.check();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 241,537.00');

@@ -31,15 +31,17 @@ export function projectRepeatSales(
   ratePercent: number = DEFAULT_REPEAT_RATE,
   model: PurchaseModel = 'repeat-purchases',
   includeAnnualAcquisition = true,
+  requestedCustomersPerYear = NEW_CUSTOMERS_PER_YEAR,
 ): Projection {
   const months = Math.min(MAX_MONTHS, Math.max(1, Math.round(Number.isFinite(requestedMonths) ? requestedMonths : 1)));
   const customers = Math.min(MAX_CUSTOMERS, Math.max(1, Math.round(Number.isFinite(requestedCustomers) ? requestedCustomers : 1)));
   const rate = Math.min(1, Math.max(0, Number.isFinite(ratePercent) ? ratePercent / 100 : DEFAULT_REPEAT_RATE / 100));
+  const customersPerYear = Math.min(MAX_CUSTOMERS, Math.max(0, Math.round(Number.isFinite(requestedCustomersPerYear) ? requestedCustomersPerYear : NEW_CUSTOMERS_PER_YEAR)));
   const cohorts = [{ joinedAt: 0, count: customers }];
   let customersAtEnd = customers;
   if (includeAnnualAcquisition) {
     for (let joinedAt = 12; joinedAt < months && customersAtEnd < MAX_CUSTOMERS; joinedAt += 12) {
-      const count = Math.min(NEW_CUSTOMERS_PER_YEAR, MAX_CUSTOMERS - customersAtEnd);
+      const count = Math.min(customersPerYear, MAX_CUSTOMERS - customersAtEnd);
       cohorts.push({ joinedAt, count });
       customersAtEnd += count;
     }

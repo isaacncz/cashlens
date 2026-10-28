@@ -211,3 +211,11 @@ test('start years support year 50 and sanitize invalid values without changing u
     close(projectRepeatSales([{ ...product, startYear }], 12, 1).total, 73.75);
   }
 });
+
+ test('configurable annual acquisition respects the global cap', () => {
+ const product = { ...find('124106'), every: 0 };
+ const projection = projectWithAcquisition([product], 25, 1, 50, 'repeat-purchases', true, 3);
+ assert.equal(projection.customersAtEnd, 7);
+ close(projection.total, 29.5 * 7);
+ assert.equal(projectWithAcquisition([product], 600, 1, 50, 'repeat-purchases', true, 5).customersAtEnd, 20);
+ });
