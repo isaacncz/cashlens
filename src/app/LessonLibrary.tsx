@@ -1,13 +1,30 @@
-import { ArrowUpRight, ArrowLeftRight, BookOpen, ChartNoAxesCombined, Gauge, Grid2X2, Layers2, ReceiptText, Route, Wallet } from 'lucide-react';
-import { lessons, routeHref } from './lessons';
-const icons = { wallet: Wallet, arrows: ArrowLeftRight, grid: Grid2X2, layers: Layers2, receipt: ReceiptText, route: Route, chart: ChartNoAxesCombined, gauge: Gauge, book: BookOpen };
-export default function LessonLibrary() {
+import { useState } from 'react';
+import { ArrowRight, ArrowUpRight, BookOpen, Layers2, Route } from 'lucide-react';
+import { learningPaths, lessons, routeHref } from './lessons';
+import type { LessonId } from './lessons';
+const pathIcons = { understand: BookOpen, build: Layers2, practice: Route };
+export default function LessonLibrary({ lastLesson }: { lastLesson: LessonId | null }) {
+  const [filter, setFilter] = useState('all');
+  const resume = lessons.find(lesson => lesson.id === lastLesson);
+  const groups = learningPaths.filter(path => filter === 'all' || path.id === filter);
   return <div className="app-page library-page">
-    <header className="page-heading"><h1>A clearer way to learn.</h1><p>One idea at a time. Try it with your own numbers.</p></header>
-    <div className="library-heading"><h2>All lessons</h2><span>9 interactive tools</span></div>
-    <div className="lesson-list">{lessons.map(({ id, title, description, group, icon }, index) => {
-      const Icon = icons[icon];
-      return <a href={routeHref(id)} className="lesson-link" key={id}><div className="lesson-icon"><Icon size={22} strokeWidth={1.6} aria-hidden="true" /></div><div><span className="lesson-group">{group} <span>· {String(index + 1).padStart(2, '0')}</span></span><h3>{title}</h3><p>{description}</p></div><ArrowUpRight size={20} aria-hidden="true" /></a>;
+    <header className="page-heading"><h1>Build your money sense.</h1><p>Three paths. Nine hands-on lessons. Start where you are.</p></header>
+    <a className="learning-start" href={routeHref(resume?.id ?? 'money-mirror')}>
+      <div><h2>{resume ? `Continue ${resume.title}` : 'Start with Money Mirror'}</h2><p>{resume ? 'Your inputs are still here in this session.' : 'See what an hour of work really earns you.'}</p></div>
+      <ArrowRight size={22} aria-hidden="true" />
+    </a>
+    <div className="library-heading"><span>Browse all 9 lessons</span></div>
+    <div className="learning-filters" role="group" aria-label="Filter learning paths">{[{ id: 'all', label: 'All' }, { id: 'understand', label: 'Understand' }, { id: 'build', label: 'Build' }, { id: 'practice', label: 'Practice' }].map(({ id, label }) => <button key={id} type="button" aria-pressed={filter === id} onClick={() => setFilter(id)}>{label}</button>)}</div>
+    <div className="learning-paths">{groups.map(path => {
+      const Icon = pathIcons[path.id];
+      return <section key={path.id} className="learning-path" aria-labelledby={`path-${path.id}`}>
+        <header><Icon size={22} strokeWidth={1.6} aria-hidden="true" /><div><h2 id={`path-${path.id}`}>{path.title}</h2><p>{path.description}</p></div></header>
+        <ol className="lesson-list">{path.lessonIds.map((id, index) => {
+          const lesson = lessons.find(lesson => lesson.id === id)!;
+          return <li key={id}><a href={routeHref(id)} className="lesson-link"><span className="lesson-number" aria-hidden="true">{index + 1}</span><div><h3>{lesson.title}</h3><p>{lesson.description}</p></div><ArrowUpRight size={20} aria-hidden="true" /></a></li>;
+        })}</ol>
+      </section>;
     })}</div>
+    <p className="learning-footnote">Explore in any order. Examples and calculators stay private to this session.</p>
   </div>;
 }

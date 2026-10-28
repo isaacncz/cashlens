@@ -28,7 +28,7 @@ const reasons = [
   {
     title: 'Compounding',
     body: 'Small streams stacked together can outperform one big salary over time.',
-    tone: 'text-sky-400',
+    tone: 'text-[var(--ledger-info)]',
   },
 ];
 
@@ -48,26 +48,22 @@ export default function IncomeEngine() {
     <section id="income-engine" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
         <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          Big Companies Build{' '}
-          <span className="text-gold">Multiple Streams.</span>
-          <br />
-          You Can Too.
+          Build income beyond <span className="text-gold">your salary.</span>
         </h1>
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-3xl">
-          Microsoft does not depend on one product. Strong businesses spread revenue across several engines. As an individual,
-          you can use the same logic: keep your salary, then slowly add side income, assets, and repeatable cashflow.
+          Compare a business with a personal income mix. See how several streams can reduce reliance on a single payer.
         </p>
 
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-6 items-stretch mb-8">
           <div data-reveal className="bg-navy-surface border border-navy-light rounded-3xl p-6 md:p-8">
             <div className="flex items-center justify-between gap-4 mb-6">
               <div>
-                <p className="text-sky-400 text-xs font-semibold uppercase tracking-[0.12em] mb-2">Company model</p>
+                <p className="text-[var(--ledger-info)] text-xs font-semibold uppercase tracking-[0.12em] mb-2">Company model</p>
                 <h2 className="text-white text-2xl font-bold">How big companies think</h2>
               </div>
-              <div className="rounded-2xl border border-sky-400/20 bg-sky-400/10 px-4 py-3 text-right">
+              <div className="rounded-2xl border border-navy-light bg-navy px-4 py-3 text-right">
                 <p className="text-slate text-sm uppercase tracking-[0.12em] mb-1">Risk profile</p>
-                <p className="text-sky-400 font-bold">Diversified revenue</p>
+                <p className="text-[var(--ledger-info)] font-bold">Diversified revenue</p>
               </div>
             </div>
 

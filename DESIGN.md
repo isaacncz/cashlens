@@ -2,18 +2,18 @@
 name: "CashflowLens.MY — Calm Ledger"
 description: "A quiet, readable space for Malaysian financial education."
 colors:
-  ground: "rgb(245 247 243)"
+  ground: "rgb(246 248 250)"
   surface: "rgb(255 255 255)"
-  raised: "rgb(235 240 233)"
-  ink: "rgb(30 45 36)"
-  muted: "rgb(84 101 89)"
-  accent: "rgb(43 98 73)"
+  raised: "rgb(237 243 239)"
+  ink: "rgb(24 40 33)"
+  muted: "rgb(79 97 86)"
+  accent: "rgb(33 100 71)"
   positive: "rgb(35 106 71)"
   negative: "rgb(171 48 48)"
   warning: "rgb(131 89 17)"
   info: "rgb(40 94 124)"
-  line: "rgb(211 222 212)"
-  control: "rgb(121 140 126)"
+  line: "rgb(211 222 216)"
+  control: "rgb(117 138 125)"
   on-accent: "#ffffff"
   dark-ground: "rgb(18 28 23)"
   dark-surface: "rgb(26 39 31)"
@@ -213,7 +213,7 @@ The fixed top bar is 64px plus the top safe-area inset. Below 1024px, four equal
 
 The main element is the vertical scroll container. Its bottom edge stops above navigation, rather than letting the document scroll underneath it. Home, Money Mirror, and Wealth Thermometer reserve an additional 84px for their action dock. Compound reserves 104px for its summary. Primary action buttons sit 12px above bottom navigation; the 88px Compound summary sits 8px above it. At desktop size, ordinary action docks return to document flow; Compound retains its summary reserve until 1200px.
 
-At 768px, Home tools and the lesson library become two columns, with the ninth lesson spanning both columns. The illustrative salary breakdown also appears alongside the task description. At 1200px, Compound uses a 360px basket beside a flexible result panel, separated by 32px; the result is sticky, the product list can scroll within 560px, and the mobile summary disappears. The chart grows from 210px to 270px high when its own container reaches 480px.
+Home tools become two columns at 768px. Learning uses three ordered paths, each with three compact lesson rows; path groups become three columns at 1200px. Topic filters keep any one path available on its own. The illustrative salary breakdown also appears alongside the task description. At 1200px, Compound uses a 360px basket beside a flexible result panel, separated by 32px; the result is sticky, the product list can scroll within 560px, and the mobile summary disappears. The chart grows from 210px to 270px high when its own container reaches 480px.
 
 **The Protected Scrollport Rule.** End the content viewport above every fixed action dock and navigation bar; adding bottom padding alone does not establish this relationship.
 
@@ -255,13 +255,19 @@ The mobile bar shows four icon-and-label links. Inactive links use muted text; t
 
 ### Appearance Choices
 
-Three equal native radio labels offer Device, Light, and Dark. Each has a control border, surface fill, 20px vertical padding, and a meaningful icon. Selection adds a raised fill and accent inset stroke; focus within adds the shared visible outline. Reduced motion uses a native checkbox with a large clickable label. Only theme and motion preferences persist on the device.
+Light is the default for new visits, independent of device appearance. Saved Device and Dark choices remain valid. Three equal native radio labels offer Device, Light, and Dark. Each has a control border, surface fill, 20px vertical padding, and a meaningful icon. Selection adds a raised fill and accent inset stroke; focus within adds the shared visible outline. Reduced motion uses a native checkbox with a large clickable label. Only theme and motion preferences persist on the device.
 
 ### Projection Summary
 
 A compact, flat summary sits above mobile navigation and carries a result or basket-edit prompt plus a 48px action button. Its amount uses tabular figures and a smaller currency label. When the main projection is visible, it becomes an “Adjust your basket” prompt rather than repeating the total. It disappears at the two-column desktop breakpoint. Results, examples, and estimates must be labeled according to their actual meaning; an illustrative salary breakdown is not a personal account balance.
 
 Motion is supporting behavior. Device reduced motion and the saved preference both shorten CSS animation and transition duration to .01ms, limit animations to one iteration, disable smooth scrolling, and pause SVG animation. There is no separate shared entrance-animation system to copy.
+
+### Learning paths
+
+Learning is organized into Understand your money (Money Mirror, Assets & liabilities, Cashflow Quadrant), Build breathing room (Debt Visualizer, Salary & wealth, Wealth Thermometer), and Put it into practice (Income Engine, Rat Race, money playbook). Rows show order within a path, not completion. A session-only Continue link resumes the last-opened tool. Each lesson has a three-step navigation bar and a next lesson in the learning sequence. No visit is presented as completed study.
+
+The salary breakdown remains interactive inside a native disclosure. Forms use white surfaces and visible input boundaries in light mode; the page ground is neutral and selection uses the raised green surface. Semantic information blue replaces the old pale cyan on light surfaces.
 
 ## Do's and Don'ts
 

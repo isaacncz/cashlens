@@ -4,14 +4,14 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Navigation from './sections/Navigation';
 import { applyPreferences, readPreferences, savePreferences } from './app/preferences';
 import type { Preferences } from './app/preferences';
-import { isLesson, lessons, routeFromHash, routeHref } from './app/lessons';
-import type { Destination, Route } from './app/lessons';
+import { isLesson, lessons, learningOrder, pathForLesson, routeFromHash, routeHref } from './app/lessons';
+import type { Destination, LessonId, Route } from './app/lessons';
 import './styles/app.css';
 
+const LessonLibrary = lazy(() => import('./app/LessonLibrary'));
 const Settings = lazy(() => import('./app/Settings'));
 const screens = {
   home: lazy(() => import('./app/Dashboard')),
-  learn: lazy(() => import('./app/LessonLibrary')),
   'money-mirror': lazy(() => import('./sections/MoneyMirror')),
   'asset-liability': lazy(() => import('./sections/AssetLiability')),
   'cashflow-quadrant': lazy(() => import('./sections/CashflowQuadrant')),
@@ -33,6 +33,7 @@ class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolea
 export default function App() {
   const [route, setRoute] = useState<Route>(routeFromHash);
   const [visited, setVisited] = useState<Route[]>(() => [routeFromHash()]);
+  const [lastLesson, setLastLesson] = useState<LessonId | null>(() => { const initial = routeFromHash(); return isLesson(initial) ? initial : null; });
   const [preferences, setPreferences] = useState(readPreferences);
   const mainRef = useRef<HTMLElement>(null);
   const destination: Destination = isLesson(route) ? 'learn' : route;
@@ -40,6 +41,7 @@ export default function App() {
     const navigate = () => {
       const next = routeFromHash();
       setRoute(next);
+      if (isLesson(next)) setLastLesson(next);
       setVisited(previous => previous.includes(next) ? previous : [...previous, next]);
       requestAnimationFrame(() => {
         mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
@@ -75,17 +77,22 @@ export default function App() {
   return <div className="app-shell">
     <Navigation active={destination} />
     <main id="main-content" data-route={route} ref={mainRef} tabIndex={-1}>
+      {visited.includes('learn') && <div hidden={route !== 'learn'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening lessons…</div>}><LessonLibrary lastLesson={lastLesson} /></Suspense></ScreenBoundary></div>}
       {visited.includes('settings') && <div hidden={route !== 'settings'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening settings…</div>}><Settings value={preferences} onChange={changePreferences} /></Suspense></ScreenBoundary></div>}
       {visited.map(key => {
         if (!(key in screens)) return null;
         const Screen = screens[key as keyof typeof screens];
         const index = lessons.findIndex(lesson => lesson.id === key);
         const lesson = lessons[index];
-        const next = lessons[(index + 1) % lessons.length];
+        const path = lesson ? pathForLesson(lesson.id) : null;
+        const position = lesson ? learningOrder.indexOf(lesson.id) : -1;
+        const nextId = learningOrder[position + 1];
+        const next = lessons.find(item => item.id === nextId);
         return <div key={key} hidden={route !== key} className={lesson ? 'lesson-screen' : 'compound-screen'}>
-          {lesson && <header className="lesson-top"><a href={routeHref('learn')}><ArrowLeft size={18} aria-hidden="true" />All lessons</a><span>{index + 1} of 9</span></header>}
+          {lesson && <header className="lesson-top"><a href={routeHref('learn')}><ArrowLeft size={18} aria-hidden="true" />All lessons</a><span>{position + 1} of 9</span></header>}
+          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`}><span>{path.title}</span><ol>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined} aria-label={`${step + 1}. ${lessons.find(item => item.id === id)!.title}`}><span>{step + 1}</span>{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
           <ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status"><div className="loading-line" /><p>Opening your tool…</p></div>}><Screen /></Suspense></ScreenBoundary>
-          {lesson && <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a><a href={routeHref(next.id)}>{next.title}<ArrowRight size={18} aria-hidden="true" /></a></nav>}
+          {lesson && <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a>{next ? <a href={routeHref(next.id)}>Next: {next.title}<ArrowRight size={18} aria-hidden="true" /></a> : <a href={routeHref('learn')}>Choose another path<ArrowRight size={18} aria-hidden="true" /></a>}</nav>}
         </div>;
       })}
     </main>

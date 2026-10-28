@@ -414,6 +414,7 @@ export default function MoneyMirror() {
             )}
           </div>
 
+          <details className="money-breakdown"><summary>Where your salary goes</summary>
           <div data-reveal className="bg-navy-surface/30 rounded-2xl border border-navy-light/50 p-5 md:p-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
               <div>
@@ -538,6 +539,7 @@ export default function MoneyMirror() {
               </div>
             )}
           </div>
+          </details>
         </div>
       </div>
     </section>

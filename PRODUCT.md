@@ -19,3 +19,5 @@ CashflowLens.MY; Calm Ledger. The user delegated visual and screen-structure dec
 
 ## Accessibility & Inclusion
 WCAG AA contrast, semantic navigation and forms, visible keyboard focus, 44px touch targets, 16px body/input text, safe-area insets, system color scheme and reduced motion. Bottom navigation on phones and sidebar navigation on desktop. Target Lighthouse mobile performance and accessibility scores of at least 90, measured against production.
+
+Light is the default theme for new visitors, including dark-mode devices. Explicit stored Light, Dark and Device selections are respected. Learning offers three ordered paths with three lessons each and a session-only last-opened lesson shortcut.

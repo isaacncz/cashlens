@@ -7,7 +7,7 @@ const errors = [];
 const lessonIds = ['money-mirror', 'asset-liability', 'cashflow-quadrant', 'income-engine', 'rat-race', 'debt', 'salary-wealth', 'wealth-thermometer', 'literacy-playbook'];
 try {
   for (const width of [360, 390, 768, 1280]) {
-    const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: true, reducedMotion: 'reduce', colorScheme: 'light' });
+    const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: true, reducedMotion: 'reduce', colorScheme: width === 360 ? 'dark' : 'light' });
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     const checkLayout = async () => {
@@ -17,12 +17,13 @@ try {
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
     const open = async name => {
       await nav.getByRole('link', { name, exact: true }).click();
-      if (name === 'Learn') await page.locator('.lesson-list').waitFor();
+      if (name === 'Learn') await page.locator('.lesson-list').first().waitFor();
       if (name === 'Settings') await page.locator('.settings-page').waitFor();
       if (name === 'Compound') await page.locator('.rs-basket').waitFor();
     };
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
     await page.getByRole('heading', { level: 1, name: /Make sense/ }).waitFor();
+    assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'New visitors default to light even on a dark device');
     assert.equal(await nav.getByRole('link').count(), 4);
     assert.equal(await page.locator('.lesson-screen').count(), 0, 'Lessons are not mounted on arrival');
     const navBox = await nav.boundingBox();
@@ -56,7 +57,11 @@ try {
     assert.equal(await page.locator('#money-mirror-results').evaluate(element => document.activeElement === element), true);
     await checkLayout();
     await open('Learn');
-    assert.equal(await page.locator('.lesson-list > a').count(), 9);
+    assert.equal(await page.locator('.lesson-list a').count(), 9);
+    assert.equal(await page.locator('.learning-path').count(), 3);
+    await page.getByRole('button', { name: 'Build', exact: true }).click();
+    assert.equal(await page.locator('.lesson-list a').count(), 3, 'Path filters limit choices');
+    await page.getByRole('button', { name: 'All', exact: true }).click();
     for (const id of lessonIds) {
       await page.locator(`.lesson-list a[href$="#${id}"]`).click();
       await page.locator(`section#${id}`).waitFor();
@@ -138,7 +143,7 @@ try {
     await page.goBack();
     await page.locator('#repeat-sales').waitFor();
     await page.goForward();
-    await page.getByRole('heading', { name: 'All lessons', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Build your money sense.', exact: true }).waitFor();
     await checkLayout();
     await context.close();
   }

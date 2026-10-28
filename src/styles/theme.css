@@ -8,18 +8,18 @@
 /* Calm Ledger — the single source for color, type, spacing and radius. */
 :root {
   color-scheme: light;
-  --ledger-bg-rgb: 245 247 243;
+  --ledger-bg-rgb: 246 248 250;
   --ledger-surface-rgb: 255 255 255;
-  --ledger-raised-rgb: 235 240 233;
-  --ledger-ink-rgb: 30 45 36;
-  --ledger-muted-rgb: 84 101 89;
-  --ledger-accent-rgb: 43 98 73;
+  --ledger-raised-rgb: 237 243 239;
+  --ledger-ink-rgb: 24 40 33;
+  --ledger-muted-rgb: 79 97 86;
+  --ledger-accent-rgb: 33 100 71;
   --ledger-positive-rgb: 35 106 71;
   --ledger-negative-rgb: 171 48 48;
   --ledger-warning-rgb: 131 89 17;
   --ledger-info-rgb: 40 94 124;
-  --ledger-line-rgb: 211 222 212;
-  --ledger-control-rgb: 121 140 126;
+  --ledger-line-rgb: 211 222 216;
+  --ledger-control-rgb: 117 138 125;
   --ledger-on-accent: #ffffff;
   --ledger-ground: rgb(var(--ledger-bg-rgb));
   --ledger-surface: rgb(var(--ledger-surface-rgb));
@@ -64,7 +64,7 @@
   --site-control-border: var(--ledger-control);
   --site-accent: var(--ledger-accent);
   --site-positive: var(--ledger-positive);
-  --background: 100 20% 96%;
+  --background: 210 29% 97%;
   --foreground: 148 20% 15%;
   --card: 0 0% 100%;
   --card-foreground: var(--foreground);

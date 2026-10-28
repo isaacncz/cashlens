@@ -64,3 +64,11 @@ The independent Impeccable finish reviewer scored the four listed finish fixes r
 Release Compounding measured 97 performance / 100 accessibility, with 2.2s LCP, 140ms TBT and zero CLS. Money Mirror measured 97 performance, 98 accessibility in the final semantic scan, and zero CLS. Its remaining automated finding treats SPA destination links as in-page skip links; those destinations are loaded and focused by the router and are covered by the browser regression.
 
 Design documentation was completed in-thread after the documentation worker became unavailable. DESIGN.md and the schemaVersion 2 sidecar were checked against the implementation.
+
+## Light and learning refinement
+
+The light-mode review found an inherited pale-cyan information color, narrow comparison headings, a flat list of nine equally weighted lesson cards, and an oversized salary breakdown. Light now uses a neutral ground with white form and reading surfaces, dark semantic information text, and explicit on-accent action text. New visits default to Light even when the device is dark. Saved Dark and Device preferences still work after reload.
+
+Learning now has three paths of three lessons, topic filters, a compact first-tool shortcut, a session-only Continue link, and within-path navigation. Detailed salary flow is a native disclosure retaining every control. No completion status is invented. Responsive and theme checks cover 360, 390, 768 and 1280px.
+
+The updated light Learn screen measured 99 performance / 98 accessibility and zero CLS in Lighthouse 12.8.2 against the production preview. The remaining automated finding classifies SPA lesson links as in-page skip links; all destinations and retained calculator controls passed the four-width browser regression.
