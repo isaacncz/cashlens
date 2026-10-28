@@ -16,7 +16,9 @@ export interface Projection {
 }
 
 /** Purchases within [0, months) are included. Each joining cohort has its own
- * first purchase and repeat/replacement schedule. One new customer joins every
+ * first purchase and repeat/replacement schedule. A product's optional startYear
+ * is on the business calendar, not the customer's age. Buying starts at the later
+ * of product introduction and customer arrival. One new customer joins every
  * 12 months, capped at 20 total customers introduced (not 20 per cohort).
  * Repeat purchase rate stays constant per cycle; annual attrition is applied
  * to each cohort's own age. Fractional buyers are expected averages.
@@ -46,6 +48,9 @@ export function projectRepeatSales(
   let recurringMonthly = 0;
   for (const product of products) {
     if (!PURCHASE_INTERVALS.includes(product.every as typeof PURCHASE_INTERVALS[number])) continue;
+    const startYear = Math.min(50, Math.max(1, Math.round(Number.isFinite(product.startYear) ? product.startYear! : 1)));
+    const availableAt = (startYear - 1) * 12;
+    if (availableAt >= months) continue;
     let group = groups.get(product.category);
     if (!group) {
       group = { color: product.color, purchases: Array<number>(months).fill(0) };
@@ -53,16 +58,19 @@ export function projectRepeatSales(
     }
     if (product.every > 0) recurringMonthly += product.aboPrice / product.every * customers;
     for (const cohort of cohorts) {
+      const startsAt = Math.max(cohort.joinedAt, availableAt);
+      const retentionAt = (month: number) => model === 'annual-attrition'
+        ? rate ** Math.floor((month - cohort.joinedAt) / 12) : 1;
       if (product.every === 0) {
-        group.purchases[cohort.joinedAt] += product.aboPrice * cohort.count;
+        group.purchases[startsAt] += product.aboPrice * cohort.count * retentionAt(startsAt);
         continue;
       }
-      const firstAge = product.type === 'filter' ? product.every : 0;
-      for (let age = firstAge; cohort.joinedAt + age < months; age += product.every) {
+      const firstPurchase = startsAt + (product.type === 'filter' ? product.every : 0);
+      for (let month = firstPurchase; month < months; month += product.every) {
         const buyerShare = model === 'annual-attrition'
-          ? rate ** Math.floor(age / 12)
-          : age === 0 ? 1 : rate;
-        group.purchases[cohort.joinedAt + age] += product.aboPrice * cohort.count * buyerShare;
+          ? retentionAt(month)
+          : month === startsAt ? 1 : rate;
+        group.purchases[month] += product.aboPrice * cohort.count * buyerShare;
       }
     }
   }

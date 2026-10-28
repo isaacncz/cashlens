@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-10-28T00:17:06.636201+00:00",
-  "title": "Design System: CashflowLens.MY \u2014 Calm Ledger",
+  "title": "Design System: CashflowLens.MY — Calm Ledger",
   "extensions": {
     "colorMeta": {
       "ground": {
@@ -536,7 +536,7 @@
       },
       {
         "name": "Basket and projection",
-        "body": "Keep product selection and scenario inputs findable. Use a visible catalog/basket switch and a native period select. Plot before fine-grained controls; no tall sticky result pane.",
+        "body": "Begin with one item and one customer. Reveal repeat sales, products introduced by business year, then the long-term plan. Use a searchable native product sheet and one total-revenue line by default. Keep the acquisition checkbox opt-in, detail collapsed, results in normal flow and mobile actions above a protected scrollport.",
         "section": "components"
       }
     ],

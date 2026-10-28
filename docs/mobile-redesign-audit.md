@@ -72,3 +72,21 @@ The light-mode review found an inherited pale-cyan information color, narrow com
 Learning now has three paths of three lessons, topic filters, a compact first-tool shortcut, a session-only Continue link, and within-path navigation. Detailed salary flow is a native disclosure retaining every control. No completion status is invented. Responsive and theme checks cover 360, 390, 768 and 1280px.
 
 The updated light Learn screen measured 99 performance / 98 accessibility and zero CLS in Lighthouse 12.8.2 against the production preview. The remaining automated finding classifies SPA lesson links as in-page skip links; all destinations and retained calculator controls passed the four-width browser regression.
+
+## Consultation and scheduled products
+
+The repeat-sales entry now begins with one product and one customer, then reveals repeat buying, year-2 additions, and long-term planning. Four clickable stages allow direct access to the planner. Customer acquisition is off until selected; the 20-customer cap and 50% repeat-purchase default remain.
+
+| Previous repeat-sales entry | Consultation |
+| --- | --- |
+| Full catalog and three-product starting basket | One toothpaste, one customer, RM29.50 first sale |
+| Immediate 50-year projection with annual customer growth enabled | One-year repeat example first; growth is opt-in in the long-term planner |
+| Products all available from the beginning | Per-product business-calendar Start year, from 1 to 50 |
+| Multiple stacked category lines by default | One total-revenue line, optional By category view |
+| Persistent catalog/search beside results | Selected plan grouped by year; searchable native product sheet |
+
+The calculation model now schedules purchases from the later of product introduction and customer arrival. The old year-1 reference totals remain unchanged. One customer buying toothpaste in year 1 and adding Dish Drops and shampoo in year 2 generates RM73.75 over year 1 and RM416.25 cumulatively over two years at 50% repeat purchasing. Adding products later cannot change earlier revenue.
+
+Production build, targeted ESLint, all 22 calculation tests and the browser regression passed. The regression covers 360, 390, 768 and 1280px, including all nine lessons, four consultation stages, picker search/selection and keyboard containment, start-year focus after regrouping, later-product boundaries, acquisition/caps, touch/keyboard chart inspection, dock clearance, history and saved appearance. Additional visual/layout checks cover 430 and 1440px, light/dark themes, all consultation stages, and the native picker. No horizontal overflow or browser errors were found.
+
+Lighthouse 12.8.2 against the production consultation entry (`#compounding`), with default mobile throttling, measured **97 performance / 100 accessibility**, **2.23s LCP**, and **0 CLS**. No automated accessibility findings were reported. These are local lab measurements of the opening stage, not a claim about every interactive state. No new application dependencies were added.

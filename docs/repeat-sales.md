@@ -1,80 +1,71 @@
-# The Power of Repeat Sales
+# Repeat-sales consultation
 
-A client-side calculator for people exploring an FMCG business, available in its own **Compounding** tab. **Learn** contains the original nine financial lessons. The calculator uses the Calm Ledger light/dark theme and stores no customer data.
+A client-side experience for people exploring FMCG, in the **Compound** destination. The consultation begins with **one product and one customer**. All nine original lessons remain in Learn. Calculator inputs stay in session memory; no customer data is stored.
+
+## Consultation flow
+
+1. **First sale:** Glister Multi-Action Toothpaste 200g, Malaysia ABO RM29.50, one customer and one item. No chart or scenario controls appear yet. “Change” opens a single-product picker; consumables and appliances can start the consultation. Replacement filters are available in the full catalog at the basket stage.
+2. **Repeat sales:** the same customer and product over 12 months, with an editable purchase cycle and a default 50% repeat-purchase assumption. The toothpaste example produces RM73.75. “Add products in year 2” moves to the two-year plan and opens the picker.
+3. **Grow basket:** users tick additions from all 28 products. New additions default to year 2, and their Start year is editable from 1 to 50. Products are grouped by introduction year. The original first product stays in year 1. No additional customer is assumed.
+4. **Long term:** the same plan can be explored from one month to 50 years. Presets cover 1 month and 1, 2, 5, 10, 25 and 50 years; Custom duration exposes the monthly slider. Customer count and optional yearly acquisition appear here. Acquisition is **off by default** and capped at 20 customers introduced in total.
+
+The four consultation steps are clickable, so users can revisit an explanation or go directly to the full planner. Inputs remain intact between steps and app destinations. Returning to the first two steps isolates the original first-sale example; later additions remain in the full plan. Reset returns to the first sale with one toothpaste, one customer, 50% repeat purchasing, no acquisition, and a five-year starting preset for the later planner. A reload starts a fresh consultation.
 
 ## Catalog provenance
 
 The 28 Malaysia products are transcribed from **ABO Price List SA13, April 2026**, supplied as `ABO_Price_List_202604.pdf`. Nutrition: printed page 2. Personal care: pages 8–9. eSpring and its e3 Carbon Filter: page 9. Atmosphere appliances and filters: page 10. Home care: page 11.
 
-`src/data/repeatSalesProducts.ts` keeps each SKU, pack size, ABO price (`aboPrice`), source page, category, default selection, and example purchase interval. All visible product prices, monthly averages, chart values, and totals use only the Malaysia AP (ABO price) column. The active catalog contains no retail-price field. SKU and source page appear under “Show source details.” Do not substitute BV, RP, or Brunei prices. Purchase cycles are editable examples, not dosage or usage advice. Follow product instructions and indicators for actual replacement timing.
+`src/data/repeatSalesProducts.ts` preserves each SKU, pack size, ABO price (`aboPrice`), source page, category, and example purchase interval. All prices, averages, chart values and totals use only Malaysia AP (ABO), never RP, BV or Brunei prices. The catalog contains no retail-price field. “Show source details” exposes SKU/page references in the plan and picker. The existing `checked` metadata identifies the three-product calculation reference basket; the consultation explicitly starts with SKU 124106 instead.
 
-## Two distinct buying assumptions
-
-The previous default applied 50% **annual attrition** to the same original cohort indefinitely. This was mathematically consistent with that assumption but unsuitable as the default repeat-business story: the customer group became 1, 0.5, 0.25, and so on, so cumulative sales approached a finite ceiling. The default must not silently label that as ongoing repeat purchasing.
-
-`src/lib/repeatSales.ts` now exposes two explicit modes:
-
-- **Repeat purchases (default):** the initial consumable purchase uses the full selected group. Every subsequent scheduled purchase uses the same repeat-purchase rate, default 50%, applied to that joining group. There is no repeated annual decay. New customer acquisition is controlled by the checkbox described below. Fractional buyers represent an expected average. Future scheduled purchases continue to add revenue at a positive rate.
-- **Annual attrition (comparison stress test):** each joining group’s remaining customers are multiplied by the selected annual retention rate, starting from its own joining date. At 50%, each group shrinks exponentially; revenue may eventually level off after the customer-acquisition cap is reached. Both the control label and explanation change when this mode is chosen.
-
-Both modes support 1–600 months and a starting group between 1 and 20. “Add 1 customer each year” is checked by default and can be unchecked to compare a fixed starting group. Checked, one customer joins at months 12, 24, 36, and so on, until 20 customers have joined in total. The cap is on total customers introduced, not a fresh allowance for each group or each year. A horizon ending exactly at month 12 excludes the new arrival at month 12; month 13 includes that arrival. Reset restores one starting customer, annual acquisition checked, 50% repeat purchasing, the 50-year horizon, and the starter basket. Users may adjust the rate between 0% and 100%. With acquisition off, a zero repeat rate or a basket containing only one-time goods can correctly produce a flat line after the first purchase. With acquisition on, new first purchases continue until the 20-customer cap; the chart must not fabricate continued growth.
+Purchase cycles and start years are scenario inputs, not source claims or usage instructions. Follow product instructions and indicators for actual replacement timing. The optional `startYear` field is a scenario override; absent or non-finite values mean year 1, and values are rounded and clamped to years 1–50.
 
 ## Purchase accounting
 
-Purchases within `[0, horizon)` are counted. Each joining group has its own purchase clock; revenue before its joining date is never counted. Consumables start at each joining group’s arrival month, then repeat at the chosen interval. Appliances default to one purchase per customer when they join. Filters start after their chosen interval, treating the initial appliance filter as included. Over 600 months an initial customer has 49 annual filter replacements; later customers have fewer, based on their joining dates. Standalone filters also use this delayed replacement schedule, relative to each joining date. One-time goods are never multiplied by the repeat rate.
+Purchases within `[0, horizon)` are counted, over a horizon clamped to 1–600 months. A year-2 introduction becomes available at month 12. A 12-month projection excludes purchases on that exact boundary; month 13 includes them.
 
-In repeat-purchase mode, purchase share is `1` at each group’s joining month and `rate / 100` at each later scheduled purchase. In annual-attrition mode it is `(rate / 100) ** floor(monthsSinceJoining / 12)`. Each purchase is Malaysia ABO price (AP) × customers in that joining group × purchase share, summed across all joining groups. Keep precision until display.
+Each customer group has its own joining date. A product's start year is on the **business calendar**, not relative to each customer's arrival. Its buying clock starts at `max(customerJoinedAt, (startYear - 1) * 12)`. Existing customers can first buy a new product when it is introduced; later arrivals begin buying it when they join. No purchases are backdated. New consumable first purchases are counted in full in the repeat-purchase model.
 
-The chart and headline use the same cumulative monthly arrays, stacked by category. The full-basket monthly average is ABO price divided by the interval, per customer, before the scenario's repeat/attrition rate. Prices stay fixed: no inflation, reinvestment, or assumed compound investment returns. Customer acquisition is explicitly modeled only when the checkbox is checked. Revenue is before expenses and is not profit. A 50-year scenario explores assumptions; it is not a forecast.
+- **Repeat purchases (default):** first consumable purchases use the full group; each later scheduled purchase applies the selected rate, default 50%, without repeated annual decay. Fractional buyers are expected averages.
+- **Annual attrition (advanced comparison):** purchase share is `(rate / 100) ** floor((purchaseMonth - customerJoinedAt) / 12)`. A later product introduction does not reset the customer's age or restore lost customers. This also applies to delayed one-time purchases.
 
-## Independently checked fixed-group examples
+Appliances default to one purchase per customer, when both customer and product are in the plan. Filters begin **one replacement interval after** that point, treating the initial filter as included. Later replacements follow the chosen cycle. In the repeat-purchase model, filter replacements use the repeat rate, including their first replacement. A one-time purchase does not use the repeat rate. Invalid intervals are ignored.
 
-Basket: toothpaste 200g every 3 months, Dish Drops 1L every 3 months, shampoo 280ml every 2 months.
+When acquisition is selected, one new customer joins at months 12, 24, 36, and so on, until 20 have been introduced in total. The starting group is clamped to 1–20. Acquisition is independent of product introductions. In attrition mode, introduced customers are not the expected number still buying. The sixth `projectRepeatSales` argument controls acquisition; its existing default remains enabled for backward compatibility, while the UI passes its explicit checkbox state.
 
-The first purchase is RM29.50 + RM35.00 + RM56.00 = **RM120.50**. At 100% purchasing, the full basket generates RM594.00 annually or RM29,700.00 over 50 years. At 50% repeat purchasing, total = first purchase + 50% × all later purchases:
+The headline and chart share cumulative category arrays. The default chart draws one total-revenue line. By category optionally reveals stacked category areas and their legend. Year markers indicate product introductions; all monthly points are retained so introduction boundaries remain visible. The active monthly basket average uses products introduced within the chosen horizon, at ABO price divided by their interval, per starting customer and before the repeat rate.
 
-- 1 year: RM120.50 + (RM594.00 − RM120.50) × 0.5 = **RM357.25**.
-- 24 years 3 months (the reported screenshot): **RM7,276.50**.
-- 50 years: RM120.50 + (RM29,700.00 − RM120.50) × 0.5 = **RM14,910.25**.
-- 20 customers over 50 years: **RM298,205.00**.
-- Every full later year, including year 50, adds **RM297.00 per customer**.
+Prices are fixed: no inflation, reinvestment, or compound investment returns are assumed. Revenue is before expenses and is not profit. A 50-year scenario explores assumptions; it is not a forecast. Zero repeats, one-time goods or future products can legitimately produce a flat line.
 
-With acquisition unchecked, the annual-attrition comparison at 50% approaches RM1,188.00 over 50 years, reproducing the old flat curve’s shape using ABO prices.
+## Independently checked examples
 
-## Annual customer acquisition examples
+**Opening toothpaste:** ABO RM29.50, every 3 months, one fixed customer, 50% repeat purchasing.
 
-With the default one starting customer and acquisition checked, years 1–20 have 1, 2, …, 20 customers introduced; no more are added once 20 have joined. New customers buy the same selected basket, with first purchases and delayed filters scheduled from their own joining dates. The interface shows starting and total introduced counts; in attrition mode, the total introduced is not the expected number still buying.
+- First sale: **RM29.50**.
+- Year 1: RM29.50 + 3 × RM14.75 = **RM73.75**.
 
-At 50% repeat purchasing:
+**Staggered three-product plan:** toothpaste in year 1; Dish Drops 1L (RM35, every 3 months) and Satinique Smooth Moisture Shampoo 280ml (RM56, every 2 months) from year 2.
 
-- 12 months: 1 customer introduced, RM357.25.
-- 13 months: 2 customers introduced, RM538.00.
-- 24 months: 2 customers introduced, RM1,011.50.
-- 24 years 3 months: 20 customers introduced, RM89,100.00.
-- 50 years: 20 customers introduced, RM241,775.00.
+- Year 1 remains **RM73.75**.
+- Year 2 adds RM59 toothpaste + RM87.50 Dish Drops + RM196 shampoo = RM342.50.
+- Cumulative 2 years: **RM416.25**, with one customer.
+- Cumulative 50 years: **RM14,672.25**, with one customer. This comprises 200 toothpaste cycles, 196 Dish Drops cycles, and 294 shampoo cycles, with each first purchase in full and later cycles at 50%.
+- With optional annual acquisition, 50 years introduces 20 customers and totals **RM241,537.00**.
+- Moving the shampoo start to year 3 removes its contribution from the two-year horizon, leaving **RM220.25**.
 
-For the 50-year total, the 20 groups have purchase histories of 50, 49, …, 31 full years. Their ages sum to 810. Each group’s value is RM297 × years + RM60.25, so total = RM297 × 810 + RM60.25 × 20 = **RM241,775.00**. Unchecking acquisition gives the fixed-one-customer total RM14,910.25. Starting with 20 customers gives RM298,205.00 with either checkbox state, because the cap is already reached.
+**All three products from year 1:** the original reference cases remain unchanged. At 50%, the fixed-customer totals are RM357.25 for 12 months, RM7,276.50 for 291 months, and RM14,910.25 for 600 months. Annual acquisition gives RM241,775 over 600 months. Starting with 20 customers gives RM298,205. Each later full year adds RM297 per fixed customer. The 50% annual-attrition reference approaches RM1,188 for the fixed group.
 
-The optional sixth `projectRepeatSales` argument disables annual acquisition for fixed-group reference calculations; the UI passes the checkbox state explicitly. Model metadata includes the clamped starting count and total introduced by the selected horizon.
+## Responsive behavior and accessibility
 
-## Mobile, navigation, and accessibility
+The first sale uses a focused single panel. Later steps use a product plan and normal-flow result panel; from 1200px they sit side by side with a 360px plan, increasing to 400px from 1440px. Products are grouped by start year with purchase-cycle editors beside their start-year controls.
 
-The mobile catalog initially shows six products, with an option to browse all 28. Its count reflects the actual visible rows. A fixed action dock shows the current revenue while browsing, then offers “Edit basket” when the projection is visible. The main scrollport reserves space for the dock and bottom navigation, including safe-area insets, so neither covers the calculator. Basket/projection jump actions scroll and move focus to their destination.
+A native dialog presents the searchable catalog as a bottom sheet on phones and a centered panel from 768px. Its header, filters and live total/Done footer stay outside the scrolling product list. It supports keyboard focus containment, Escape/backdrop dismissal and focus return. Start-year edits restore focus after a product moves to another year group.
 
-Controls have associated labels, visible focus, and 44px control areas; mobile text-entry and select controls use 16px text. Product names and pack sizes share a checkbox label. Source details remain available on demand. Scoped slider tracks prevent style leakage from the learning modules. Charts resize to their container and support touch and keyboard inspection.
+Mobile retains the protected action dock above four-item navigation. It shows the live amount and the consultation's next action; the long-term planner switches between View projection and Edit basket. The main scrollport reserves the dock's entire footprint, including safe areas. Controls are at least 44px; text-entry and select controls use 16px text. Theme tokens, visible focus and reduced motion remain respected.
 
-Home, Learn, Compound, and Settings use hash routes and browser history. The four-item bottom navigation becomes a sidebar from 1024px. Screens load on demand and retain inputs when switching destinations within a session. Light is the default; saved Light, Dark, and Device preferences remain respected. Reduced-motion users get native scrolling.
+Charts load only after the first-sale step. Their container determines plot height, label density and loading height. Tap/drag reveals a crosshair and total; Monthly values provides a keyboard-accessible month slider. By category is a native checkbox. Full scenario explanations, source details and annual attrition remain in a collapsed disclosure.
 
 ## Validation
 
-Run `npm test`, `npm run build`, and targeted ESLint on changed files. `npm run lint` also reports existing unrelated repository issues. For UI regression checks, start `npm run dev`, then run `npm run test:browser`. Install Chromium with `npx playwright install chromium`, or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `CASHLENS_TEST_URL` optionally changes the default `http://localhost:3010/`.
+Run `npm test`, `npm run build`, and targeted ESLint on changed source files. `npm run lint` also reports unrelated existing repository issues. For UI checks, run `npm run dev`, then `npm run test:browser`; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for a system Chromium and `CASHLENS_TEST_URL` to change the default `http://localhost:3010/`.
 
-Tests distinguish the two scenario formulas, verify a positive year-49-to-50 revenue increment, preserve legitimate flat one-time/zero-repeat cases, and check ABO-only prices (including a regression that injects an ignored retail-price property), purchase boundaries, filters, limits, and chart totals. Additional tests cover the checkbox, anniversary boundary, 20-customer global cap, new customers’ independent purchase/filter schedules, and retention by joining-group age. Browser checks cover the exact screenshot horizon, both scenario labels, cap/default/reset behavior, navigation, touch layouts, and the summary/projection overlap regression.
-
-### Basket and projection workbench
-
-The catalog has visible **All products / My basket** controls, search, category filtering, and an ABO-per-pack column. My basket exposes purchase-cycle editors; All products shows a concise cycle hint for selected products. The basket header shows the computed first order for one customer (filters are excluded until their replacement interval). A separate Price source disclosure retains each SKU/page reference. Empty baskets and searches have a direct browse action.
-
-The projection period is a native select in the result header with the six existing horizon presets. The chart is shown before the fine-duration slider and scenario controls. Customer count, optional yearly acquisition, and repeat rate appear together under Your scenario. The annual-attrition comparison and monthly basket average remain under Advanced assumptions. Nothing in the calculation model changes.
-
-Selection feedback reports the changed product’s contribution over the chosen horizon. The chart supports a tap/drag crosshair and a keyboard-accessible monthly-value slider. The result panel uses normal page flow so lower controls remain reachable; the catalog scrolls within a framed region on desktop. Mobile retains the reserved bottom summary and basket/projection jump controls.
+The 22 calculation tests cover ABO-only pricing, both buying models, fixed and growing customers, limits, independent clocks, introduction boundaries, year 50, delayed appliances/filters and chart totals. Browser regression covers the consultation and existing nine lessons at 360, 390, 768 and 1280px, including source prices, picker keyboard behavior, start-year edits, retained inputs, mobile docks, touch inspection, form validation, history and saved theme choices.

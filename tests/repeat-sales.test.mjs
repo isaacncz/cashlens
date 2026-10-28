@@ -144,3 +144,70 @@ test('invalid purchase intervals cannot create purchases or an unbounded schedul
     assert.deepEqual(projection.categories, []);
   }
 });
+
+test('consultation starts with one toothpaste sale, then one year of repeat purchasing', () => {
+  const toothpaste = { ...find('124106'), startYear: 1 };
+  close(projectRepeatSales([toothpaste], 1, 1).total, 29.5);
+  close(projectRepeatSales([toothpaste], 12, 1).total, 29.5 + 3 * 14.75);
+});
+
+test('a year-2 product cannot contribute before introduction, including the exact boundary', () => {
+  const dishDrops = { ...find('110488'), startYear: 2 };
+  close(projectRepeatSales([dishDrops], 12, 1).total, 0);
+  close(projectRepeatSales([dishDrops], 13, 1).total, 35);
+  close(projectRepeatSales([dishDrops], 24, 1).total, 35 + 3 * 17.5);
+  close(projectRepeatSales([dishDrops], 24, 1).recurringMonthly, 35 / 3);
+  const projection = projectRepeatSales([dishDrops], 24, 1);
+  assert.ok(projection.categories[0].cumulative.slice(0, 13).every(value => value === 0));
+});
+
+test('one customer can grow from one product to three in year 2', () => {
+  const plan = starter.map(product => ({ ...product, startYear: product.id === '124106' ? 1 : 2 }));
+  // Year 1: 73.75 toothpaste. Year 2: 59 toothpaste + 87.50 dish drops + 196 shampoo.
+  close(projectRepeatSales(plan, 12, 1).total, 73.75);
+  close(projectRepeatSales(plan, 24, 1).total, 73.75 + 59 + 87.5 + 196);
+  assert.equal(projectRepeatSales(plan, 600, 1).customersAtEnd, 1);
+  // 200 toothpaste cycles, 196 dish-drop cycles and 294 shampoo cycles.
+  close(projectRepeatSales(plan, 600, 1).total, (29.5 + 199 * 14.75) + (35 + 195 * 17.5) + (56 + 293 * 28));
+});
+
+test('product introduction and customer arrival have independent buying clocks', () => {
+  const toothpaste = { ...find('124106'), startYear: 1 };
+  const dishDrops = { ...find('110488'), startYear: 2 };
+  // At month 12: initial customer repeats toothpaste; new customer buys it in full;
+  // both customers buy the newly introduced dish drops in full.
+  close(projectWithAcquisition([toothpaste, dishDrops], 13, 1).total, 73.75 + 14.75 + 29.5 + 70);
+  // Year-3 introduction: three cohorts each buy for the first time, without backdating.
+  close(projectWithAcquisition([{ ...dishDrops, startYear: 3 }], 24, 1).total, 0);
+  close(projectWithAcquisition([{ ...dishDrops, startYear: 3 }], 25, 1).total, 35 * 3);
+  // A customer arriving after introduction has its own first purchase.
+  close(projectWithAcquisition([dishDrops], 25, 1).total, 87.5 * 2 + 17.5 * 2 + 35);
+});
+
+test('delayed appliances and filters keep first-purchase and replacement accounting', () => {
+  const device = { ...find('122940M'), startYear: 2 }, filter = { ...find('122943M'), startYear: 2 };
+  close(projectWithAcquisition([device], 12, 1).total, 0);
+  close(projectWithAcquisition([device], 13, 1).total, 4680 * 2);
+  close(projectRepeatSales([device], 600, 1).total, 4680);
+  close(projectWithAcquisition([filter], 24, 1).total, 0);
+  close(projectWithAcquisition([filter], 25, 1).total, 595 * .5 * 2);
+  close(projectWithAcquisition([filter], 37, 1).total, 595 * .5 * 5);
+});
+
+test('annual attrition follows customer age when a later product is introduced', () => {
+  const dishDrops = { ...find('110488'), startYear: 2 };
+  close(projectRepeatSales([dishDrops], 13, 1, 50, 'annual-attrition').total, 35 * .5);
+  close(projectWithAcquisition([dishDrops], 13, 1, 50, 'annual-attrition').total, 35 * (.5 + 1));
+  close(projectWithAcquisition([{ ...find('122940M'), startYear: 2 }], 13, 1, 50, 'annual-attrition').total, 4680 * (.5 + 1));
+});
+
+test('start years support year 50 and sanitize invalid values without changing unplanned products', () => {
+  const product = { ...find('124106'), startYear: 50 };
+  close(projectRepeatSales([product], 588, 1).total, 0);
+  close(projectRepeatSales([product], 589, 1).total, 29.5);
+  close(projectRepeatSales([product], 600, 1).total, 73.75);
+  close(projectRepeatSales([{ ...product, startYear: 100 }], 600, 1).total, 73.75);
+  for (const startYear of [undefined, NaN, Infinity, -1, 0]) {
+    close(projectRepeatSales([{ ...product, startYear }], 12, 1).total, 73.75);
+  }
+});

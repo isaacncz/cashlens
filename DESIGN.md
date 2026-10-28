@@ -213,7 +213,7 @@ The fixed top bar is 64px plus the top safe-area inset. Below 1024px, four equal
 
 The main element is the vertical scroll container. Its bottom edge stops above navigation, rather than letting the document scroll underneath it. Home, Money Mirror, and Wealth Thermometer reserve an additional 84px for their action dock. Compound reserves 104px for its summary. Primary action buttons sit 12px above bottom navigation; the 88px Compound summary sits 8px above it. At desktop size, ordinary action docks return to document flow; Compound retains its summary reserve until 1200px.
 
-Home tools become two columns at 768px. Learning uses three ordered paths, each with three compact lesson rows; path groups become three columns at 1200px. Topic filters keep any one path available on its own. The illustrative salary breakdown also appears alongside the task description. At 1200px, Compound uses a 390px basket beside a flexible result panel, separated by 24px; from 1440px the basket grows to 400px with a 32px gap. The result flows normally so scenario controls stay reachable, the product list scrolls within 536px, and the mobile summary disappears. The chart grows from 210px to 270px high when its own container reaches 480px.
+Home tools become two columns at 768px. Learning uses three ordered paths, each with three compact lesson rows; path groups become three columns at 1200px. Topic filters keep any one path available on its own. The illustrative salary breakdown also appears alongside the task description. Compound begins with a focused first-sale panel within 900px. Its four consultation stages reveal repeat purchasing, year-based product additions and the longer-term plan. At 1200px, the later stages use a 360px product plan beside a flexible result panel, separated by 24px; from 1440px the plan grows to 400px with a 32px gap. Both panels flow normally so all controls remain reachable, and desktop next actions replace the mobile dock. The searchable catalog uses a native modal bottom sheet on phones and a centered 720px panel from 768px, with a scrolling list between fixed controls and its footer. The chart grows from 210px to 270px high when its own container reaches 480px.
 
 **The Protected Scrollport Rule.** End the content viewport above every fixed action dock and navigation bar; adding bottom padding alone does not establish this relationship.
 
@@ -239,7 +239,7 @@ Calm, legible actions with generous touch space.
 
 ### Chips
 
-Compound exposes All products / My basket as a two-choice control with counts and aria-pressed. Category filtering and search remain visible. The horizon presets are a labeled native select beside Your projection; a range input below the chart supports any month.
+Compound uses four numbered, clickable consultation steps with aria-current="step". The initial selection is one product and one customer. The searchable product picker keeps category filters visible; its checkbox mode grows the plan, and its radio mode changes the first product. Product rows are grouped by Start year, with native year and purchase-cycle selects. The long-term horizon uses a labeled native select; Custom duration reveals a range for any month. Total revenue is the default chart, with an optional By category checkbox.
 
 ### Cards / Containers
 
@@ -259,7 +259,7 @@ Light is the default for new visits, independent of device appearance. Saved Dev
 
 ### Projection Summary
 
-A compact, flat summary sits above mobile navigation and carries a result or basket-edit prompt plus a 48px action button. Its amount uses tabular figures and a smaller currency label. When the main projection is visible, it becomes an “Adjust your basket” prompt rather than repeating the total. It disappears at the two-column desktop breakpoint. Results, examples, and estimates must be labeled according to their actual meaning; an illustrative salary breakdown is not a personal account balance.
+A compact, flat summary sits above mobile navigation and carries the live amount plus a labeled action with a minimum 56px height. Its amount uses tabular figures and a smaller currency label. The amount remains visible while its action advances the consultation. In the final planner, its action switches between View projection and Edit basket according to the visible panel. It disappears at the two-column desktop breakpoint, where the consultation next action appears in normal flow. Results, examples, and estimates must be labeled according to their actual meaning; an illustrative salary breakdown is not a personal account balance.
 
 Motion is supporting behavior. Device reduced motion and the saved preference both shorten CSS animation and transition duration to .01ms, limit animations to one iteration, disable smooth scrolling, and pause SVG animation. There is no separate shared entrance-animation system to copy.
 

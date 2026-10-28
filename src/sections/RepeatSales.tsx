@@ -1,64 +1,76 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { ArrowDown, ArrowUp, ChevronDown, Plus, RotateCcw, Search, ShoppingBasket } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, Plus, RotateCcw, ShoppingBasket, UserRound, X } from 'lucide-react';
 import { repeatSalesProducts } from '../data/repeatSalesProducts';
-import type { ProductCategory } from '../data/repeatSalesProducts';
-import { durationLabel, formatRinggit, DEFAULT_REPEAT_RATE, MAX_CUSTOMERS, MAX_MONTHS, NEW_CUSTOMERS_PER_YEAR, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
+import { durationLabel, formatRinggit, DEFAULT_REPEAT_RATE, MAX_CUSTOMERS, MAX_MONTHS, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
 import type { PurchaseModel } from '../lib/repeatSales';
 import { scrollToContent } from '../lib/pageNavigation';
+import ProductPicker from './ProductPicker';
 import './RepeatSales.css';
 
-const categories: ProductCategory[] = ['Personal care', 'Home care', 'Nutrition', 'Filters', 'Appliances'];
-const presets = [1, 12, 60, 120, 300, 600];
-const initialIds = repeatSalesProducts.filter(product => product.checked).map(product => product.id);
+const FIRST_PRODUCT_ID = '124106';
+const presets = [1, 12, 24, 60, 120, 300, 600];
+const startYears = Array.from({ length: 50 }, (_, index) => index + 1);
+const steps = ['First sale', 'Repeat sales', 'Grow basket', 'Long term'];
+const titles = ['One product. One customer.', 'One sale becomes repeat sales.', 'Grow the basket in year 2.', 'See what time can build.'];
+const descriptions = ['Start with a simple first sale.', 'See what the same customer could buy again.', 'Keep the customer. Add another product.', 'Explore your plan over the next 50 years.'];
 const cycleLabel = (interval: number) => interval === 0 ? 'One-time purchase' : interval === 1 ? 'Every month' : interval === 12 ? 'Every year' : `Every ${durationLabel(interval)}`;
 const rangeStyle = (percentage: number): CSSProperties => ({ '--range-fill': `${percentage}%` } as CSSProperties);
 const RevenueChart = lazy(() => import('./RevenueChart'));
 
 export default function RepeatSales() {
-  const [selectedIds, setSelectedIds] = useState<string[]>(initialIds);
+  const [step, setStep] = useState(0);
+  const [firstId, setFirstId] = useState(FIRST_PRODUCT_ID);
+  const [selectedIds, setSelectedIds] = useState<string[]>([FIRST_PRODUCT_ID]);
   const [intervals, setIntervals] = useState<Record<string, number>>({});
-  const [months, setMonths] = useState(MAX_MONTHS);
+  const [productYears, setProductYears] = useState<Record<string, number>>({});
+  const [months, setMonths] = useState(60);
   const [customers, setCustomers] = useState(1);
   const [customerInput, setCustomerInput] = useState('1');
   const [rate, setRate] = useState(DEFAULT_REPEAT_RATE);
   const [purchaseModel, setPurchaseModel] = useState<PurchaseModel>('repeat-purchases');
-  const [addCustomerEachYear, setAddCustomerEachYear] = useState(true);
-  const [projectionInView, setProjectionInView] = useState(false);
-  const projectionRef = useRef<HTMLDivElement>(null);
-  const productsRef = useRef<HTMLDivElement>(null);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('All categories');
-  const [selectedOnly, setSelectedOnly] = useState(false);
-  const [catalogExpanded, setCatalogExpanded] = useState(false);
-  const [showPricingDetails, setShowPricingDetails] = useState(false);
+  const [addCustomerEachYear, setAddCustomerEachYear] = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
+  const [showSource, setShowSource] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerMode, setPickerMode] = useState<'first' | 'add'>('first');
   const [activity, setActivity] = useState<{ id: string; kind: 'added' | 'removed' | 'updated' } | null>(null);
-  const catalog = useMemo(() => repeatSalesProducts.map(product => ({ ...product, every: intervals[product.id] ?? product.every })), [intervals]);
-  const selected = useMemo(() => catalog.filter(product => selectedIds.includes(product.id)), [catalog, selectedIds]);
-  const projection = useMemo(() => projectRepeatSales(selected, months, customers, rate, purchaseModel, addCustomerEachYear), [selected, months, customers, rate, purchaseModel, addCustomerEachYear]);
-  const firstOrder = useMemo(() => projectRepeatSales(selected, 1, 1, 100, 'repeat-purchases', false).total, [selected]);
-  const query = search.trim().toLowerCase();
-  const visible = catalog.filter(product => (category === 'All categories' || category === product.category)
-    && (!selectedOnly || selectedIds.includes(product.id))
-    && (!query || `${product.name} ${product.id} ${product.size}`.toLowerCase().includes(query)));
-  const collapsedCatalog = !catalogExpanded && !query && category === 'All categories' && !selectedOnly;
-  const mobileProductCount = collapsedCatalog ? Math.min(6, visible.length) : visible.length;
+  const [projectionInView, setProjectionInView] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const projectionRef = useRef<HTMLDivElement>(null);
+  const basketRef = useRef<HTMLDivElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const previousStep = useRef(step);
+  const catalog = useMemo(() => repeatSalesProducts.map(product => ({ ...product, every: intervals[product.id] ?? product.every, startYear: product.id === firstId ? 1 : productYears[product.id] ?? 2 })), [intervals, productYears, firstId]);
+  const firstProduct = catalog.find(product => product.id === firstId)!;
+  const selected = useMemo(() => catalog.filter(product => selectedIds.includes(product.id)).sort((a, b) => a.startYear - b.startYear || a.aboPrice - b.aboPrice), [catalog, selectedIds]);
+  const products = useMemo(() => step < 2 ? [firstProduct] : selected, [step, firstProduct, selected]);
+  const horizon = step === 0 ? 1 : step === 1 ? 12 : step === 2 ? 24 : months;
+  const startingCustomers = step < 3 ? 1 : customers;
+  const acquisition = step === 3 && addCustomerEachYear;
+  const projection = useMemo(() => projectRepeatSales(products, horizon, startingCustomers, rate, purchaseModel, acquisition), [products, horizon, startingCustomers, rate, purchaseModel, acquisition]);
+  const firstOrder = useMemo(() => projectRepeatSales(products, 1, 1, 100, 'repeat-purchases', false).total, [products]);
+  const introductions = [...new Set(products.map(product => product.startYear))].sort((a, b) => a - b).map(year => ({ year, count: products.filter(product => product.startYear === year).length }));
+  const activeCount = products.filter(product => (product.startYear - 1) * 12 < horizon).length;
   const changedProduct = catalog.find(product => product.id === activity?.id);
-  const contribution = changedProduct ? projectRepeatSales([changedProduct], months, customers, rate, purchaseModel, addCustomerEachYear).total : 0;
-  const customerLabel = projection.customersAtEnd === customers ? `${customers} ${customers === 1 ? 'customer' : 'customers'}` : `${customers} starting, ${projection.customersAtEnd} total customers`;
+  const contribution = changedProduct ? projectRepeatSales([changedProduct], horizon, startingCustomers, rate, purchaseModel, acquisition).total : 0;
+  const customerLabel = `${projection.customersAtEnd} ${purchaseModel === 'annual-attrition' ? 'customers introduced' : projection.customersAtEnd === 1 ? 'customer' : 'customers'}`;
   const invalidCustomers = customerInput === '' || Number(customerInput) < 1 || Number(customerInput) > MAX_CUSTOMERS || !Number.isInteger(Number(customerInput));
+  const nextLabel = step === 0 ? 'See repeat sales' : step === 1 ? 'Add products in year 2' : 'Explore long term';
 
   useEffect(() => {
+    if (previousStep.current !== step && headingRef.current) scrollToContent(headingRef.current);
+    previousStep.current = step;
     const target = projectionRef.current;
     if (!target) return;
-    const observer = new IntersectionObserver(([entry]) => setProjectionInView(entry.isIntersecting), {
-      root: document.getElementById('main-content'), rootMargin: '0px 0px -25% 0px', threshold: 0,
-    });
+    const observer = new IntersectionObserver(([entry]) => setProjectionInView(entry.isIntersecting), { root: document.getElementById('main-content'), rootMargin: '0px 0px -25% 0px', threshold: 0 });
     observer.observe(target);
     return () => observer.disconnect();
-  }, []);
+  }, [step]);
 
-  const viewProjection = () => { if (projectionRef.current) scrollToContent(projectionRef.current); };
+  const openPicker = (mode: 'first' | 'add') => { setPickerMode(mode); setPickerOpen(true); };
+  const advance = () => { setStep(value => Math.min(3, value + 1)); if (step === 1) openPicker('add'); };
+  const jump = () => { const target = projectionInView ? basketRef.current : projectionRef.current; if (target) scrollToContent(target); };
   const changeCustomers = (value: number) => {
     const next = Math.min(MAX_CUSTOMERS, Math.max(1, Math.round(Number.isFinite(value) ? value : 1)));
     setCustomers(next); setCustomerInput(String(next));
@@ -68,68 +80,81 @@ export default function RepeatSales() {
     setSelectedIds(previous => removing ? previous.filter(value => value !== id) : [...previous, id]);
     setActivity({ id, kind: removing ? 'removed' : 'added' });
   };
-  const showCatalog = (basket: boolean) => {
-    setSelectedOnly(basket); setSearch(''); setCategory('All categories');
-    productsRef.current?.scrollTo({ top: 0 });
+  const chooseFirst = (id: string) => {
+    setSelectedIds(previous => [id, ...previous.filter(value => value !== firstId && value !== id)]);
+    setFirstId(id); setActivity(null);
+  };
+  const removeProduct = (id: string) => {
+    toggleProduct(id);
+    requestAnimationFrame(() => addButtonRef.current?.focus({ preventScroll: true }));
+  };
+  const changeStartYear = (id: string, year: number) => {
+    setProductYears(previous => ({ ...previous, [id]: year }));
+    setActivity({ id, kind: 'updated' });
+    // Regrouping by year remounts this row; keep the edited control in keyboard focus.
+    requestAnimationFrame(() => document.getElementById(`rs-start-${id}`)?.focus({ preventScroll: true }));
   };
   const reset = () => {
-    setSelectedIds(initialIds); setIntervals({}); setMonths(MAX_MONTHS); changeCustomers(1);
-    setRate(DEFAULT_REPEAT_RATE); setPurchaseModel('repeat-purchases'); setAddCustomerEachYear(true);
-    setSearch(''); setCategory('All categories'); setSelectedOnly(false); setCatalogExpanded(false); setShowPricingDetails(false); setActivity(null);
-    productsRef.current?.scrollTo({ top: 0 });
+    setStep(0); setFirstId(FIRST_PRODUCT_ID); setSelectedIds([FIRST_PRODUCT_ID]); setIntervals({}); setProductYears({}); setMonths(60); changeCustomers(1);
+    setRate(DEFAULT_REPEAT_RATE); setPurchaseModel('repeat-purchases'); setAddCustomerEachYear(false); setShowCategories(false); setShowSource(false); setActivity(null); setPickerOpen(false);
+    if (headingRef.current) scrollToContent(headingRef.current);
   };
 
-  return <section id="repeat-sales" className="repeat-sales" aria-labelledby="repeat-sales-heading">
-    <div className="rs-container">
-      <header className="rs-intro"><div><h1 id="repeat-sales-heading">Repeat sales</h1><p>Build a basket. Explore its future.</p></div><button type="button" className="rs-text-button rs-reset" aria-label="Reset" title="Reset scenario" onClick={reset}><RotateCcw size={16} aria-hidden="true" />Reset</button></header>
-      <div className={`rs-mobile-summary${projectionInView ? ' rs-summary-result' : ''}`}>
-        <div className="rs-mobile-summary-copy"><span>{selected.length} {selected.length === 1 ? 'product' : 'products'} · {durationLabel(months)}</span>{projectionInView ? <p className="rs-edit-basket-label">Adjust your basket</p> : <p><span>RM </span>{formatRinggit(projection.total)}</p>}<span className="rs-summary-caption">{projectionInView ? customerLabel : 'Revenue before costs'}</span></div>
-        <button type="button" aria-label={projectionInView ? 'Edit basket' : 'View projection'} onClick={() => { if (projectionInView) { const basket = document.getElementById('rs-basket'); if (basket) scrollToContent(basket); } else viewProjection(); }}>{projectionInView ? <ArrowUp size={20} aria-hidden="true" /> : <ArrowDown size={20} aria-hidden="true" />}</button>
-      </div>
-      <div className="rs-workspace">
-        <div className="rs-basket" id="rs-basket" tabIndex={-1}>
-          <div className="rs-basket-heading"><div><h2>Your products</h2><p className="rs-muted">Malaysia ABO prices · Apr 2026</p></div><ShoppingBasket size={22} strokeWidth={1.6} aria-hidden="true" /></div>
-          <div className="rs-basket-value"><span>First order / customer</span><strong>RM {formatRinggit(firstOrder)}</strong></div>
-          <div className="rs-catalog-tabs" role="group" aria-label="Product view"><button type="button" aria-pressed={!selectedOnly} onClick={() => showCatalog(false)}>All products <span>28</span></button><button type="button" aria-pressed={selectedOnly} onClick={() => showCatalog(true)}>My basket <span>{selected.length}</span></button></div>
-          <div className="rs-catalog-tools"><div className="rs-search"><Search size={18} aria-hidden="true" /><input type="search" aria-label="Find a product" placeholder="Search products" value={search} onChange={event => setSearch(event.target.value)} /></div><select aria-label="Filter product category" value={category} onChange={event => setCategory(event.target.value)}><option>All categories</option>{categories.map(name => <option key={name}>{name}</option>)}</select></div>
-          <div className="rs-catalog-count"><span className="rs-count-desktop">{visible.length} {selectedOnly ? 'in your basket' : 'products · price low to high'}</span><span className="rs-count-mobile">{mobileProductCount} {selectedOnly ? 'in your basket' : 'of 28 products'}</span><span>ABO / pack</span></div>
-          <div className="rs-products" ref={productsRef} tabIndex={0} role="region" aria-label="Product catalog, scroll for more products">
-            {visible.map((product, index) => {
-              const checked = selectedIds.includes(product.id);
-              return <div key={product.id} className={`rs-product${checked ? ' rs-product-selected' : ''}${index >= 6 && collapsedCatalog ? ' rs-product-extra' : ''}`}>
-                <label className="rs-pick-target"><input id={`rs-pick-${product.id}`} type="checkbox" checked={checked} onChange={() => toggleProduct(product.id)} aria-label={`Select ${product.name}, ${product.size}`} /></label>
-                <div className="rs-product-copy"><label htmlFor={`rs-pick-${product.id}`}>{product.name}<span className="rs-product-meta">{product.size}{showPricingDetails && <> · {product.id} · p.{product.page}</>}</span></label>
-                  {selectedOnly && <select aria-label={`Purchase interval for ${product.name}, ${product.size}`} value={product.every} onChange={event => { setIntervals(previous => ({ ...previous, [product.id]: Number(event.target.value) })); setActivity({ id: product.id, kind: 'updated' }); }}>{PURCHASE_INTERVALS.map(interval => <option key={interval} value={interval}>{cycleLabel(interval)}</option>)}</select>}
-                  {checked && !selectedOnly && <span className="rs-cycle-hint">{cycleLabel(product.every)}</span>}
-                  {selectedOnly && product.type === 'filter' && product.every > 0 && <span className="rs-product-meta">First replacement after interval</span>}
-                </div>
-                <label className="rs-product-price" htmlFor={`rs-pick-${product.id}`}><strong>RM {formatRinggit(product.aboPrice)}</strong></label>
-              </div>;
-            })}
-            {!visible.length && <div className="rs-no-results"><ShoppingBasket size={24} strokeWidth={1.6} aria-hidden="true" /><p>{selectedOnly && selected.length === 0 ? 'Your basket is empty.' : 'No matching products.'}</p><button type="button" className="rs-text-button" onClick={() => showCatalog(false)}>Browse all products</button></div>}
-          </div>
-          {!query && category === 'All categories' && !selectedOnly && <button className="rs-expand-products" type="button" aria-expanded={catalogExpanded} onClick={() => setCatalogExpanded(value => !value)}>{catalogExpanded ? 'Show fewer products' : 'Browse all 28 products'}</button>}
-          <div className="rs-basket-footer"><span>{selected.length} selected</span><button className="rs-text-button" type="button" disabled={!selected.length} onClick={() => { setSelectedIds([]); setActivity(null); }}>Clear basket</button></div>
-          <details className="rs-source"><summary>Price source<ChevronDown size={16} aria-hidden="true" /></summary><p className="rs-muted">Malaysia AP column · ABO Price List SA13, April 2026.</p><button type="button" className="rs-text-button" aria-pressed={showPricingDetails} onClick={() => setShowPricingDetails(value => !value)}>{showPricingDetails ? 'Hide source details' : 'Show source details'}</button></details>
+  return <section id="repeat-sales" className={`repeat-sales${step === 0 ? ' rs-opening' : ''}`} aria-labelledby="repeat-sales-heading">
+    <header className="rs-intro"><div><h1 id="repeat-sales-heading" ref={headingRef} tabIndex={-1}>{titles[step]}</h1><p>{descriptions[step]}</p></div><button type="button" className="rs-text-button rs-reset" aria-label="Reset" title="Restart consultation" onClick={reset}><RotateCcw size={16} aria-hidden="true" />Reset</button></header>
+    <nav className="rs-steps" aria-label="Consultation steps"><ol>{steps.map((label, index) => <li key={label}><button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => setStep(index)}><span aria-hidden="true">{index + 1}</span>{label}</button></li>)}</ol></nav>
+
+    {step === 0 ? <div className="rs-first-sale rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
+      <div className="rs-sale-product"><ShoppingBasket size={28} strokeWidth={1.5} aria-hidden="true" /><div><h2>{firstProduct.name}</h2><p>{firstProduct.size} · RM {formatRinggit(firstProduct.aboPrice)} ABO</p></div><button type="button" className="rs-text-button" onClick={() => openPicker('first')}>Change</button></div>
+      <div className="rs-one-customer"><UserRound size={20} aria-hidden="true" /><span>1 customer buys 1 item</span></div>
+      <div className="rs-first-receipt"><h2>First sale</h2><p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM </span>{formatRinggit(projection.total)}</p><p className="rs-muted">Malaysia ABO price · before costs</p></div>
+      <p className="rs-sale-question">What if this customer comes back?</p>
+      <button type="button" className="primary-button rs-desktop-next" onClick={advance}>{nextLabel}<ArrowRight size={18} aria-hidden="true" /></button>
+    </div> : <div className="rs-workspace">
+      <div className="rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
+        <div className="rs-basket-heading"><div><h2>{step === 1 ? 'Your one product' : 'Your product plan'}</h2><p className="rs-muted">Malaysia ABO prices · Apr 2026</p></div>{step === 1 && <button type="button" className="rs-text-button" onClick={() => openPicker('first')}>Change</button>}</div>
+        {step >= 2 && <button type="button" ref={addButtonRef} className="rs-add-products" onClick={() => openPicker('add')}><Plus size={18} aria-hidden="true" />Add products</button>}
+        <div className="rs-plan">
+          {introductions.map(({ year, count }) => <div className="rs-plan-year" key={year}><h3 className="rs-year-heading">Year {year}<span>{count} {count === 1 ? 'product' : 'products'}{year > 1 ? ' added' : ''}</span></h3>
+            {products.filter(product => product.startYear === year).map(product => <article className="rs-plan-product" key={product.id}>
+              <div className="rs-plan-product-heading"><h4>{product.name}</h4>{step >= 2 && <button className="rs-icon-button" type="button" aria-label={`Remove ${product.name}, ${product.size}`} onClick={() => removeProduct(product.id)}><X size={18} aria-hidden="true" /></button>}</div>
+              <div className="rs-plan-product-meta"><span>{product.size}</span><strong>RM {formatRinggit(product.aboPrice)}</strong></div>
+              {showSource && <p className="rs-muted">SKU {product.id} · source p.{product.page}</p>}
+              <div className={`rs-product-controls${step === 1 ? ' rs-single-control' : ''}`}>
+                {step >= 2 && <label>Start year{product.id === firstId ? <span className="rs-fixed-year">Year 1</span> : <select id={`rs-start-${product.id}`} aria-label={`Start year for ${product.name}, ${product.size}`} value={product.startYear} onChange={event => changeStartYear(product.id, Number(event.target.value))}>{startYears.map(year => <option key={year} value={year}>Year {year}</option>)}</select>}</label>}
+                <label>Purchase cycle<select aria-label={`Purchase interval for ${product.name}, ${product.size}`} value={product.every} onChange={event => { setIntervals(previous => ({ ...previous, [product.id]: Number(event.target.value) })); setActivity({ id: product.id, kind: 'updated' }); }}>{PURCHASE_INTERVALS.map(interval => <option key={interval} value={interval}>{cycleLabel(interval)}</option>)}</select></label>
+              </div>
+              {product.type === 'filter' && product.every > 0 && <p className="rs-muted rs-filter-note">First replacement after {durationLabel(product.every)}.</p>}
+            </article>)}
+          </div>)}
+          {!products.length && <div className="rs-no-results"><ShoppingBasket size={24} aria-hidden="true" /><p>Your basket is empty.</p><button type="button" className="rs-text-button" onClick={() => openPicker('add')}>Add a product</button></div>}
         </div>
-        <div className="rs-result" id="rs-projection" ref={projectionRef} tabIndex={-1} aria-label="Revenue projection">
-          <div className="rs-result-top"><h2>Your projection</h2><select aria-label="Projection duration" value={months} onChange={event => setMonths(Number(event.target.value))}>{!presets.includes(months) && <option value={months}>{durationLabel(months)}</option>}{presets.map(preset => <option key={preset} value={preset}>{durationLabel(preset)}</option>)}</select></div>
-          <p className="rs-revenue-label">Estimated revenue before costs</p>
-          <p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM </span>{formatRinggit(projection.total)}</p>
-          <p className="rs-context">{selected.length} {selected.length === 1 ? 'product' : 'products'} · {customerLabel} · ABO prices</p>
-          <p className="rs-insight" role="status">{activity && changedProduct ? <>{activity.kind === 'removed' ? 'Removed' : activity.kind === 'updated' ? 'Updated' : 'Added'} {changedProduct.name} · <strong>{activity.kind === 'removed' ? '−' : activity.kind === 'added' ? '+' : ''}RM {formatRinggit(contribution)}</strong> over {durationLabel(months)}</> : <><Plus size={16} aria-hidden="true" />Tick a product to compare.</>}</p>
-          <div className="rs-chart-heading"><h3>Revenue over time</h3><span>Cumulative · RM</span></div>
-          <Suspense fallback={<div className="rs-chart-loading" role="status">Loading chart…</div>}><RevenueChart projection={projection} months={months} model={purchaseModel} rate={rate} /></Suspense>
-          <div className="rs-legend">{projection.categories.map(group => <span key={group.name}><i style={{ backgroundColor: group.color }} aria-hidden="true" />{group.name}</span>)}</div>
-          <div className="rs-time-controls"><div className="rs-label-line"><label htmlFor="rs-months">Fine-tune duration</label><strong>{durationLabel(months)}</strong></div><input id="rs-months" className="rs-range" style={rangeStyle((months - 1) / (MAX_MONTHS - 1) * 100)} type="range" min="1" max={MAX_MONTHS} value={months} aria-valuetext={durationLabel(months)} onChange={event => setMonths(Number(event.target.value))} /><div className="rs-range-ends"><span>1 month</span><span>50 years</span></div></div>
-          <div className="rs-scenario"><h3>Your scenario</h3><div className="rs-scenario-grid">
-            <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Starting customers</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" aria-invalid={invalidCustomers} aria-describedby="rs-customer-help" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Starting customers, maximum 20" style={rangeStyle((customers - 1) / (MAX_CUSTOMERS - 1) * 100)} min="1" max={MAX_CUSTOMERS} value={customers} onChange={event => changeCustomers(Number(event.target.value))} /><div className="rs-range-ends"><span>1</span><span>20 maximum</span></div><label className="rs-growth-option" htmlFor="rs-add-customers"><input id="rs-add-customers" type="checkbox" checked={addCustomerEachYear} onChange={event => setAddCustomerEachYear(event.target.checked)} /><span>Add {NEW_CUSTOMERS_PER_YEAR} customer each year</span></label><p id="rs-customer-help" className="rs-customer-growth">{invalidCustomers ? 'Enter 1–20 customers. Values are clamped when you leave the field.' : addCustomerEachYear ? customers === MAX_CUSTOMERS ? '20-customer limit reached.' : 'Up to 20 total, each with their own buying cycle.' : 'Fixed starting group.'}</p></div>
-            <div className="rs-repeat-control"><div className="rs-label-line"><label htmlFor="rs-repeat-rate">{purchaseModel === 'repeat-purchases' ? 'Repeat purchase rate' : 'Annual customer retention'}</label><strong>{rate}%</strong></div><input id="rs-repeat-rate" className="rs-range" style={rangeStyle(rate)} type="range" min="0" max="100" value={rate} aria-valuetext={purchaseModel === 'repeat-purchases' ? `${rate}% expected to buy each repeat cycle` : `${rate}% of remaining customers return each year`} onChange={event => setRate(Number(event.target.value))} /><div className="rs-range-ends"><span>0%</span><span>100%</span></div><p className="rs-muted">{purchaseModel === 'repeat-purchases' ? 'First purchase in full. Later cycles use this rate.' : `${rate}% of each joining group’s remaining customers return each year.`}</p></div>
-          </div></div>
-          <details className="rs-retention"><summary>Advanced assumptions<ChevronDown size={16} aria-hidden="true" /></summary><fieldset className="rs-model-selector"><legend>Purchase model</legend><div>{([['repeat-purchases', 'Repeat purchases'], ['annual-attrition', 'Annual attrition']] as const).map(([value, label]) => <label key={value} data-selected={purchaseModel === value}><input type="radio" name="purchase-model" value={value} checked={purchaseModel === value} onChange={() => setPurchaseModel(value)} /><span>{label}</span></label>)}</div></fieldset><div className="rs-monthly"><span>Monthly basket / customer<br /><small>Before repeat rate</small></span><strong>RM {formatRinggit(projection.recurringMonthly / customers)}</strong></div></details>
-        </div>
+        {step >= 2 && <><div className="rs-basket-value"><span>Year 1 first order / customer</span><strong>RM {formatRinggit(firstOrder)}</strong></div><div className="rs-basket-footer"><span>{selected.length} in your plan</span><button className="rs-text-button" type="button" disabled={!selected.length} onClick={() => { setSelectedIds([]); setActivity(null); }}>Clear basket</button></div></>}
       </div>
-        <div className="rs-below"><details className="rs-assumptions"><summary>Prices & assumptions</summary><p>Malaysia ABO prices (the AP column) are transcribed from <cite>ABO Price List SA13, April 2026</cite>, pages 2 and 8–11. Turn on “Show source details” to see each product’s SKU and source page. All displayed prices, monthly values, chart values, and totals use the Malaysia AP column. Actual selling prices can differ.</p><p>Purchase intervals are editable scenario assumptions, not product usage advice. Consumables are purchased at the start, then at the chosen interval. Appliances default to one purchase. Filters start after one replacement interval, avoiding an additional charge for a filter included with a new appliance. Follow product instructions and indicators for actual replacement timing.</p><p>Prices stay fixed, with no inflation or reinvestment. When “Add 1 customer each year” is checked, one customer joins at the start of each year after the first, up to 20 total customers introduced. Uncheck it to keep the starting group fixed. Each new customer starts its own purchase and filter-replacement schedule. The default scenario applies the repeat-purchase rate to each later buying cycle, not as repeated annual customer loss. The optional annual-attrition stress test applies retention to each joining group’s remaining customers based on its own age. Revenue is before costs and is not profit. A 50-year scenario explores assumptions; it is not a forecast.</p><p>Repeat sales accumulate, and adding customers increases the repeat-sales base. Reinvestment returns are not assumed.</p></details></div>
-    </div>
+      <div className="rs-result" id="rs-projection" ref={projectionRef} tabIndex={-1} aria-label="Revenue projection">
+        <div className="rs-result-top"><h2>{step === 1 ? 'One customer, one year' : 'Your projection'}</h2>{step === 3 ? <select aria-label="Projection duration" value={months} onChange={event => setMonths(Number(event.target.value))}>{!presets.includes(months) && <option value={months}>{durationLabel(months)}</option>}{presets.map(preset => <option key={preset} value={preset}>{durationLabel(preset)}</option>)}</select> : <span>{durationLabel(horizon)}</span>}</div>
+        <p className="rs-revenue-label">Estimated revenue · before costs</p>
+        <p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM </span>{formatRinggit(projection.total)}</p>
+        <p className="rs-context">{products.length} {products.length === 1 ? 'product' : 'products'} · {customerLabel} · {durationLabel(horizon)}</p>
+        {activeCount !== products.length && <p className="rs-muted rs-future-note">{products.length - activeCount} {products.length - activeCount === 1 ? 'product starts' : 'products start'} after this period.</p>}
+        {step >= 2 && activity && changedProduct && <p className="rs-insight" role="status"><span>{activity.kind === 'removed' ? 'Product removed' : activity.kind === 'updated' ? 'Product updated' : 'Product added'}<span className="sr-only">: {changedProduct.name}, {changedProduct.size}.</span></span><strong>{activity.kind === 'removed' ? '−' : activity.kind === 'added' ? '+' : ''}RM {formatRinggit(contribution)}</strong><small>{activity.kind === 'updated' ? 'Contribution · ' : ''}From year {changedProduct.startYear} · {durationLabel(horizon)}</small></p>}
+        <div className="rs-chart-heading"><h3>Revenue over time</h3><label className="rs-breakdown"><input type="checkbox" checked={showCategories} onChange={event => setShowCategories(event.target.checked)} />By category</label></div>
+        <Suspense fallback={<div className="rs-chart-loading" role="status">Loading chart…</div>}><RevenueChart projection={projection} months={horizon} model={purchaseModel} rate={rate} showCategories={showCategories} introductions={introductions.map(({ year }) => year)} emptyMessage={products.length ? `Your products start in year ${Math.min(...products.map(product => product.startYear))}.` : 'Add a product to begin.'} /></Suspense>
+        {showCategories && <div className="rs-legend">{projection.categories.map(group => <span key={group.name}><i style={{ backgroundColor: group.color }} aria-hidden="true" />{group.name}</span>)}</div>}
+        {step < 3 && <button type="button" className="primary-button rs-desktop-next" onClick={advance}>{nextLabel}<ArrowRight size={18} aria-hidden="true" /></button>}
+        {step === 3 && <details className="rs-time-controls"><summary>Custom duration<ChevronDown size={16} aria-hidden="true" /></summary><div className="rs-label-line"><label htmlFor="rs-months">Duration</label><strong>{durationLabel(months)}</strong></div><input id="rs-months" className="rs-range" style={rangeStyle((months - 1) / (MAX_MONTHS - 1) * 100)} type="range" min="1" max={MAX_MONTHS} value={months} aria-valuetext={durationLabel(months)} onChange={event => setMonths(Number(event.target.value))} /><div className="rs-range-ends"><span>1 month</span><span>50 years</span></div></details>}
+        <div className="rs-scenario"><h3>Your scenario</h3><div className={`rs-scenario-grid${step < 3 ? ' rs-one-scenario' : ''}`}>
+          {step === 3 && <div className="rs-customer-control"><div className="rs-label-line"><label htmlFor="rs-customers">Starting customers</label><input id="rs-customers" type="number" min="1" max={MAX_CUSTOMERS} step="1" inputMode="numeric" aria-invalid={invalidCustomers} aria-describedby="rs-customer-help" value={customerInput} onChange={event => { const value = event.target.value; setCustomerInput(value); const number = Number(value); if (value !== '' && Number.isInteger(number) && number >= 1 && number <= MAX_CUSTOMERS) setCustomers(number); }} onBlur={() => changeCustomers(Number(customerInput))} onKeyDown={event => { if (event.key === 'Enter') changeCustomers(Number(customerInput)); }} /></div><input className="rs-range" type="range" aria-label="Starting customers, maximum 20" style={rangeStyle((customers - 1) / (MAX_CUSTOMERS - 1) * 100)} min="1" max={MAX_CUSTOMERS} value={customers} onChange={event => changeCustomers(Number(event.target.value))} /><label className="rs-growth-option" htmlFor="rs-add-customers"><input id="rs-add-customers" type="checkbox" checked={addCustomerEachYear} onChange={event => setAddCustomerEachYear(event.target.checked)} /><span>Add 1 customer each year</span></label><p id="rs-customer-help" className="rs-muted">{invalidCustomers ? 'Enter a whole number from 1 to 20.' : addCustomerEachYear ? `Up to 20 customers total. ${customers === MAX_CUSTOMERS ? 'Limit reached.' : 'New customers join from year 2.'}` : 'Keep this group fixed. Maximum 20 customers.'}</p></div>}
+          <div className="rs-repeat-control"><div className="rs-label-line"><label htmlFor="rs-repeat-rate">{purchaseModel === 'repeat-purchases' ? 'Repeat purchase rate' : 'Annual customer retention'}</label><strong>{rate}%</strong></div><input id="rs-repeat-rate" className="rs-range" style={rangeStyle(rate)} type="range" min="0" max="100" value={rate} aria-valuetext={purchaseModel === 'repeat-purchases' ? `${rate}% expected to buy each repeat cycle` : `${rate}% of remaining customers return each year`} onChange={event => setRate(Number(event.target.value))} /><p className="rs-muted">{purchaseModel === 'repeat-purchases' ? 'First purchase in full. Later cycles use this rate.' : `${rate}% of each joining group’s remaining customers return each year.`}</p></div>
+        </div></div>
+        <details className="rs-retention"><summary>Assumptions & price source<ChevronDown size={16} aria-hidden="true" /></summary><fieldset className="rs-model-selector"><legend>Purchase model</legend><div>{([['repeat-purchases', 'Repeat purchases'], ['annual-attrition', 'Annual attrition']] as const).map(([value, label]) => <label key={value} data-selected={purchaseModel === value}><input type="radio" name="purchase-model" value={value} checked={purchaseModel === value} onChange={() => setPurchaseModel(value)} /><span>{label}</span></label>)}</div></fieldset><div className="rs-monthly"><span>Active monthly basket / customer<br /><small>Before repeat rate</small></span><strong>RM {formatRinggit(projection.recurringMonthly / startingCustomers)}</strong></div>
+          <p>Start years refer to the business calendar. Each customer starts buying a product when both the customer and product have joined the plan. Repeat purchasing applies the rate to later cycles; fractional buyers are expected averages. Annual attrition instead reduces each group by its age since joining.</p>
+          <p>Intervals are editable examples, not usage advice. Appliances default to one purchase. Filters start one replacement interval after the product becomes available to that customer, treating the initial filter as included. Follow product instructions and indicators.</p>
+          <p>All prices and estimates use Malaysia ABO/AP prices from <cite>ABO Price List SA13, April 2026</cite>, pages 2 and 8–11. Actual selling prices can differ. Prices stay fixed, with no inflation or reinvestment. Revenue is before costs and is not profit. A 50-year scenario explores assumptions; it is not a forecast.</p><button className="rs-text-button" type="button" aria-pressed={showSource} onClick={() => setShowSource(value => !value)}>{showSource ? 'Hide source details' : 'Show source details'}</button>
+        </details>
+      </div>
+    </div>}
+    <div className="rs-mobile-summary"><div className="rs-mobile-summary-copy"><span>{step === 0 ? '1 item · 1 customer' : `${products.length} ${products.length === 1 ? 'product' : 'products'} · ${durationLabel(horizon)}`}</span><p><span>RM </span>{formatRinggit(projection.total)}</p><span>{step === 0 ? 'First sale · before costs' : 'Revenue before costs'}</span></div><button type="button" aria-label={step < 3 ? nextLabel : projectionInView ? 'Edit basket' : 'View projection'} onClick={step < 3 ? advance : jump}><span>{step === 0 ? 'See repeat sales' : step === 1 ? 'Add products' : step === 2 ? 'Explore long term' : projectionInView ? 'Edit basket' : 'View projection'}</span>{step < 3 ? <ArrowRight size={18} aria-hidden="true" /> : projectionInView ? <ArrowUp size={18} aria-hidden="true" /> : <ArrowDown size={18} aria-hidden="true" />}</button></div>
+    <ProductPicker open={pickerOpen} mode={pickerMode} catalog={catalog} selectedIds={selectedIds} firstId={firstId} total={pickerMode === 'first' ? firstProduct.aboPrice : projection.total} months={horizon} showSource={showSource} onClose={() => setPickerOpen(false)} onToggle={toggleProduct} onChooseFirst={chooseFirst} />
   </section>;
 }

@@ -6,6 +6,8 @@ export interface RepeatSalesProduct {
   size: string;
   aboPrice: number;
   every: number;
+  /** Business-calendar year when this product is introduced; scenario input. */
+  startYear?: number;
   category: ProductCategory;
   page: number;
   type: ProductType;
@@ -14,7 +16,7 @@ export interface RepeatSalesProduct {
 }
 
 // Malaysia ABO price (AP column), ABO Price List SA13, April 2026. Page numbers are printed PDF pages.
-// `every` and `checked` are scenario defaults, not source claims or usage instructions.
+// `every` is an editable example; `checked` identifies the legacy reference basket, not the consultation selection.
 export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
   {
     "id": "124107",
