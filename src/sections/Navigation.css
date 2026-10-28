@@ -1,12 +1,12 @@
 .site-header { position: fixed; inset: 0 0 auto; z-index: 50; display: flex; align-items: center; justify-content: space-between; height: var(--site-header-height); padding: env(safe-area-inset-top) max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left)); background: var(--ledger-ground); border-bottom: 1px solid var(--ledger-line); }
-.site-brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: var(--text-subtitle); font-weight: 650; letter-spacing: -.045em; color: var(--ledger-ink); text-decoration: none; }
+.site-brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: var(--text-subtitle); font-weight: 650; letter-spacing: -.035em; color: var(--ledger-ink); text-decoration: none; }
 .brand-mark { display: grid; place-items: center; color: var(--ledger-accent); }
 .brand-domain { color: var(--ledger-accent); }
 .header-note { display: none; }
 .header-currency { font-size: var(--text-caption); color: var(--ledger-muted); white-space: nowrap; }
 .header-currency > span { padding: 0 4px; }
 .app-navigation { position: fixed; inset: auto 0 0; z-index: 60; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); padding: 4px max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background: var(--ledger-surface); border-top: 1px solid var(--ledger-line); }
-.app-navigation > a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 60px; padding: 6px 2px; border-radius: var(--radius-control); color: var(--ledger-muted); font-size: var(--text-caption); font-weight: 500; text-decoration: none; }
+.app-navigation > a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 60px; padding: 4px 2px; border-radius: var(--radius-control); color: var(--ledger-muted); font-size: var(--text-caption); font-weight: 500; text-decoration: none; }
 .app-navigation > a svg { box-sizing: content-box; padding: 4px 14px; border-radius: 12px; }
 .app-navigation > a[aria-current] { color: var(--ledger-accent); font-weight: 650; }
 .app-navigation > a[aria-current] svg { background: var(--ledger-raised); }

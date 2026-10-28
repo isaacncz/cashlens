@@ -22,7 +22,7 @@ try {
       if (name === 'Compound') await page.locator('.rs-basket').waitFor();
     };
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
-    await page.getByRole('heading', { level: 1, name: /Make sense/ }).waitFor();
+    await page.getByRole('heading', { level: 1, name: /A little clarity/ }).waitFor();
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'New visitors default to light even on a dark device');
     assert.equal(await nav.getByRole('link').count(), 4);
     assert.equal(await page.locator('.lesson-screen').count(), 0, 'Lessons are not mounted on arrival');
@@ -30,12 +30,14 @@ try {
     const scrollBox = await page.locator('#main-content').boundingBox();
     if (width < 1024) {
       assert.ok(navBox.y > 700, 'Primary navigation is in the bottom thumb zone');
-      const actionBox = await page.locator('.thumb-action').boundingBox();
-      assert.ok(scrollBox.y + scrollBox.height <= actionBox.y, 'Primary action never overlays scrollable content');
+      const actionBox = await page.getByRole('link', { name: 'Check my cashflow', exact: true }).boundingBox();
+      assert.ok(actionBox.y >= scrollBox.y && actionBox.y + actionBox.height <= scrollBox.y + scrollBox.height, 'Home action is visible within the scrolling task panel');
+      assert.ok(scrollBox.y + scrollBox.height <= navBox.y, 'Navigation never overlays scrollable content');
       for (const link of await nav.getByRole('link').all()) assert.ok((await link.boundingBox()).height >= 44);
     } else assert.equal(navBox.x, 0, 'Desktop uses a sidebar');
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
     await page.locator('#mm-salary').waitFor();
+    assert.equal(await page.getByRole('navigation', { name: 'Understand your money lessons' }).getByRole('link', { name: '1 Money Mirror', exact: true }).getAttribute('aria-current'), 'step', 'Lesson navigation uses its visible label as the accessible name');
     await page.getByRole('button', { name: 'View my results', exact: true }).click();
     await page.locator('#mm-salary[aria-invalid=true]').waitFor();
     assert.ok(await page.locator('.money-form .inline-error').count());
@@ -59,9 +61,14 @@ try {
     await open('Learn');
     assert.equal(await page.locator('.lesson-list a').count(), 9);
     assert.equal(await page.locator('.learning-path').count(), 3);
+    assert.equal(await page.locator('.lesson-link[data-resume] h3').innerText(), 'Money Mirror');
+    assert.equal(await page.locator('.lesson-resume-badge').innerText(), 'Last opened');
     await page.getByRole('button', { name: 'Build', exact: true }).click();
     assert.equal(await page.locator('.lesson-list a').count(), 3, 'Path filters limit choices');
+    assert.equal(await page.locator('.library-heading [role=status]').innerText(), '3 lessons · Build breathing room');
+    assert.equal(await page.getByRole('button', { name: 'Build', exact: true }).evaluate(element => element === document.activeElement), true, 'Filtering announces results without moving focus');
     await page.getByRole('button', { name: 'All', exact: true }).click();
+    assert.equal(await page.locator('.library-heading [role=status]').innerText(), '9 lessons · explore in any order');
     for (const id of lessonIds) {
       await page.locator(`.lesson-list a[href$="#${id}"]`).click();
       await page.locator(`section#${id}`).waitFor();

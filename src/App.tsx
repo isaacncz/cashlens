@@ -90,7 +90,7 @@ export default function App() {
         const next = lessons.find(item => item.id === nextId);
         return <div key={key} hidden={route !== key} className={lesson ? 'lesson-screen' : 'compound-screen'}>
           {lesson && <header className="lesson-top"><a href={routeHref('learn')}><ArrowLeft size={18} aria-hidden="true" />All lessons</a><span>{position + 1} of 9</span></header>}
-          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`}><span>{path.title}</span><ol>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined} aria-label={`${step + 1}. ${lessons.find(item => item.id === id)!.title}`}><span>{step + 1}</span>{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
+          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`}><span>{path.title}</span><ol>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined}><span>{step + 1}</span>{' '}{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
           <ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status"><div className="loading-line" /><p>Opening your tool…</p></div>}><Screen /></Suspense></ScreenBoundary>
           {lesson && <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a>{next ? <a href={routeHref(next.id)}>Next: {next.title}<ArrowRight size={18} aria-hidden="true" /></a> : <a href={routeHref('learn')}>Choose another path<ArrowRight size={18} aria-hidden="true" /></a>}</nav>}
         </div>;

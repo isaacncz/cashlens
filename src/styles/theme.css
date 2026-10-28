@@ -5,22 +5,28 @@
   font-display: optional;
   src: url('/fonts/inter-latin-variable.woff2') format('woff2');
 }
-/* Calm Ledger — the single source for color, type, spacing and radius. */
+/* Pocket Coach — the single source for color, type, spacing and radius. */
 :root {
   color-scheme: light;
-  --ledger-bg-rgb: 246 248 250;
-  --ledger-surface-rgb: 255 255 255;
-  --ledger-raised-rgb: 237 243 239;
-  --ledger-ink-rgb: 24 40 33;
-  --ledger-muted-rgb: 79 97 86;
-  --ledger-accent-rgb: 33 100 71;
+  --ledger-bg-rgb: 247 244 235;
+  --ledger-surface-rgb: 255 254 249;
+  --ledger-raised-rgb: 233 238 227;
+  --ledger-ink-rgb: 35 58 47;
+  --ledger-muted-rgb: 89 100 84;
+  --ledger-accent-rgb: 39 92 72;
   --ledger-positive-rgb: 35 106 71;
   --ledger-negative-rgb: 171 48 48;
-  --ledger-warning-rgb: 131 89 17;
-  --ledger-info-rgb: 40 94 124;
-  --ledger-line-rgb: 211 222 216;
-  --ledger-control-rgb: 117 138 125;
-  --ledger-on-accent: #ffffff;
+  --ledger-warning-rgb: 142 95 33;
+  --ledger-info-rgb: 52 94 123;
+  --ledger-line-rgb: 214 217 202;
+  --ledger-control-rgb: 116 133 113;
+  --ledger-on-accent: #fffef9;
+  --coach-feature: #275c48;
+  --coach-on-feature: #fffef9;
+  --coach-feature-muted: #dbe5d5;
+  --coach-button: #e7eddb;
+  --coach-on-button: #234532;
+  --coach-guide: #eee8d8;
   --ledger-ground: rgb(var(--ledger-bg-rgb));
   --ledger-surface: rgb(var(--ledger-surface-rgb));
   --ledger-raised: rgb(var(--ledger-raised-rgb));
@@ -41,7 +47,9 @@
   --text-body: 1rem;
   --text-lead: 1.25rem;
   --text-title: 1.75rem;
-  --text-display: clamp(2rem, 5vw, 2.5rem);
+  --text-display: clamp(2rem, 4vw, 2.625rem);
+  --text-feature: clamp(1.5rem, 3vw, 1.875rem);
+  --text-consultation: clamp(1.75rem, 3vw, 2rem);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -64,24 +72,24 @@
   --site-control-border: var(--ledger-control);
   --site-accent: var(--ledger-accent);
   --site-positive: var(--ledger-positive);
-  --background: 210 29% 97%;
-  --foreground: 148 20% 15%;
-  --card: 0 0% 100%;
+  --background: 45 43% 95%;
+  --foreground: 151 25% 18%;
+  --card: 50 100% 99%;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: 153 39% 28%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 96 19% 93%;
+  --primary: 157 40% 26%;
+  --primary-foreground: 50 100% 99%;
+  --secondary: 87 24% 91%;
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
-  --muted-foreground: 138 9% 36%;
+  --muted-foreground: 101 9% 36%;
   --accent: var(--secondary);
   --accent-foreground: var(--foreground);
   --destructive: 0 56% 43%;
   --destructive-foreground: 0 0% 100%;
-  --border: 125 14% 85%;
-  --input: 136 8% 51%;
+  --border: 72 16% 82%;
+  --input: 111 8% 48%;
   --ring: var(--primary);
 }
 :root[data-theme="dark"] {
@@ -99,6 +107,8 @@
   --ledger-line-rgb: 61 82 68;
   --ledger-control-rgb: 123 151 131;
   --ledger-on-accent: #122018;
+  --coach-feature: #244b39;
+  --coach-guide: #303a2d;
   --background: 150 22% 9%;
   --foreground: 130 23% 95%;
   --card: 143 20% 13%;

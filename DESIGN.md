@@ -1,184 +1,222 @@
 ---
-name: "CashflowLens.MY — Calm Ledger"
-description: "A quiet, readable space for Malaysian financial education."
+name: CashflowLens.MY — Pocket Coach
+description: A welcoming field guide for the next small money decision.
 colors:
-  ground: "rgb(246 248 250)"
-  surface: "rgb(255 255 255)"
-  raised: "rgb(237 243 239)"
-  ink: "rgb(24 40 33)"
-  muted: "rgb(79 97 86)"
-  accent: "rgb(33 100 71)"
-  positive: "rgb(35 106 71)"
-  negative: "rgb(171 48 48)"
-  warning: "rgb(131 89 17)"
-  info: "rgb(40 94 124)"
-  line: "rgb(211 222 216)"
-  control: "rgb(117 138 125)"
-  on-accent: "#ffffff"
-  dark-ground: "rgb(18 28 23)"
-  dark-surface: "rgb(26 39 31)"
-  dark-raised: "rgb(36 53 42)"
-  dark-ink: "rgb(238 244 239)"
-  dark-muted: "rgb(182 201 187)"
-  dark-accent: "rgb(160 209 178)"
-  dark-positive: "rgb(142 218 171)"
-  dark-negative: "rgb(255 168 163)"
-  dark-warning: "rgb(232 198 129)"
-  dark-info: "rgb(154 203 232)"
-  dark-line: "rgb(61 82 68)"
-  dark-control: "rgb(123 151 131)"
-  dark-on-accent: "#122018"
+  ground: rgb(247 244 235)
+  surface: rgb(255 254 249)
+  raised: rgb(233 238 227)
+  ink: rgb(35 58 47)
+  muted: rgb(89 100 84)
+  accent: rgb(39 92 72)
+  positive: rgb(35 106 71)
+  negative: rgb(171 48 48)
+  warning: rgb(142 95 33)
+  info: rgb(52 94 123)
+  line: rgb(214 217 202)
+  control: rgb(116 133 113)
+  on-accent: '#fffef9'
+  coach-feature: '#275c48'
+  coach-on-feature: '#fffef9'
+  coach-feature-muted: '#dbe5d5'
+  coach-button: '#e7eddb'
+  coach-on-button: '#234532'
+  coach-guide: '#eee8d8'
+  dark-ground: rgb(18 28 23)
+  dark-surface: rgb(26 39 31)
+  dark-raised: rgb(36 53 42)
+  dark-ink: rgb(238 244 239)
+  dark-muted: rgb(182 201 187)
+  dark-accent: rgb(160 209 178)
+  dark-positive: rgb(142 218 171)
+  dark-negative: rgb(255 168 163)
+  dark-warning: rgb(232 198 129)
+  dark-info: rgb(154 203 232)
+  dark-line: rgb(61 82 68)
+  dark-control: rgb(123 151 131)
+  dark-on-accent: '#122018'
+  dark-coach-feature: '#244b39'
+  dark-coach-guide: '#303a2d'
 typography:
   display:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "clamp(2rem, 5vw, 2.5rem)"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: clamp(2rem, 4vw, 2.625rem)
     fontWeight: 600
     lineHeight: 1.2
-    letterSpacing: "-0.035em"
-  title:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "1.75rem"
+    letterSpacing: -0.035em
+  feature:
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: clamp(1.5rem, 3vw, 1.875rem)
     fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "-0.035em"
-  section:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "1.5rem"
-    fontWeight: 550
     lineHeight: 1.25
-    letterSpacing: "-0.025em"
+    letterSpacing: -0.025em
+  consultation:
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: clamp(1.75rem, 3vw, 2rem)
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: -0.03em
+  title:
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 1.75rem
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: -0.035em
+  section:
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 1.5rem
   lead:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "1.25rem"
-    fontWeight: 550
-    lineHeight: 1.6
-    letterSpacing: "-0.02em"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 1.25rem
   subtitle:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 550
-    lineHeight: 1.6
-    letterSpacing: "-0.02em"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 1.125rem
   body:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "1rem"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "1rem"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 1rem
     fontWeight: 500
     lineHeight: 1.6
   small:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "0.875rem"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.6
   caption:
-    fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-    fontSize: "0.75rem"
+    fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontSize: 0.75rem
     fontWeight: 400
     lineHeight: 1.6
 rounded:
-  control: "8px"
-  panel: "16px"
-  legacy-base: "0.75rem"
+  control: 8px
+  panel: 16px
+  legacy-base: 0.75rem
 spacing:
-  "1": "4px"
-  "2": "8px"
-  "3": "12px"
-  "4": "16px"
-  "6": "24px"
-  "8": "32px"
-  "12": "48px"
+  '1': 4px
+  '2': 8px
+  '3': 12px
+  '4': 16px
+  '6': 24px
+  '8': 32px
+  '12': 48px
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.on-accent}"
-    rounded: "{rounded.control}"
-    padding: "12px 20px"
+    backgroundColor: '{colors.accent}'
+    textColor: '{colors.on-accent}'
+    rounded: '{rounded.control}'
+    padding: 12px 20px
+  button-feature:
+    backgroundColor: '{colors.coach-button}'
+    textColor: '{colors.coach-on-button}'
+    rounded: '{rounded.control}'
+    padding: 12px 20px
   button-link:
-    textColor: "{colors.accent}"
-    padding: "4px 0"
+    textColor: '{colors.accent}'
+    padding: 4px 0
   number-field:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "12px 14px"
-  tool-card:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.panel}"
-    padding: "20px"
-  tool-card-hover:
-    backgroundColor: "{colors.raised}"
-    textColor: "{colors.ink}"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: 12px 14px
+  tool-row:
+    textColor: '{colors.ink}'
+    padding: 20px 0
+  tool-row-hover:
+    backgroundColor: '{colors.raised}'
+    textColor: '{colors.ink}'
+  coach-task:
+    backgroundColor: '{colors.coach-feature}'
+    textColor: '{colors.coach-on-feature}'
+    rounded: '{rounded.panel}'
+    padding: 24px
+  coach-guide:
+    backgroundColor: '{colors.coach-guide}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.panel}'
+    padding: 24px
+  lesson-group:
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.panel}'
   filter-chip:
-    textColor: "{colors.accent}"
-    rounded: "{rounded.control}"
-    padding: "4px 12px"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: 8px 14px
   filter-chip-selected:
-    backgroundColor: "{colors.raised}"
-    textColor: "{colors.accent}"
+    backgroundColor: '{colors.accent}'
+    textColor: '{colors.on-accent}'
   theme-choice:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "20px 4px"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: 20px 4px
   theme-choice-selected:
-    backgroundColor: "{colors.raised}"
-    textColor: "{colors.accent}"
+    backgroundColor: '{colors.raised}'
+    textColor: '{colors.accent}'
   bottom-navigation:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.muted}"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.muted}'
   projection-summary:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.panel}"
-    padding: "12px 16px"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.panel}'
+    padding: 12px 16px
+  first-sale:
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.panel}'
+    padding: 20px
 ---
 
-# Design System: CashflowLens.MY — Calm Ledger
+# Design System: CashflowLens.MY — Pocket Coach
 
 ## Overview
 
-**Creative North Star: "Calm Ledger"**
+**Creative North Star: "Pocket Coach"**
 
-Calm Ledger makes financial education feel like a usable personal space. Green-tinted paper, forest ink, aligned monetary figures, and quiet surface steps give calculators the readability of a well-kept notebook. Direct titles introduce the task; short explanations and familiar controls keep the next action clear.
+Pocket Coach makes financial education feel like a personal field guide. Warm ivory gives explanations room to breathe; forest panels frame the next useful task; sage actions and a sand-toned guide make the next small decision approachable. Inter, aligned monetary figures, thin boundaries, and familiar controls carry that character through lessons and calculators.
 
-The system is mobile first. Its signature is a protected scrolling area above a reachable action dock: a primary action must never cover the content it acts on. Desktop adds a persistent sidebar and room for side-by-side tools while keeping the same hierarchy. Light and dark themes preserve these roles rather than introducing a separate visual identity.
+The system is mobile first. Useful titles lead into short explanations and visible actions. Home places its main action inside the task panel in normal flow; lessons and Compound preserve protected scrolling above their fixed mobile actions. Desktop adds a persistent sidebar and wider compositions. Theme changes preserve the same semantic relationships and readable hierarchy.
 
 **Key Characteristics:**
 
-- Paper-like tonal surfaces with restrained forest accents.
-- Direct headings, readable controls, and aligned monetary figures.
-- Protected content above thumb actions and persistent navigation.
-- Quiet state changes that respect device and user motion preferences.
+- Warm ivory reading surfaces with forest task panels and sage actions.
+- Direct, conversational headings and a readable single-family hierarchy.
+- Flat tonal guidance, quiet link rows, and ordered learning paths.
+- Visible navigation, protected fixed actions, and aligned monetary figures.
+- Restrained state changes that respect device and saved motion preferences.
 
-Implementation authority: `src/styles/theme.css` owns palette, type sizes, spacing, and radii. `src/styles/app.css`, `src/sections/Navigation.css`, and `src/sections/RepeatSales.css` apply those roles. The YAML above records the shipped values; it does not introduce a second implementation theme.
+Implementation authority: `src/styles/theme.css` owns palette, type sizes, spacing, and radii. `src/styles/app.css`, `src/sections/Navigation.css`, and `src/sections/RepeatSales.css` apply those roles. The tokens above record the implementation rather than defining an independent theme.
 
 ## Colors
 
-The palette uses a single forest accent within green-tinted neutrals, with distinct semantic colors for financial signals and chart series. Frontmatter colors without a prefix describe light mode; `dark-` entries are their dark-mode counterparts.
+Forest and sage establish the action hierarchy within warm ivory and sand neutrals. Unprefixed colors describe light mode; `dark-` entries record theme overrides.
 
 ### Primary
 
-- **Forest Accent:** actions, selected navigation, meaningful icons, chart emphasis, and keyboard focus. Dark mode uses a pale sage equivalent so the role stays legible.
-- **On Accent:** content on filled accent controls. Use the paired token for the active theme; dark filled controls use dark ink.
+- **Forest Accent:** primary controls, selected navigation, meaningful icons, chart emphasis, and keyboard focus. Its dark-mode counterpart is pale sage.
+- **On Accent:** the foreground paired with accent-filled controls; dark mode uses dark ink.
+- **Coach Feature / On Feature / Feature Muted:** a forest task surface, warm light headings, and pale supporting text. Home and Learn share these roles. Dark mode deepens the feature surface while preserving both foreground roles.
+- **Coach Button / On Button:** the sage action and dark forest foreground inside the Home task panel. These roles remain stable across themes.
 
-Positive, negative, warning, and information colors communicate outcomes or distinguish labeled data series. Keep meaning visible in text as well as color. The illustrative salary breakdown uses warning for deductions, information for work costs, and accent for what remains.
+Positive, negative, warning, and information colors retain financial and chart meaning. Always carry that meaning in a label or explanation as well as color.
 
 ### Neutral
 
-- **Paper Ground:** the app canvas, top bar, and desktop sidebar; **Night Ground** is its dark counterpart.
-- **Surface:** cards, inputs, mobile navigation, and the projection summary.
-- **Raised:** task panels, selected options, active navigation markers, and hover surfaces. This is a tonal step, not a promise of shadow elevation.
-- **Ink / Muted:** primary reading text and supporting explanations respectively. Muted text remains readable; it is not a disabled state.
-- **Line / Control:** quiet separators and panel borders versus stronger input and selection boundaries.
+- **Warm Ground:** the app canvas, top bar, and desktop sidebar; dark mode uses a deep green-black ground.
+- **Surface:** warm light forms, grouped lessons, mobile navigation, consultation panels, and projection summaries.
+- **Raised:** selected options, navigation markers, hover surfaces, and the mobile first-sale amount panel.
+- **Coach Guide:** sand-toned guidance on Home and the privacy panel in Settings. Its dark override is muted olive-green.
+- **Ink / Muted:** primary reading text and supporting explanations. Placeholders use the muted role at full opacity.
+- **Line / Control:** thin dividers and quiet panel boundaries versus stronger field and selection boundaries.
 
-**The Semantic Pair Rule.** Resolve every foreground and surface through the current theme; never carry a light-mode fill or its foreground into dark mode on its own.
+**The Semantic Pair Rule.** Resolve every foreground and surface through the current theme; keep coach feature, feature text, and feature action roles paired rather than substituting ordinary accent roles independently.
 
-Legacy Tailwind names such as gold, navy, slate, emerald, and crimson map to these roles in `tailwind.config.js`. They are compatibility aliases, not additional brand colors. New UI uses the semantic ledger properties.
+Legacy Tailwind names such as gold, navy, slate, emerald, and crimson map to semantic roles in `tailwind.config.js`. They are compatibility names, not extra brand colors. New UI uses the ledger and coach properties directly.
 
 ## Typography
 
@@ -186,20 +224,21 @@ Legacy Tailwind names such as gold, navy, slate, emerald, and crimson map to the
 
 **Body Font:** Inter, using the same stack.
 
-**Character:** A single variable family supplies a systematic, approachable hierarchy. Moderately tight headings contrast with open body leading; numeric results use tabular figures rather than a separate display or monospace face.
+**Character:** One variable family combines conversational headings with practical controls. Tight heading tracking contrasts with open body leading. Monetary values use tabular numerals rather than a separate display or monospace face.
 
-The local Latin variable font lives at `public/fonts/inter-latin-variable.woff2` (48,256 bytes), is preloaded by `index.html`, and uses `font-display: optional`. Its license is retained at `public/fonts/Inter-OFL.txt`.
+The local Latin variable font lives at `public/fonts/inter-latin-variable.woff2`, is preloaded by `index.html`, and uses `font-display: optional`. Its license remains at `public/fonts/Inter-OFL.txt`.
 
 ### Hierarchy
 
-- **Display:** the Home introduction; responsive size and tight tracking are recorded in the frontmatter.
-- **Title:** ordinary page headings. Lesson headings use a separate responsive range (`clamp(24px, 4vw, 32px)`) with compact leading (1.25).
-- **Section:** the main task-panel heading. Smaller sections and lesson titles use the subtitle role, with weight 600 for section labels and 550 for lesson titles.
-- **Lead:** basket headings and compact projection emphasis.
-- **Body / Label:** prose and all primary form labels and inputs. Primary buttons and card titles use weight 600; field labels use weight 500.
-- **Small / Caption:** metadata, chart labels, navigation captions, and supporting status. They do not replace body text or input labels.
+- **Display:** the Home introduction, responsive from 32px to 42px with weight 600 and compact leading. Its two-line composition stays within 19ch.
+- **Feature:** Home task headings, responsive from 24px to 30px with weight 600 and leading 1.25.
+- **Consultation:** Compound titles, responsive from 28px to 32px with weight 600 and leading 1.25.
+- **Title:** ordinary page headings. Existing lesson headings retain their separate responsive 24–32px range and leading 1.25.
+- **Section / Lead / Subtitle:** smaller section headings, basket headings, and learning-path titles. Weights and leading follow their component context; grouped lesson titles use body size and weight 600.
+- **Body / Label:** prose, primary form labels, and inputs. Body and inputs use 16px; labels use weight 500 and primary actions weight 600.
+- **Small / Caption:** metadata, chart context, filter labels, navigation captions, and supporting status. They do not replace body text or primary input labels.
 
-Introductory copy is capped at 50ch; task descriptions at 42ch. Longer assumptions can reach 70ch. Use tabular figures for monetary results, prices, and chart readouts; keep currency context visible.
+Introductory prose is capped at 50ch and task descriptions at 42ch; longer assumptions can reach 70ch. Projection amounts have their own responsive 32–42px treatment; the first-sale amount reaches 40–52px. Keep currency context and before-costs qualifications visible.
 
 **The Reading Floor Rule.** Body text and inputs stay at 16px; reserve 14px and 12px for metadata and compact supporting labels.
 
@@ -207,84 +246,95 @@ Introductory copy is capped at 50ch; task descriptions at 42ch. Longer assumptio
 
 ## Layout
 
-The spatial rhythm starts at 4px. Reused gaps and insets come from the frontmatter scale; observed page and control insets also include 20px and 28px. Pages are centered within a maximum width (1100px); Settings narrows to 840px from tablet size. Mobile page gutters are 20px, narrowing to 16px below 381px. From 768px, gutters become 32px and page padding becomes 40px; desktop begins its main content at 44px from the top of the scrollport.
+The rhythm starts at 4px. Reused gaps and insets come from the frontmatter scale; observed control and page insets also include 20px and 28px. App pages center within 1100px; Settings narrows to 840px from 768px. Phone gutters are 20px, narrowing to 16px below 381px. At 768px, page padding becomes 40px vertically and 32px horizontally; desktop app pages begin 44px below the scrollport top.
 
-The fixed top bar is 64px plus the top safe-area inset. Below 1024px, four equal bottom destinations—Home, Learn, Compound, Settings—occupy 68px plus the bottom safe-area inset. From 1024px, navigation becomes a 232px sidebar and the content area begins to its right. Labels remain visible in both forms. Top bar, navigation, and docks account for device safe areas.
+A fixed header occupies 64px plus the top safe area. Below 1024px, Home, Learn, Compound, and Settings form four equal labeled destinations in a 68px bottom bar plus the bottom safe area. From 1024px, a 232px sidebar replaces the bottom bar. Header, navigation, dialogs, and fixed actions account for safe-area insets.
 
-The main element is the vertical scroll container. Its bottom edge stops above navigation, rather than letting the document scroll underneath it. Home, Money Mirror, and Wealth Thermometer reserve an additional 84px for their action dock. Compound reserves 104px for its summary. Primary action buttons sit 12px above bottom navigation; the 88px Compound summary sits 8px above it. At desktop size, ordinary action docks return to document flow; Compound retains its summary reserve until 1200px.
+The main element is the vertical scroll container, ending above mobile navigation. Home has no fixed action dock: its sage action remains inside the forest task panel. Money Mirror and Wealth Thermometer reserve an additional 84px for their existing lesson actions. Compound reserves 104px for its 88px summary, positioned 8px above navigation. At 1024px, ordinary lesson actions return to document flow; Compound retains its summary until 1200px, then uses inline next actions.
 
-Home tools become two columns at 768px. Learning uses three ordered paths, each with three compact lesson rows; path groups become three columns at 1200px. Topic filters keep any one path available on its own. The illustrative salary breakdown also appears alongside the task description. Compound begins with a focused first-sale panel within 900px. Its four consultation stages reveal repeat purchasing, year-based product additions and the longer-term plan. At 1200px, the later stages use a 360px product plan beside a flexible result panel, separated by 24px; from 1440px the plan grows to 400px with a 32px gap. Both panels flow normally so all controls remain reachable, and desktop next actions replace the mobile dock. The searchable catalog uses a native modal bottom sheet on phones and a centered 720px panel from 768px, with a scrolling list between fixed controls and its footer. The chart grows from 210px to 270px high when its own container reaches 480px.
+Home stacks its task copy and full-width action on phones; from 768px, they share a row. Task padding grows from 24px to 32px and then 36px 40px at desktop; below 381px it is 20px. Tool links form two columns from 768px, and the three path links form a row. The sand guide gains its explanatory paragraph at that same breakpoint.
+
+Learning groups compact lesson rows inside three ordered path containers. Paths become three columns at 1200px; filtering to one path keeps a single column within 720px. Continue and Last opened identify session context, never completion.
+
+Compound's first-sale panel uses the app's 1100px maximum. Product story and a raised amount panel stack below 1200px. At 1200px, a 1.15:1 composition places story beside the amount; a vertical divider replaces the raised amount fill and a compact facts list becomes visible. The four numbered consultation steps remain directly accessible at every width. Later stages use the wider 1280px workspace: a 360px product plan beside flexible results from 1200px, growing to 400px with a 32px gap at 1440px. Results and controls remain in normal flow.
+
+The searchable native product dialog is a bottom sheet on phones and a centered panel up to 720px from 768px. Its list scrolls between stable controls and footer. Charts grow from 210px to 270px high when their own container reaches 480px.
 
 **The Protected Scrollport Rule.** End the content viewport above every fixed action dock and navigation bar; adding bottom padding alone does not establish this relationship.
 
 ## Elevation & Depth
 
-Tonal surfaces and thin boundaries provide most depth. Panels and the Compound summary are flat. The mobile primary-action dock uses one soft separation shadow (`0 4px 16px rgb(var(--ledger-ink-rgb) / .12)`), removed when it returns to desktop flow. A selected appearance option uses an inset accent stroke (`inset 0 0 0 1px var(--ledger-accent)`), which expresses selection rather than elevation. Existing lesson shadow effects are suppressed by the app stylesheet.
+Flat tonal surfaces and thin boundaries carry the visual structure. Forest task panels, sand guides, lesson groups, consultation panels, and the Compound summary use no decorative elevation. Appearance selection uses `inset 0 0 0 1px var(--ledger-accent)` as a selection stroke. The native product dialog dims its backdrop with `rgb(var(--ledger-ink-rgb) / .36)`. Existing lesson shadow effects are suppressed by the app stylesheet.
 
-**The Quiet Depth Rule.** Use surface tone and borders for structure; reserve the soft dock shadow for a floating primary action.
+**The Quiet Depth Rule.** Use tone, spacing, and thin boundaries for structure; selection strokes and dialog dimming express state rather than decorative elevation.
 
 ## Shapes
 
-Controls use restrained corners (8px); task panels, tool cards, lesson cards, and results use softer corners (16px). The legacy radius base remains 12px for Tailwind compatibility. Thin borders (1px) separate panels and strengthen around controls. Circles belong to radio controls, chart keys, status dots, and range handles; they do not replace the panel silhouette. Mobile navigation uses a small rounded marker around the active icon.
+Controls use restrained corners (8px); task panels, guides, grouped lessons, consultation panels, and results use softer corners (16px). The legacy radius base remains 12px for Tailwind compatibility. Thin borders (1px) separate panels and strengthen around fields. Circles belong to radio controls, numbered consultation markers, chart keys, status dots, and range handles. Mobile navigation uses a rounded marker around its active icon.
 
 ## Components
 
 ### Buttons
 
-Calm, legible actions with generous touch space.
+Legible, familiar actions with generous touch space.
 
-- **Primary:** accent fill, paired on-accent text, control corners, and padding from the component tokens. Minimum height is 52px; icon and label have a 12px gap.
-- **Hover / Focus:** primary hover uses `brightness(.92)`; keyboard focus uses a 3px accent outline with 4px offset. Disabled buttons reduce opacity and lose the pointer cursor.
-- **Text:** accent-colored controls retain a minimum 44px target. Compound text buttons underline on hover; filters and secondary expansion controls add a control-colored border.
+- **Primary:** accent fill, paired on-accent text, control corners, a minimum 52px height, 12px icon gap, and padding from the component tokens.
+- **Feature action:** the Home primary action uses sage fill and its dedicated dark foreground within the forest task panel. It is full width on phones and inline beside the copy from 768px.
+- **Hover / Focus:** primary hover uses `brightness(.92)`; keyboard focus uses a 3px theme-aware accent outline with 4px offset. Disabled controls reduce opacity and lose the pointer cursor.
+- **Text / Icon:** secondary text and icon actions retain a 44px target. Text actions underline on hover; icon actions gain a raised surface.
 
 ### Chips
 
-Compound uses four numbered, clickable consultation steps with aria-current="step". The initial selection is one product and one customer. The searchable product picker keeps category filters visible; its checkbox mode grows the plan, and its radio mode changes the first product. Product rows are grouped by Start year, with native year and purchase-cycle selects. The long-term horizon uses a labeled native select; Custom duration reveals a range for any month. Total revenue is the default chart, with an optional By category checkbox.
+Learning filters use surface fill, control boundaries, 8px corners, and a 44px minimum target. The active filter uses accent fill and paired on-accent text with `aria-pressed`. A Last opened badge uses the raised surface and accent foreground; it reports session context rather than progress.
+
+Compound's four step controls use a numbered circle and visible label, with `aria-current="step"` on the current stage. They stack number above label on phones and align horizontally from 768px. All four are direct buttons rather than locked stages.
 
 ### Cards / Containers
 
-Tool and lesson links combine a surface background, line border, panel corners, a meaningful outline icon, and a directional arrow. Tool cards use 20px padding; lesson cards use 20px vertical and 16px horizontal padding. Hover moves to the raised surface and strengthens the border. The Home task card instead uses a raised background with 24px padding on phones and 32px from tablet size.
+Forest task and Continue panels share coach feature colors and 16px corners. The Home task contains its sage action; Learn's entire Continue panel is a link and gently darkens on hover. Home's guide and Settings' privacy panel share the coach guide role.
+
+Home tools are quiet link rows with horizontal rules, outline icons, and an arrow. They use no resting panel fill or rounded card shell. Grouped learning cards use a surface background, thin outer boundary, panel corners, and internal dividers. Their lesson rows use 20px vertical and 16px horizontal padding and a raised hover surface. Focus draws inside the clipped group so it remains visible.
 
 ### Inputs / Fields
 
-Number fields have an explicit label, surface fill, control border, tabular figures, and a minimum 52px height. Error borders use the negative role and an associated readable message. `aria-invalid` and `aria-describedby` connect state and help text. Hints and validation text remain body size. Compound search and number controls use a 48px minimum; range inputs provide a 44px interaction track area with a visible accent handle.
+Number fields have associated labels, surface fill, control boundaries, tabular figures, and a minimum 52px height. Error boundaries use the negative role with readable messages, `aria-invalid`, and associated help. Hints and validation remain body size. Compound search is at least 48px high; native selects and number controls are at least 44px. Range inputs retain a 44px interaction area and visible accent handle. Search focus outlines its containing field; placeholders use muted text at full opacity.
 
 ### Navigation
 
-The mobile bar shows four icon-and-label links. Inactive links use muted text; the current destination uses accent text and a raised icon marker. The desktop sidebar uses the same destinations in horizontal rows, with a raised full-row active state. Use semantic navigation and `aria-current="page"`. A keyboard-visible skip link leads to the focusable main scroll container. Route changes reset that container to the top and move focus to it.
+The mobile bar shows four icon-and-label links. Inactive destinations use muted text; the current destination uses accent text and a raised icon marker. Desktop uses the same destinations in rows with a raised full-row current state. Use semantic navigation and `aria-current="page"`. A visible-on-focus skip link reaches the focusable main scroll container; route changes reset that container and move focus to it.
 
 ### Appearance Choices
 
-Light is the default for new visits, independent of device appearance. Saved Device and Dark choices remain valid. Three equal native radio labels offer Device, Light, and Dark. Each has a control border, surface fill, 20px vertical padding, and a meaningful icon. Selection adds a raised fill and accent inset stroke; focus within adds the shared visible outline. Reduced motion uses a native checkbox with a large clickable label. Only theme and motion preferences persist on the device.
+Three equal native radio labels offer Device, Light, and Dark. Surface fill, control boundaries, icons, and 20px vertical padding make them familiar controls. Selection adds raised fill and an accent inset stroke; keyboard focus uses the shared outline. Reduced motion is a native checkbox with a large clickable label. Light is the default; stored Light, Dark, and Device choices remain respected. Only appearance and motion preferences persist.
 
-### Projection Summary
+### First-sale Consultation
 
-A compact, flat summary sits above mobile navigation and carries the live amount plus a labeled action with a minimum 56px height. Its amount uses tabular figures and a smaller currency label. The amount remains visible while its action advances the consultation. In the final planner, its action switches between View projection and Edit basket according to the visible panel. It disappears at the two-column desktop breakpoint, where the consultation next action appears in normal flow. Results, examples, and estimates must be labeled according to their actual meaning; an illustrative salary breakdown is not a personal account balance.
+A light, flat panel pairs one product and one customer with a qualified first-sale amount. The product story retains its Change action and conversational next question. On phones, the raised receipt follows the story. From 1200px, it becomes a side-by-side amount area with a divider and a facts list; those redundant facts stay hidden on smaller screens. Monetary amounts remain tabular and the Malaysia ABO / before-costs qualification stays adjacent.
 
-Motion is supporting behavior. Device reduced motion and the saved preference both shorten CSS animation and transition duration to .01ms, limit animations to one iteration, disable smooth scrolling, and pause SVG animation. There is no separate shared entrance-animation system to copy.
+The protected mobile summary carries the live amount, its qualification, and a labeled action at least 56px high. It advances the early stages; the final stage switches between View projection and Edit basket according to the visible panel. At 1200px, inline next actions replace this summary. The product picker uses native radio selection for changing the first product and checkbox selection for growing a basket.
 
-### Learning paths
+### Learning Paths and Motion
 
-Learning is organized into Understand your money (Money Mirror, Assets & liabilities, Cashflow Quadrant), Build breathing room (Debt Visualizer, Salary & wealth, Wealth Thermometer), and Put it into practice (Income Engine, Rat Race, money playbook). Rows show order within a path, not completion. A session-only Continue link resumes the last-opened tool. Each lesson has a three-step navigation bar and a next lesson in the learning sequence. No visit is presented as completed study.
+Three ordered paths group nine lessons. Order is instructional; visits do not imply completed study. Keep the session-only Continue link, Last opened context, path filters, three-step lesson navigation, and next-lesson link explicit. Native disclosures keep optional explanation and assumptions available without overwhelming the main task.
 
-The salary breakdown remains interactive inside a native disclosure. Forms use white surfaces and visible input boundaries in light mode; the page ground is neutral and selection uses the raised green surface. Semantic information blue replaces the old pale cyan on light surfaces.
+State changes use color, boundary, or brightness rather than layout movement. Shared color transitions use 160ms ease-out. Device reduced motion and the saved preference reduce CSS animations and transitions to .01ms, limit animations to one iteration, and disable smooth scrolling; the existing runtime also pauses SVG animation. There is no shared entrance-animation system to copy.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** use the ledger theme properties for every foreground, surface, boundary, and state.
+- **Do** use ledger and coach theme roles for every foreground, surface, boundary, and state.
 - **Do** keep body and input text at 16px and interactive targets at least 44px.
-- **Do** preserve the protected scrollport when adding or resizing a fixed action.
-- **Do** align monetary figures with tabular numerals and show their currency context.
-- **Do** pair semantic color with text and label examples and estimates clearly.
-- **Do** respect device theme and reduced-motion preferences alongside the user's settings.
+- **Do** keep the Home action inside its forest task panel and preserve protected scrolling above fixed lesson and Compound actions.
+- **Do** align monetary figures with tabular numerals and retain currency and before-costs context.
+- **Do** pair semantic color with text and identify session context without implying completion.
+- **Do** respect device theme and reduced-motion preferences alongside saved appearance settings.
 
 ### Don't:
 
 - **Don't** add decorative eyebrow labels above useful headings.
 - **Don't** treat legacy gold, navy, or white utility names as literal brand colors.
 - **Don't** place fixed actions over scrollable content or remove safe-area allowances.
-- **Don't** introduce decorative panel shadows or hard offset shadows into this quiet surface system.
-- **Don't** present an illustrative financial value as a user's balance.
+- **Don't** add decorative panel shadows or hard offset shadows to these flat tonal surfaces.
+- **Don't** substitute an invented account balance or completion metric for educational examples and session context.
 - **Don't** persist calculator inputs alongside appearance preferences.

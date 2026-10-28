@@ -1,97 +1,97 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-28T00:17:06.636201+00:00",
-  "title": "Design System: CashflowLens.MY — Calm Ledger",
+  "generatedAt": "2026-10-28T06:59:09.323847+00:00",
+  "title": "Design System: CashflowLens.MY — Pocket Coach",
   "extensions": {
     "colorMeta": {
       "ground": {
         "role": "neutral",
-        "displayName": "Ground",
-        "canonical": "rgb(246 248 250)",
+        "displayName": "Warm Ivory Ground",
+        "canonical": "rgb(247 244 235)",
         "tonalRamp": [
-          "oklch(0.150 0.0014 247.86)",
-          "oklch(0.260 0.0029 247.86)",
-          "oklch(0.380 0.0034 247.86)",
-          "oklch(0.500 0.0034 247.86)",
-          "oklch(0.620 0.0034 247.86)",
-          "oklch(0.740 0.0034 247.86)",
-          "oklch(0.860 0.0023 247.86)",
-          "oklch(0.950 0.0011 247.86)"
+          "oklch(0.150 0.0049 91.52)",
+          "oklch(0.260 0.0104 91.52)",
+          "oklch(0.380 0.0123 91.52)",
+          "oklch(0.500 0.0123 91.52)",
+          "oklch(0.620 0.0123 91.52)",
+          "oklch(0.740 0.0123 91.52)",
+          "oklch(0.860 0.0084 91.52)",
+          "oklch(0.950 0.0039 91.52)"
         ]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Surface",
-        "canonical": "rgb(255 255 255)",
+        "displayName": "Warm Reading Surface",
+        "canonical": "rgb(255 254 249)",
         "tonalRamp": [
-          "oklch(0.150 0.0000 89.88)",
-          "oklch(0.260 0.0000 89.88)",
-          "oklch(0.380 0.0000 89.88)",
-          "oklch(0.500 0.0000 89.88)",
-          "oklch(0.620 0.0000 89.88)",
-          "oklch(0.740 0.0000 89.88)",
-          "oklch(0.860 0.0000 89.88)",
-          "oklch(0.950 0.0000 89.88)"
+          "oklch(0.150 0.0027 97.35)",
+          "oklch(0.260 0.0056 97.35)",
+          "oklch(0.380 0.0067 97.35)",
+          "oklch(0.500 0.0067 97.35)",
+          "oklch(0.620 0.0067 97.35)",
+          "oklch(0.740 0.0067 97.35)",
+          "oklch(0.860 0.0045 97.35)",
+          "oklch(0.950 0.0021 97.35)"
         ]
       },
       "raised": {
         "role": "neutral",
-        "displayName": "Raised",
-        "canonical": "rgb(237 243 239)",
+        "displayName": "Raised Sage",
+        "canonical": "rgb(233 238 227)",
         "tonalRamp": [
-          "oklch(0.150 0.0033 157.09)",
-          "oklch(0.260 0.0069 157.09)",
-          "oklch(0.380 0.0083 157.09)",
-          "oklch(0.500 0.0083 157.09)",
-          "oklch(0.620 0.0083 157.09)",
-          "oklch(0.740 0.0083 157.09)",
-          "oklch(0.860 0.0056 157.09)",
-          "oklch(0.950 0.0026 157.09)"
+          "oklch(0.150 0.0062 126.83)",
+          "oklch(0.260 0.0131 126.83)",
+          "oklch(0.380 0.0155 126.83)",
+          "oklch(0.500 0.0155 126.83)",
+          "oklch(0.620 0.0155 126.83)",
+          "oklch(0.740 0.0155 126.83)",
+          "oklch(0.860 0.0106 126.83)",
+          "oklch(0.950 0.0050 126.83)"
         ]
       },
       "ink": {
         "role": "neutral",
-        "displayName": "Ink",
-        "canonical": "rgb(24 40 33)",
+        "displayName": "Forest Ink",
+        "canonical": "rgb(35 58 47)",
         "tonalRamp": [
-          "oklch(0.150 0.0101 165.39)",
-          "oklch(0.260 0.0213 165.39)",
-          "oklch(0.380 0.0254 165.39)",
-          "oklch(0.500 0.0254 165.39)",
-          "oklch(0.620 0.0254 165.39)",
-          "oklch(0.740 0.0254 165.39)",
-          "oklch(0.860 0.0172 165.39)",
-          "oklch(0.950 0.0081 165.39)"
+          "oklch(0.150 0.0141 162.92)",
+          "oklch(0.260 0.0295 162.92)",
+          "oklch(0.380 0.0351 162.92)",
+          "oklch(0.500 0.0351 162.92)",
+          "oklch(0.620 0.0351 162.92)",
+          "oklch(0.740 0.0351 162.92)",
+          "oklch(0.860 0.0239 162.92)",
+          "oklch(0.950 0.0112 162.92)"
         ]
       },
       "muted": {
         "role": "neutral",
-        "displayName": "Muted",
-        "canonical": "rgb(79 97 86)",
+        "displayName": "Muted Olive Ink",
+        "canonical": "rgb(89 100 84)",
         "tonalRamp": [
-          "oklch(0.150 0.0113 158.31)",
-          "oklch(0.260 0.0236 158.31)",
-          "oklch(0.380 0.0282 158.31)",
-          "oklch(0.500 0.0282 158.31)",
-          "oklch(0.620 0.0282 158.31)",
-          "oklch(0.740 0.0282 158.31)",
-          "oklch(0.860 0.0191 158.31)",
-          "oklch(0.950 0.0090 158.31)"
+          "oklch(0.150 0.0114 135.83)",
+          "oklch(0.260 0.0239 135.83)",
+          "oklch(0.380 0.0284 135.83)",
+          "oklch(0.500 0.0284 135.83)",
+          "oklch(0.620 0.0284 135.83)",
+          "oklch(0.740 0.0284 135.83)",
+          "oklch(0.860 0.0193 135.83)",
+          "oklch(0.950 0.0091 135.83)"
         ]
       },
       "accent": {
         "role": "primary",
-        "displayName": "Accent",
-        "canonical": "rgb(33 100 71)",
+        "displayName": "Forest Accent",
+        "canonical": "rgb(39 92 72)",
         "tonalRamp": [
-          "oklch(0.150 0.0332 161.40)",
-          "oklch(0.260 0.0696 161.40)",
-          "oklch(0.380 0.0829 161.40)",
-          "oklch(0.500 0.0829 161.40)",
-          "oklch(0.620 0.0829 161.40)",
-          "oklch(0.740 0.0829 161.40)",
-          "oklch(0.860 0.0564 161.40)",
-          "oklch(0.950 0.0265 161.40)"
+          "oklch(0.150 0.0265 166.04)",
+          "oklch(0.260 0.0556 166.04)",
+          "oklch(0.380 0.0662 166.04)",
+          "oklch(0.500 0.0662 166.04)",
+          "oklch(0.620 0.0662 166.04)",
+          "oklch(0.740 0.0662 166.04)",
+          "oklch(0.860 0.0450 166.04)",
+          "oklch(0.950 0.0212 166.04)"
         ]
       },
       "positive": {
@@ -127,81 +127,171 @@
       "warning": {
         "role": "semantic",
         "displayName": "Warning",
-        "canonical": "rgb(131 89 17)",
+        "canonical": "rgb(142 95 33)",
         "tonalRamp": [
-          "oklch(0.150 0.0394 74.68)",
-          "oklch(0.260 0.0827 74.68)",
-          "oklch(0.380 0.0984 74.68)",
-          "oklch(0.500 0.0984 74.68)",
-          "oklch(0.620 0.0984 74.68)",
-          "oklch(0.740 0.0984 74.68)",
-          "oklch(0.860 0.0669 74.68)",
-          "oklch(0.950 0.0315 74.68)"
+          "oklch(0.150 0.0390 69.69)",
+          "oklch(0.260 0.0820 69.69)",
+          "oklch(0.380 0.0976 69.69)",
+          "oklch(0.500 0.0976 69.69)",
+          "oklch(0.620 0.0976 69.69)",
+          "oklch(0.740 0.0976 69.69)",
+          "oklch(0.860 0.0664 69.69)",
+          "oklch(0.950 0.0312 69.69)"
         ]
       },
       "info": {
         "role": "semantic",
         "displayName": "Info",
-        "canonical": "rgb(40 94 124)",
+        "canonical": "rgb(52 94 123)",
         "tonalRamp": [
-          "oklch(0.150 0.0300 236.01)",
-          "oklch(0.260 0.0629 236.01)",
-          "oklch(0.380 0.0749 236.01)",
-          "oklch(0.500 0.0749 236.01)",
-          "oklch(0.620 0.0749 236.01)",
-          "oklch(0.740 0.0749 236.01)",
-          "oklch(0.860 0.0509 236.01)",
-          "oklch(0.950 0.0240 236.01)"
+          "oklch(0.150 0.0267 240.44)",
+          "oklch(0.260 0.0561 240.44)",
+          "oklch(0.380 0.0668 240.44)",
+          "oklch(0.500 0.0668 240.44)",
+          "oklch(0.620 0.0668 240.44)",
+          "oklch(0.740 0.0668 240.44)",
+          "oklch(0.860 0.0454 240.44)",
+          "oklch(0.950 0.0214 240.44)"
         ]
       },
       "line": {
         "role": "neutral",
         "displayName": "Line",
-        "canonical": "rgb(211 222 216)",
+        "canonical": "rgb(214 217 202)",
         "tonalRamp": [
-          "oklch(0.150 0.0057 162.44)",
-          "oklch(0.260 0.0120 162.44)",
-          "oklch(0.380 0.0143 162.44)",
-          "oklch(0.500 0.0143 162.44)",
-          "oklch(0.620 0.0143 162.44)",
-          "oklch(0.740 0.0143 162.44)",
-          "oklch(0.860 0.0097 162.44)",
-          "oklch(0.950 0.0046 162.44)"
+          "oklch(0.150 0.0082 116.01)",
+          "oklch(0.260 0.0172 116.01)",
+          "oklch(0.380 0.0205 116.01)",
+          "oklch(0.500 0.0205 116.01)",
+          "oklch(0.620 0.0205 116.01)",
+          "oklch(0.740 0.0205 116.01)",
+          "oklch(0.860 0.0139 116.01)",
+          "oklch(0.950 0.0066 116.01)"
         ]
       },
       "control": {
         "role": "neutral",
         "displayName": "Control",
-        "canonical": "rgb(117 138 125)",
+        "canonical": "rgb(116 133 113)",
         "tonalRamp": [
-          "oklch(0.150 0.0124 158.18)",
-          "oklch(0.260 0.0261 158.18)",
-          "oklch(0.380 0.0311 158.18)",
-          "oklch(0.500 0.0311 158.18)",
-          "oklch(0.620 0.0311 158.18)",
-          "oklch(0.740 0.0311 158.18)",
-          "oklch(0.860 0.0211 158.18)",
-          "oklch(0.950 0.0099 158.18)"
+          "oklch(0.150 0.0143 140.93)",
+          "oklch(0.260 0.0301 140.93)",
+          "oklch(0.380 0.0358 140.93)",
+          "oklch(0.500 0.0358 140.93)",
+          "oklch(0.620 0.0358 140.93)",
+          "oklch(0.740 0.0358 140.93)",
+          "oklch(0.860 0.0244 140.93)",
+          "oklch(0.950 0.0115 140.93)"
         ]
       },
       "on-accent": {
         "role": "primary",
-        "displayName": "On Accent",
-        "canonical": "#ffffff",
+        "displayName": "Warm On Accent",
+        "canonical": "#fffef9",
         "tonalRamp": [
-          "oklch(0.150 0.0000 89.88)",
-          "oklch(0.260 0.0000 89.88)",
-          "oklch(0.380 0.0000 89.88)",
-          "oklch(0.500 0.0000 89.88)",
-          "oklch(0.620 0.0000 89.88)",
-          "oklch(0.740 0.0000 89.88)",
-          "oklch(0.860 0.0000 89.88)",
-          "oklch(0.950 0.0000 89.88)"
+          "oklch(0.150 0.0027 97.35)",
+          "oklch(0.260 0.0056 97.35)",
+          "oklch(0.380 0.0067 97.35)",
+          "oklch(0.500 0.0067 97.35)",
+          "oklch(0.620 0.0067 97.35)",
+          "oklch(0.740 0.0067 97.35)",
+          "oklch(0.860 0.0045 97.35)",
+          "oklch(0.950 0.0021 97.35)"
+        ]
+      },
+      "coach-feature": {
+        "role": "primary",
+        "displayName": "Forest Task",
+        "canonical": "#275c48",
+        "tonalRamp": [
+          "oklch(0.150 0.0265 166.04)",
+          "oklch(0.260 0.0556 166.04)",
+          "oklch(0.380 0.0662 166.04)",
+          "oklch(0.500 0.0662 166.04)",
+          "oklch(0.620 0.0662 166.04)",
+          "oklch(0.740 0.0662 166.04)",
+          "oklch(0.860 0.0450 166.04)",
+          "oklch(0.950 0.0212 166.04)"
+        ]
+      },
+      "coach-on-feature": {
+        "role": "primary",
+        "displayName": "Warm Feature Text",
+        "canonical": "#fffef9",
+        "tonalRamp": [
+          "oklch(0.150 0.0027 97.35)",
+          "oklch(0.260 0.0056 97.35)",
+          "oklch(0.380 0.0067 97.35)",
+          "oklch(0.500 0.0067 97.35)",
+          "oklch(0.620 0.0067 97.35)",
+          "oklch(0.740 0.0067 97.35)",
+          "oklch(0.860 0.0045 97.35)",
+          "oklch(0.950 0.0021 97.35)"
+        ]
+      },
+      "coach-feature-muted": {
+        "role": "primary",
+        "displayName": "Pale Feature Support",
+        "canonical": "#dbe5d5",
+        "tonalRamp": [
+          "oklch(0.150 0.0096 133.47)",
+          "oklch(0.260 0.0201 133.47)",
+          "oklch(0.380 0.0239 133.47)",
+          "oklch(0.500 0.0239 133.47)",
+          "oklch(0.620 0.0239 133.47)",
+          "oklch(0.740 0.0239 133.47)",
+          "oklch(0.860 0.0163 133.47)",
+          "oklch(0.950 0.0077 133.47)"
+        ]
+      },
+      "coach-button": {
+        "role": "primary",
+        "displayName": "Sage Feature Action",
+        "canonical": "#e7eddb",
+        "tonalRamp": [
+          "oklch(0.150 0.0099 121.92)",
+          "oklch(0.260 0.0208 121.92)",
+          "oklch(0.380 0.0247 121.92)",
+          "oklch(0.500 0.0247 121.92)",
+          "oklch(0.620 0.0247 121.92)",
+          "oklch(0.740 0.0247 121.92)",
+          "oklch(0.860 0.0168 121.92)",
+          "oklch(0.950 0.0079 121.92)"
+        ]
+      },
+      "coach-on-button": {
+        "role": "primary",
+        "displayName": "Forest Action Text",
+        "canonical": "#234532",
+        "tonalRamp": [
+          "oklch(0.150 0.0209 157.86)",
+          "oklch(0.260 0.0439 157.86)",
+          "oklch(0.380 0.0522 157.86)",
+          "oklch(0.500 0.0522 157.86)",
+          "oklch(0.620 0.0522 157.86)",
+          "oklch(0.740 0.0522 157.86)",
+          "oklch(0.860 0.0355 157.86)",
+          "oklch(0.950 0.0167 157.86)"
+        ]
+      },
+      "coach-guide": {
+        "role": "neutral",
+        "displayName": "Sand Guide",
+        "canonical": "#eee8d8",
+        "tonalRamp": [
+          "oklch(0.150 0.0089 89.80)",
+          "oklch(0.260 0.0187 89.80)",
+          "oklch(0.380 0.0222 89.80)",
+          "oklch(0.500 0.0222 89.80)",
+          "oklch(0.620 0.0222 89.80)",
+          "oklch(0.740 0.0222 89.80)",
+          "oklch(0.860 0.0151 89.80)",
+          "oklch(0.950 0.0071 89.80)"
         ]
       },
       "dark-ground": {
         "role": "neutral",
-        "displayName": "Dark Ground",
+        "displayName": "Night Ground",
         "canonical": "rgb(18 28 23)",
         "tonalRamp": [
           "oklch(0.150 0.0070 162.78)",
@@ -216,7 +306,7 @@
       },
       "dark-surface": {
         "role": "neutral",
-        "displayName": "Dark Surface",
+        "displayName": "Night Surface",
         "canonical": "rgb(26 39 31)",
         "tonalRamp": [
           "oklch(0.150 0.0094 157.30)",
@@ -231,7 +321,7 @@
       },
       "dark-raised": {
         "role": "neutral",
-        "displayName": "Dark Raised",
+        "displayName": "Night Raised",
         "canonical": "rgb(36 53 42)",
         "tonalRamp": [
           "oklch(0.150 0.0119 155.88)",
@@ -246,7 +336,7 @@
       },
       "dark-ink": {
         "role": "neutral",
-        "displayName": "Dark Ink",
+        "displayName": "Night Ink",
         "canonical": "rgb(238 244 239)",
         "tonalRamp": [
           "oklch(0.150 0.0037 150.69)",
@@ -261,7 +351,7 @@
       },
       "dark-muted": {
         "role": "neutral",
-        "displayName": "Dark Muted",
+        "displayName": "Night Muted",
         "canonical": "rgb(182 201 187)",
         "tonalRamp": [
           "oklch(0.150 0.0113 153.77)",
@@ -276,7 +366,7 @@
       },
       "dark-accent": {
         "role": "primary",
-        "displayName": "Dark Accent",
+        "displayName": "Night Sage Accent",
         "canonical": "rgb(160 209 178)",
         "tonalRamp": [
           "oklch(0.150 0.0269 156.82)",
@@ -381,7 +471,7 @@
       },
       "dark-on-accent": {
         "role": "primary",
-        "displayName": "Dark On Accent",
+        "displayName": "Night On Accent",
         "canonical": "#122018",
         "tonalRamp": [
           "oklch(0.150 0.0100 158.59)",
@@ -393,50 +483,101 @@
           "oklch(0.860 0.0170 158.59)",
           "oklch(0.950 0.0080 158.59)"
         ]
+      },
+      "dark-coach-feature": {
+        "role": "primary",
+        "displayName": "Night Forest Task",
+        "canonical": "#244b39",
+        "tonalRamp": [
+          "oklch(0.150 0.0219 162.21)",
+          "oklch(0.260 0.0460 162.21)",
+          "oklch(0.380 0.0547 162.21)",
+          "oklch(0.500 0.0547 162.21)",
+          "oklch(0.620 0.0547 162.21)",
+          "oklch(0.740 0.0547 162.21)",
+          "oklch(0.860 0.0372 162.21)",
+          "oklch(0.950 0.0175 162.21)"
+        ]
+      },
+      "dark-coach-guide": {
+        "role": "neutral",
+        "displayName": "Night Olive Guide",
+        "canonical": "#303a2d",
+        "tonalRamp": [
+          "oklch(0.150 0.0104 138.50)",
+          "oklch(0.260 0.0219 138.50)",
+          "oklch(0.380 0.0261 138.50)",
+          "oklch(0.500 0.0261 138.50)",
+          "oklch(0.620 0.0261 138.50)",
+          "oklch(0.740 0.0261 138.50)",
+          "oklch(0.860 0.0177 138.50)",
+          "oklch(0.950 0.0083 138.50)"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Dashboard headline"
+        "purpose": "Home introduction, responsive from 32px to 42px."
+      },
+      "feature": {
+        "displayName": "Feature",
+        "purpose": "Forest Home task heading, responsive from 24px to 30px."
+      },
+      "consultation": {
+        "displayName": "Consultation",
+        "purpose": "Compound consultation title, responsive from 28px to 32px."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Screen titles"
+        "purpose": "Ordinary page headings."
       },
       "section": {
         "displayName": "Section",
-        "purpose": "Task titles"
+        "purpose": "Smaller section and fallback error headings."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Basket headings and compact projection emphasis."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Learning-path headings and secondary section titles."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Body text and inputs, at least 16px"
+        "purpose": "Prose and inputs, at least 16px."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Associated form labels"
+        "purpose": "Associated primary form labels."
       },
       "small": {
         "displayName": "Small",
-        "purpose": "Supporting metadata"
+        "purpose": "Supporting metadata, filters and context."
       },
       "caption": {
         "displayName": "Caption",
-        "purpose": "Compact navigation and chart context"
+        "purpose": "Compact navigation and chart context."
       }
     },
     "shadows": [
       {
-        "name": "thumb-dock",
-        "value": "0 4px 16px rgb(var(--ledger-ink-rgb) / .12)",
-        "purpose": "Primary mobile action separation only"
+        "name": "appearance-selection",
+        "value": "inset 0 0 0 1px var(--ledger-accent)",
+        "purpose": "Selection stroke on the current appearance option; no decorative elevation."
       }
     ],
     "motion": [
       {
+        "name": "color-state",
+        "value": "160ms ease-out",
+        "purpose": "Shared background, boundary and foreground transitions without layout movement."
+      },
+      {
         "name": "reduced",
         "value": ".01ms",
-        "purpose": "Device or saved reduced motion; SVG animations are paused"
+        "purpose": "Device or saved reduced motion; CSS animations run once and SVG animation is paused."
       }
     ],
     "breakpoints": [
@@ -449,8 +590,12 @@
         "value": "1024px"
       },
       {
-        "name": "compound-columns",
+        "name": "consultation-columns",
         "value": "1200px"
+      },
+      {
+        "name": "wide-plan",
+        "value": "1440px"
       }
     ]
   },
@@ -459,54 +604,97 @@
       "name": "Primary button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The main task, with a 52px target.",
-      "html": "<button class=\"ds-primary\">Check my cashflow</button>",
-      "css": ".ds-primary{min-height:52px;padding:12px 20px;border:0;border-radius:var(--radius-control);font:600 16px var(--ledger-font);background:var(--ledger-accent);color:var(--ledger-on-accent);cursor:pointer}.ds-primary:hover{filter:brightness(.92)}.ds-primary:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+      "description": "A familiar forest action with a 52px minimum target.",
+      "html": "<button class=\"ds-primary\">See repeat sales<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-primary{box-sizing:border-box}.ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:12px 20px;border:0;border-radius:var(--radius-control);font:600 16px var(--ledger-font);text-decoration:none;cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out;background:var(--ledger-accent);color:var(--ledger-on-accent)}.ds-primary:hover{filter:brightness(.92)}.ds-primary:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}.ds-primary:disabled{opacity:.65;cursor:default}"
+    },
+    {
+      "name": "Feature action",
+      "kind": "button",
+      "refersTo": "button-feature",
+      "description": "The sage Home action stays within its forest task panel.",
+      "html": "<div class=\"ds-feature-context\"><a class=\"ds-feature-action\" href=\"#money-mirror\">Check my cashflow<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></div>",
+      "css": ".ds-feature-context,.ds-feature-action{box-sizing:border-box}.ds-feature-context{padding:24px;border-radius:var(--radius-panel);background:var(--coach-feature)}.ds-feature-action{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:12px 20px;border:0;border-radius:var(--radius-control);font:600 16px var(--ledger-font);text-decoration:none;cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out;background:var(--coach-button);color:var(--coach-on-button)}.ds-feature-action:hover{filter:brightness(.92)}.ds-feature-action:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
     },
     {
       "name": "Text button",
       "kind": "button",
       "refersTo": "button-link",
-      "description": "Secondary actions retain a 44px target.",
-      "html": "<button class=\"ds-link\">Reset</button>",
-      "css": ".ds-link{min-height:44px;padding:4px 0;border:0;background:none;color:var(--ledger-accent);font:400 14px var(--ledger-font);cursor:pointer;text-underline-offset:4px}.ds-link:hover{text-decoration:underline}.ds-link:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+      "description": "A quiet secondary action with a 44px minimum target.",
+      "html": "<button class=\"ds-text\">Change</button>",
+      "css": ".ds-text{box-sizing:border-box}.ds-text{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:4px 0;border:0;background:none;color:var(--ledger-accent);font:400 14px var(--ledger-font);cursor:pointer;text-underline-offset:4px}.ds-text:hover:not(:disabled){text-decoration:underline}.ds-text:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}.ds-text:disabled{opacity:.6;cursor:default}"
     },
     {
       "name": "Number field",
       "kind": "input",
       "refersTo": "number-field",
-      "description": "An associated label, decimal keyboard and readable input.",
-      "html": "<label class=\"ds-label\" for=\"ds-amount\">Monthly salary (RM)</label><input class=\"ds-number\" id=\"ds-amount\" type=\"number\" inputmode=\"decimal\" min=\"0\" step=\"any\" placeholder=\"8000\">",
-      "css": ".ds-label{display:block;margin-bottom:8px;color:var(--ledger-ink);font:500 16px var(--ledger-font)}.ds-number{width:100%;min-height:52px;padding:12px 14px;border:1px solid var(--ledger-control);border-radius:var(--radius-control);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px var(--ledger-font);font-variant-numeric:tabular-nums}.ds-number[aria-invalid=true]{border-color:var(--ledger-negative)}.ds-number:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+      "description": "A labeled decimal field with tabular figures, visible boundaries and muted placeholder.",
+      "html": "<label class=\"ds-number-label\" for=\"ds-monthly\">Monthly salary (RM)</label><input class=\"ds-number\" id=\"ds-monthly\" type=\"number\" inputmode=\"decimal\" min=\"0\" step=\"any\" placeholder=\"8000\">",
+      "css": ".ds-number{box-sizing:border-box}.ds-number-label{display:block;margin-bottom:8px;color:var(--ledger-ink);font:500 16px/1.6 var(--ledger-font)}.ds-number{box-sizing:border-box;width:100%;min-height:52px;padding:12px 14px;border:1px solid var(--ledger-control);border-radius:var(--radius-control);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px/1.6 var(--ledger-font);font-variant-numeric:tabular-nums;caret-color:var(--ledger-accent)}.ds-number::placeholder{color:var(--ledger-muted);opacity:1}.ds-number:hover{border-color:var(--ledger-control)}.ds-number[aria-invalid=true]{border-color:var(--ledger-negative)}.ds-number:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
     },
     {
       "name": "Destination navigation",
       "kind": "nav",
-      "description": "Four visible destinations; current state stays explicit.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Example destinations\"><a href=\"#home\" aria-current=\"page\">Home</a><a href=\"#learn\">Learn</a><a href=\"#compounding\">Compound</a><a href=\"#settings\">Settings</a></nav>",
-      "css": ".ds-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--ledger-surface);border-top:1px solid var(--ledger-line)}.ds-nav a{display:grid;place-items:center;min-height:60px;padding:6px 2px;color:var(--ledger-muted);text-decoration:none;font:500 12px var(--ledger-font)}.ds-nav a[aria-current]{background:var(--ledger-raised);color:var(--ledger-accent);font-weight:650}.ds-nav a:hover{background:var(--ledger-raised)}.ds-nav a:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+      "refersTo": "bottom-navigation",
+      "description": "Four visible icon-and-label destinations with explicit current state.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Example destinations\"><a href=\"#home\" aria-current=\"page\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg><span>Home</span></a><a href=\"#learn\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/></svg><span>Learn</span></a><a href=\"#compounding\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3\"/><path d=\"M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4\"/><path d=\"M5 21h14\"/></svg><span>Compound</span></a><a href=\"#settings\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 17H5\"/><path d=\"M19 7h-9\"/><circle cx=\"17\" cy=\"17\" r=\"3\"/><circle cx=\"7\" cy=\"7\" r=\"3\"/></svg><span>Settings</span></a></nav>",
+      "css": ".ds-nav,.ds-nav a{box-sizing:border-box}.ds-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));min-height:68px;padding:4px 8px 0;background:var(--ledger-surface);border-top:1px solid var(--ledger-line)}.ds-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:60px;padding:4px 2px;border-radius:var(--radius-control);color:var(--ledger-muted);font:500 12px/1.6 var(--ledger-font);text-decoration:none}.ds-nav svg{box-sizing:content-box;padding:4px 14px;border-radius:12px}.ds-nav a[aria-current]{color:var(--ledger-accent);font-weight:650}.ds-nav a[aria-current] svg{background:var(--ledger-raised)}.ds-nav a:hover{color:var(--ledger-ink);background:var(--ledger-raised)}.ds-nav a:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
     },
     {
-      "name": "Tool card",
+      "name": "Learning filter",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "A pressed filter uses forest fill; the unselected filter keeps a clear field boundary.",
+      "html": "<div class=\"ds-filters\" role=\"group\" aria-label=\"Filter paths\"><button aria-pressed=\"true\">All</button><button aria-pressed=\"false\">Understand</button><button aria-pressed=\"false\">Build</button><button aria-pressed=\"false\">Practice</button></div>",
+      "css": ".ds-filters,.ds-filters button{box-sizing:border-box}.ds-filters{display:flex;flex-wrap:wrap;gap:8px;padding:4px}.ds-filters button{min-height:44px;padding:8px 14px;border:1px solid var(--ledger-control);border-radius:var(--radius-control);background:var(--ledger-surface);color:var(--ledger-ink);font:400 14px/1.6 var(--ledger-font);cursor:pointer;transition:background-color 160ms ease-out,border-color 160ms ease-out,color 160ms ease-out}.ds-filters button[aria-pressed=true]{background:var(--ledger-accent);border-color:var(--ledger-accent);color:var(--ledger-on-accent)}.ds-filters button:hover{border-color:var(--ledger-accent)}.ds-filters button:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+    },
+    {
+      "name": "Grouped lesson card",
       "kind": "card",
-      "description": "A direct path to an existing financial tool.",
-      "html": "<a class=\"ds-tool\" href=\"#wealth-thermometer\"><strong>How long could it last?</strong><span>Find your financial breathing room.</span></a>",
-      "css": ".ds-tool{display:block;padding:20px;border:1px solid var(--ledger-line);border-radius:var(--radius-panel);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px var(--ledger-font);text-decoration:none}.ds-tool strong{display:block;font-weight:600}.ds-tool span{display:block;margin-top:6px;color:var(--ledger-muted)}.ds-tool:hover{background:var(--ledger-raised);border-color:var(--ledger-control)}.ds-tool:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}"
+      "refersTo": "lesson-group",
+      "description": "Thin boundaries and compact numbered rows communicate order without claiming completion.",
+      "html": "<ol class=\"ds-lessons\"><li><a href=\"#money-mirror\"><span class=\"ds-lesson-number\" aria-hidden=\"true\">1</span><div><strong>Money Mirror</strong><p>See what an hour of work really earns you.</p><span class=\"ds-last-opened\">Last opened</span></div><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a></li><li><a href=\"#assets\"><span class=\"ds-lesson-number\" aria-hidden=\"true\">2</span><div><strong>Assets &amp; liabilities</strong><p>Understand what builds your financial position.</p></div><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a></li></ol>",
+      "css": ".ds-lessons,.ds-lessons a{box-sizing:border-box}.ds-lessons{margin:0;padding:0;border:1px solid var(--ledger-line);border-radius:var(--radius-panel);overflow:hidden;background:var(--ledger-surface);list-style:none}.ds-lessons li+li{border-top:1px solid var(--ledger-line)}.ds-lessons a{display:flex;align-items:flex-start;gap:12px;padding:20px 16px;color:var(--ledger-ink);font:400 16px/1.5 var(--ledger-font);text-decoration:none;transition:background-color 160ms ease-out}.ds-lessons strong{font-weight:600}.ds-lessons p{margin:6px 0 0;color:var(--ledger-muted)}.ds-lesson-number{min-width:24px;color:var(--ledger-muted);font-size:14px;text-align:center;font-variant-numeric:tabular-nums}.ds-lessons svg{margin-left:auto;flex-shrink:0;color:var(--ledger-muted)}.ds-last-opened{display:inline-block;margin-top:10px;padding:2px 8px;border-radius:var(--radius-control);background:var(--ledger-raised);color:var(--ledger-accent);font-size:14px;font-weight:500}.ds-lessons a:hover{background:var(--ledger-raised)}.ds-lessons a:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px;outline-offset:-4px}"
+    },
+    {
+      "name": "Coach task",
+      "kind": "custom",
+      "refersTo": "coach-task",
+      "description": "The signature forest task panel contains its sage cashflow action in normal flow.",
+      "html": "<section class=\"ds-task\"><div><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/></svg><h2>What does an hour<br>really earn you?</h2><p>Look beyond your salary. See what’s left after time, deductions, and work costs.</p></div><a href=\"#money-mirror\">Check my cashflow<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></section>",
+      "css": ".ds-task,.ds-task>a{box-sizing:border-box}.ds-task{padding:24px;border-radius:var(--radius-panel);background:var(--coach-feature);color:var(--coach-on-feature);font-family:var(--ledger-font);}.ds-task>div>svg{color:var(--coach-feature-muted)}.ds-task h2{margin:12px 0;font-size:var(--text-feature);font-weight:600;line-height:1.25;letter-spacing:-.025em}.ds-task p{max-width:42ch;margin:0;color:var(--coach-feature-muted);font-size:16px;line-height:1.6}.ds-task>a{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:12px 20px;border:0;border-radius:var(--radius-control);font:600 16px var(--ledger-font);text-decoration:none;cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out;box-sizing:border-box;width:100%;margin-top:20px;background:var(--coach-button);color:var(--coach-on-button)}.ds-task>a:hover{filter:brightness(.92)}.ds-task>a:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}@media(min-width:768px){.ds-task{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:32px;padding:32px}.ds-task>a{width:auto;margin-top:0}}@media(min-width:1024px){.ds-task{padding:36px 40px}}"
+    },
+    {
+      "name": "Warm guide",
+      "kind": "card",
+      "refersTo": "coach-guide",
+      "description": "Sand guidance shares its tonal role with the Settings privacy panel.",
+      "html": "<section class=\"ds-guide\"><h2>Start where you are.</h2><p>Understand your money, build breathing room, then put it into practice.</p><a href=\"#learn\">Find your path<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></section>",
+      "css": ".ds-guide{box-sizing:border-box}.ds-guide{display:flex;align-items:center;gap:24px;padding:24px;border-radius:var(--radius-panel);background:var(--coach-guide);color:var(--ledger-ink);font-family:var(--ledger-font);}.ds-guide h2{flex-shrink:0;max-width:12ch;margin:0;font-size:18px;font-weight:600;line-height:1.4;letter-spacing:-.02em}.ds-guide p{display:none;max-width:44ch;margin:0;color:var(--ledger-muted);font-size:16px;line-height:1.6}.ds-guide a{display:inline-flex;align-items:center;gap:12px;min-height:44px;margin-left:auto;color:var(--ledger-accent);font-size:14px;font-weight:600;text-decoration:none}.ds-guide a:hover{text-decoration:underline;text-underline-offset:4px}.ds-guide a:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}@media(min-width:768px){.ds-guide p{display:block}}"
+    },
+    {
+      "name": "First-sale consultation",
+      "kind": "custom",
+      "refersTo": "first-sale",
+      "description": "One product story and a qualified amount stack on mobile and divide into two columns at 1200px.",
+      "html": "<section class=\"ds-first-sale\"><div class=\"ds-sale-story\"><div class=\"ds-sale-product\"><svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m15 11-1 9\"/><path d=\"m19 11-4-7\"/><path d=\"M2 11h20\"/><path d=\"m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4\"/><path d=\"M4.5 15.5h15\"/><path d=\"m5 11 4-7\"/><path d=\"m9 11 1 9\"/></svg><div><h2>Glister Multi-Action Toothpaste</h2><p>200g · RM 29.50 ABO</p></div><button>Change</button></div><p class=\"ds-sale-customer\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 0 0-16 0\"/></svg><span>1 customer buys 1 item</span></p><p class=\"ds-sale-question\">What if this customer comes back?<span>Next, explore a year of repeat sales.</span></p></div><div class=\"ds-receipt\"><h2>Your first sale</h2><p class=\"ds-sale-amount\"><span>RM </span>29.50</p><p class=\"ds-sale-qualifier\">Malaysia ABO price · before costs</p><dl class=\"ds-sale-facts\"><div><dt>Product quantity</dt><dd>1 item</dd></div><div><dt>Customer</dt><dd>1 person</dd></div><div><dt>Price source</dt><dd>Apr 2026 · ABO</dd></div></dl></div></section>",
+      "css": ".ds-first-sale,.ds-receipt,.ds-sale-product button{box-sizing:border-box}.ds-first-sale{padding:20px;border:1px solid var(--ledger-line);border-radius:var(--radius-panel);background:var(--ledger-surface);color:var(--ledger-ink);font:400 16px/1.6 var(--ledger-font)}.ds-sale-product{display:flex;align-items:flex-start;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--ledger-line)}.ds-sale-product h2,.ds-receipt h2{margin:0;font-size:16px;font-weight:550;line-height:1.5}.ds-sale-product p{margin:4px 0 0;color:var(--ledger-muted);font-size:14px}.ds-sale-product button{min-height:44px;margin-left:auto;padding:4px 0;border:0;background:none;color:var(--ledger-accent);font:400 14px var(--ledger-font);cursor:pointer;text-underline-offset:4px}.ds-sale-product button:hover{text-decoration:underline}.ds-sale-product button:focus-visible{outline:3px solid var(--ledger-accent);outline-offset:4px}.ds-sale-customer{margin:16px 0;color:var(--ledger-muted)}.ds-sale-question{margin:20px 0 0}.ds-sale-question span{display:block;margin-top:4px;color:var(--ledger-muted);font-size:14px}.ds-receipt{margin-top:24px;padding:24px;border-radius:var(--radius-control);background:var(--ledger-raised)}.ds-sale-amount{margin:8px 0 12px;font-size:clamp(40px,6vw,52px);line-height:1.2;font-weight:550;letter-spacing:-.03em;font-variant-numeric:tabular-nums}.ds-sale-amount>span{font-size:.45em;letter-spacing:0;color:var(--ledger-muted)}.ds-sale-qualifier{margin:0;color:var(--ledger-muted);font-size:14px}.ds-sale-facts{display:none}@media(min-width:768px){.ds-first-sale{padding:32px}.ds-sale-amount{font-size:52px}}@media(min-width:1200px){.ds-first-sale{display:grid;grid-template-columns:1.15fr 1fr;gap:32px}.ds-receipt{display:flex;flex-direction:column;justify-content:center;margin:0;padding:16px 0 16px 32px;border-left:1px solid var(--ledger-line);border-radius:0;background:transparent}.ds-sale-facts{display:grid;gap:12px;margin:24px 0 0;padding-top:24px;border-top:1px solid var(--ledger-line);font-size:14px}.ds-sale-facts>div{display:flex;justify-content:space-between;gap:16px}.ds-sale-facts dt{color:var(--ledger-muted)}.ds-sale-facts dd{margin:0;font-weight:550;font-variant-numeric:tabular-nums}}.ds-sale-product>svg{flex-shrink:0;margin-top:4px;color:var(--ledger-accent)}.ds-sale-product>div{min-width:0}.ds-sale-customer{display:flex;align-items:center;gap:12px}.ds-sale-customer>svg{color:var(--ledger-accent);flex-shrink:0}"
     }
   ],
   "narrative": {
-    "northStar": "Calm Ledger",
-    "overview": "**Creative North Star: \"Calm Ledger\"**\n\nCalm Ledger makes financial education feel like a usable personal space. Green-tinted paper, forest ink, aligned monetary figures, and quiet surface steps give calculators the readability of a well-kept notebook. Direct titles introduce the task; short explanations and familiar controls keep the next action clear.\n\nThe system is mobile first. Its signature is a protected scrolling area above a reachable action dock: a primary action must never cover the content it acts on. Desktop adds a persistent sidebar and room for side-by-side tools while keeping the same hierarchy. Light and dark themes preserve these roles rather than introducing a separate visual identity.\n\n**Key Characteristics:**\n\n- Paper-like tonal surfaces with restrained forest accents.\n- Direct headings, readable controls, and aligned monetary figures.\n- Protected content above thumb actions and persistent navigation.\n- Quiet state changes that respect device and user motion preferences.\n\nImplementation authority: `src/styles/theme.css` owns palette, type sizes, spacing, and radii. `src/styles/app.css`, `src/sections/Navigation.css`, and `src/sections/RepeatSales.css` apply those roles. The YAML above records the shipped values; it does not introduce a second implementation theme.",
+    "northStar": "Pocket Coach",
+    "overview": "Pocket Coach makes financial education feel like a personal field guide. Warm ivory gives explanations room to breathe; forest panels frame the next useful task; sage actions and a sand-toned guide make the next small decision approachable. Inter, aligned monetary figures, thin boundaries, and familiar controls carry that character through lessons and calculators.\n\nThe system is mobile first. Useful titles lead into short explanations and visible actions. Home places its main action inside the task panel in normal flow; lessons and Compound preserve protected scrolling above their fixed mobile actions. Desktop adds a persistent sidebar and wider compositions. Theme changes preserve the same semantic relationships and readable hierarchy.",
     "keyCharacteristics": [
-      "Paper-like tonal surfaces with restrained forest accents.",
-      "Direct headings, readable controls, and aligned monetary figures.",
-      "Protected content above thumb actions and persistent navigation.",
-      "Quiet state changes that respect device and user motion preferences."
+      "Warm ivory reading surfaces with forest task panels and sage actions.",
+      "Direct, conversational headings and a readable single-family hierarchy.",
+      "Flat tonal guidance, quiet link rows, and ordered learning paths.",
+      "Visible navigation, protected fixed actions, and aligned monetary figures.",
+      "Restrained state changes that respect device and saved motion preferences."
     ],
     "rules": [
       {
         "name": "The Semantic Pair Rule.",
-        "body": "Resolve every foreground and surface through the current theme; never carry a light-mode fill or its foreground into dark mode on its own.",
+        "body": "Resolve every foreground and surface through the current theme; keep coach feature, feature text, and feature action roles paired rather than substituting ordinary accent roles independently.",
         "section": "colors"
       },
       {
@@ -526,35 +714,25 @@
       },
       {
         "name": "The Quiet Depth Rule.",
-        "body": "Use surface tone and borders for structure; reserve the soft dock shadow for a floating primary action.",
-        "section": "elevation-depth"
-      },
-      {
-        "name": "Learning paths",
-        "body": "Three paths group nine tools. Order is instructional; visits are not completion. Keep lesson controls available and use disclosure for detail.",
-        "section": "components"
-      },
-      {
-        "name": "Basket and projection",
-        "body": "Begin with one item and one customer. Reveal repeat sales, products introduced by business year, then the long-term plan. Use a searchable native product sheet and one total-revenue line by default. Keep the acquisition checkbox opt-in, detail collapsed, results in normal flow and mobile actions above a protected scrollport.",
-        "section": "components"
+        "body": "Use tone, spacing, and thin boundaries for structure; selection strokes and dialog dimming express state rather than decorative elevation.",
+        "section": "elevation"
       }
     ],
     "dos": [
-      "use the ledger theme properties for every foreground, surface, boundary, and state.",
-      "keep body and input text at 16px and interactive targets at least 44px.",
-      "preserve the protected scrollport when adding or resizing a fixed action.",
-      "align monetary figures with tabular numerals and show their currency context.",
-      "pair semantic color with text and label examples and estimates clearly.",
-      "respect device theme and reduced-motion preferences alongside the user's settings."
+      "Do use ledger and coach theme roles for every foreground, surface, boundary, and state.",
+      "Do keep body and input text at 16px and interactive targets at least 44px.",
+      "Do keep the Home action inside its forest task panel and preserve protected scrolling above fixed lesson and Compound actions.",
+      "Do align monetary figures with tabular numerals and retain currency and before-costs context.",
+      "Do pair semantic color with text and identify session context without implying completion.",
+      "Do respect device theme and reduced-motion preferences alongside saved appearance settings."
     ],
     "donts": [
-      "add decorative eyebrow labels above useful headings.",
-      "treat legacy gold, navy, or white utility names as literal brand colors.",
-      "place fixed actions over scrollable content or remove safe-area allowances.",
-      "introduce decorative panel shadows or hard offset shadows into this quiet surface system.",
-      "present an illustrative financial value as a user's balance.",
-      "persist calculator inputs alongside appearance preferences."
+      "Don't add decorative eyebrow labels above useful headings.",
+      "Don't treat legacy gold, navy, or white utility names as literal brand colors.",
+      "Don't place fixed actions over scrollable content or remove safe-area allowances.",
+      "Don't add decorative panel shadows or hard offset shadows to these flat tonal surfaces.",
+      "Don't substitute an invented account balance or completion metric for educational examples and session context.",
+      "Don't persist calculator inputs alongside appearance preferences."
     ]
   }
 }

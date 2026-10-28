@@ -13,7 +13,7 @@ export function applyPreferences(value: Preferences) {
   root.dataset.theme = dark ? 'dark' : 'light';
   root.classList.toggle('dark', dark);
   root.dataset.reduceMotion = String(value.reduceMotion);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#121c17' : '#f6f8fa');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#121c17' : '#f7f4eb');
 }
 export function savePreferences(value: Preferences) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* Private browsing can block storage. */ }
