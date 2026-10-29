@@ -133,7 +133,7 @@ try {
     assert.equal(await page.locator('#rs-step').evaluate(element => element === document.activeElement), true, 'Changing consultation stages preserves selector focus');
     await edit();
     if (height >= 812 && textSize === 16) assert.ok(await inScrollport(page.locator('#rs-customers')), 'Long-term customer input appears before the product list and chart');
-    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('12');
+    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('12');
     await page.locator('#rs-customers').fill('2');
     await page.locator('#rs-customers').blur();
     await page.getByRole('button', { name: 'View results', exact: true }).click();

@@ -178,16 +178,16 @@ try {
     await results();
     await page.getByRole('button', { name: 'Explore long term', exact: true }).click();
     await editPlan();
-    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('600');
+    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('600');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 29,224.00');
     const growth = page.getByRole('checkbox', { name: 'Add customers each year', exact: true });
     assert.equal(await growth.isChecked(), false, 'The consultation keeps one customer until growth is selected');
     await growth.check();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 480,664.00');
     await growth.uncheck();
-    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('12');
+    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('12');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 118.00', 'Later products never change year 1');
-    await page.getByRole('combobox', { name: 'Projection duration', exact: true }).selectOption('600');
+    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('600');
     await results();
     if (width < 1200) {
       const dock = await page.locator('.rs-mobile-summary').boundingBox();

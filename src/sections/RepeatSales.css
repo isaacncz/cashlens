@@ -335,3 +335,11 @@
   .rs-repeat-control { padding-top: 12px; border-top: 1px solid var(--rs-line); }
   .rs-reset { font-size: var(--text-small) !important; width: auto; }
 }
+
+/* Clarify mobile hierarchy without shrinking reading or touch sizes. */
+@media (max-width: 767px) {
+  .rs-chart-heading { flex-wrap: wrap; gap: 0 12px; }
+  .rs-chart-heading h3 { flex: 1 1 11rem; }
+  .rs-result-assumption { line-height: 1.4; }
+  .rs-context { line-height: 1.4; }
+}
