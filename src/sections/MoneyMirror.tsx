@@ -2,11 +2,12 @@ import NumberField from '../app/NumberField';
 import { numberError } from '../lib/numericInput';
 import { scrollToContent } from '../lib/pageNavigation';
 import { formatMoney } from '../lib/currency';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { ArrowRight, ArrowUp, ChevronDown } from 'lucide-react';
+import './MoneyMirror.css';
 
 interface MoneyMirrorPreset {
   name: string;
-  icon: string;
   badge: string;
   salary: string;
   hours: string;
@@ -28,9 +29,6 @@ interface MoneyMirrorResult {
   workExpenses: number;
   netIncome: number;
 }
-
-type FlowKey = 'pcb' | 'epf' | 'socso' | 'eis' | 'expense' | 'net';
-type InsightKey = 'rate' | 'keep' | 'time';
 
 function calculateAnnualTax(chargeableAnnual: number): number {
   if (chargeableAnnual <= 0) return 0;
@@ -99,7 +97,6 @@ const HOURS_MAX = 100;
 const presets: MoneyMirrorPreset[] = [
   {
     name: 'Fresh Grad',
-    icon: '🎓',
     badge: 'Starter',
     salary: '3500',
     hours: '45',
@@ -109,7 +106,6 @@ const presets: MoneyMirrorPreset[] = [
   },
   {
     name: 'Urban Commuter',
-    icon: '🏙️',
     badge: 'Busy city',
     salary: '8000',
     hours: '55',
@@ -119,7 +115,6 @@ const presets: MoneyMirrorPreset[] = [
   },
   {
     name: 'Disciplined Saver',
-    icon: '💾',
     badge: 'Lean spender',
     salary: '5000',
     hours: '42',
@@ -156,393 +151,125 @@ function computeMoneyMirrorResults(salary: number, hours: number, commute: numbe
 }
 
 export default function MoneyMirror() {
-  const sectionRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
-
+  const examplesButtonRef = useRef<HTMLButtonElement>(null);
   const [salary, setSalary] = useState('');
   const [hours, setHours] = useState('');
   const [commute, setCommute] = useState('');
   const [expenses, setExpenses] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [examplesOpen, setExamplesOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
-  const [highlightedFlow, setHighlightedFlow] = useState<FlowKey>('net');
-  const [activeInsight, setActiveInsight] = useState<InsightKey>('rate');
-  const [supportsHover, setSupportsHover] = useState(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches);
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const updateHoverSupport = () => setSupportsHover(mediaQuery.matches);
-    mediaQuery.addEventListener('change', updateHoverSupport);
-    return () => mediaQuery.removeEventListener('change', updateHoverSupport);
-  }, []);
 
-  const salaryValue = salary === '' ? Number.NaN : parseFloat(salary);
-  const salaryHasInput = salary.trim().length > 0;
-  const salaryIsValid = salaryHasInput && salaryValue >= SALARY_MIN && salaryValue <= SALARY_MAX;
-  const hoursValue = hours === '' ? 44 : Math.min(HOURS_MAX, Math.max(HOURS_MIN, parseFloat(hours) || 44));
-  const selectedPresetMeta = presets.find((preset) => preset.name === selectedPreset);
-
+  const salaryIsValid = salary.trim() !== '' && !numberError(salary, SALARY_MIN, SALARY_MAX, true);
   const calculated = salaryIsValid && !numberError(hours, HOURS_MIN, HOURS_MAX) && !numberError(commute, 0, 24) && !numberError(expenses);
+  const hoursValue = hours === '' ? 44 : Math.min(HOURS_MAX, Math.max(HOURS_MIN, Number(hours) || 44));
   const results = useMemo(() => computeMoneyMirrorResults(
     calculated ? Number(salary) : 0, hours === '' ? 44 : Number(hours), Number(commute) || 0, Number(expenses) || 0,
   ), [calculated, salary, hours, commute, expenses]);
-  const viewResults = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitted(true);
-    if (!calculated) {
-      event.currentTarget.querySelector<HTMLElement>('[aria-invalid=true], input:invalid')?.focus();
-      return;
-    }
-    const target = resultsRef.current;
-    if (target) {
-      scrollToContent(target);
-    }
+  const deductions = results.pcbMonthly + results.epfEmployee + results.socsoEmployee + results.eisEmployee;
+  const hasInvalidInput = !!numberError(salary, SALARY_MIN, SALARY_MAX) || !!numberError(hours, HOURS_MIN, HOURS_MAX) || !!numberError(commute, 0, 24) || !!numberError(expenses);
+  const selectedPresetMeta = presets.find(preset => preset.name === selectedPreset);
+  const edit = (setter: (value: string) => void) => (value: string) => {
+    setter(value);
+    setSelectedPreset(null);
   };
-
   const applyPreset = (preset: MoneyMirrorPreset) => {
-    setSelectedPreset(preset.name);
     setSalary(preset.salary);
     setHours(preset.hours);
     setCommute(preset.commute);
     setExpenses(preset.expenses);
+    setSelectedPreset(preset.name);
+    setSubmitted(false);
+    setExamplesOpen(false);
+    examplesButtonRef.current?.focus({ preventScroll: true });
   };
-
-  const hourlyInsight = results.trueHourly < 15
-    ? {
-        title: 'Your job is paying less than it looks.',
-        body: 'Once time and work-related costs are included, the headline salary is masking a weak real return on your hours.',
-        tone: 'text-crimson',
-      }
-    : results.trueHourly < 30
-      ? {
-          title: 'Your pay is decent, but leaks matter.',
-          body: 'You are earning, but tax, commute, and work costs are taking a meaningful bite out of your real hourly value.',
-          tone: 'text-gold',
-        }
-      : {
-          title: 'Your hourly value is strong. Protect it.',
-          body: 'The next question is not just how much you earn, but how quickly that income can stop depending on your hours.',
-          tone: 'text-emerald',
-        };
-
-  const flowItems = useMemo(() => {
-    const gross = Math.max(results.grossMonthly, 1);
-    return [
-      {
-        key: 'pcb' as const,
-        label: 'PCB tax',
-        amount: results.pcbMonthly,
-        percent: (results.pcbMonthly / gross) * 100,
-        color: 'var(--ledger-negative)',
-        accent: 'text-crimson',
-        description: 'Estimated monthly tax deduction (PCB).',
-      },
-      {
-        key: 'epf' as const,
-        label: 'EPF',
-        amount: results.epfEmployee,
-        percent: (results.epfEmployee / gross) * 100,
-        color: 'var(--ledger-accent)',
-        accent: 'text-gold',
-        description: 'Employee EPF contribution.',
-      },
-      {
-        key: 'socso' as const,
-        label: 'SOCSO',
-        amount: results.socsoEmployee,
-        percent: (results.socsoEmployee / gross) * 100,
-        color: 'var(--ledger-info)',
-        accent: 'text-white',
-        description: 'PERKESO employee contribution.',
-      },
-      {
-        key: 'eis' as const,
-        label: 'EIS',
-        amount: results.eisEmployee,
-        percent: (results.eisEmployee / gross) * 100,
-        color: 'var(--ledger-muted)',
-        accent: 'text-slate',
-        description: 'Employment Insurance System contribution.',
-      },
-      {
-        key: 'expense' as const,
-        label: 'Work costs',
-        amount: results.workExpenses,
-        percent: (results.workExpenses / gross) * 100,
-        color: 'var(--ledger-negative)',
-        accent: 'text-crimson',
-        description: 'Petrol, tolls, food, parking, uniforms, commute friction.',
-      },
-      {
-        key: 'net' as const,
-        label: 'Keep',
-        amount: results.netIncome,
-        percent: (results.netIncome / gross) * 100,
-        color: 'var(--ledger-positive)',
-        accent: 'text-emerald',
-        description: 'This is what is truly left for living, saving, or investing.',
-      },
-    ];
-  }, [results]);
-
-  const highlightedItem = flowItems.find((item) => item.key === highlightedFlow) ?? flowItems[flowItems.length - 1];
-  const takeHomePercent = Math.max(0, highlightedItem.key === 'net' ? highlightedItem.percent : flowItems.find((item) => item.key === 'net')?.percent ?? 0);
-  const netItem = flowItems.find((item) => item.key === 'net') ?? flowItems[flowItems.length - 1];
-  const totalOutflow = Math.max(0, results.grossMonthly - netItem.amount);
-  const insightItems = [
-    {
-      key: 'rate' as const,
-      label: 'Real rate',
-      value: `RM ${formatMoney(results.trueHourly)}/hr`,
-      detail: hourlyInsight.body,
-      tone: hourlyInsight.tone,
-    },
-    {
-      key: 'keep' as const,
-      label: 'Keep rate',
-      value: `${netItem.percent.toFixed(1)}%`,
-      detail: `From RM ${formatMoney(results.grossMonthly)}, you keep RM ${formatMoney(netItem.amount)} after PCB, EPF, SOCSO, EIS, and work costs.`,
-      tone: 'text-emerald',
-    },
-    {
-      key: 'time' as const,
-      label: 'Time traded',
-      value: `${results.annualHours.toFixed(0)} hrs/yr`,
-      detail: `At this pace, your job takes about ${Math.round(results.annualHours / 24)} full days each year.`,
-      tone: 'text-gold',
-    },
+  const viewResults = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitted(true);
+    if (!calculated) {
+      const invalidId = !salaryIsValid ? 'mm-salary' : numberError(expenses) ? 'mm-expenses' : numberError(hours, HOURS_MIN, HOURS_MAX) ? 'mm-hours' : 'mm-commute';
+      document.getElementById(invalidId)?.focus();
+      return;
+    }
+    if (resultsRef.current) scrollToContent(resultsRef.current);
+  };
+  const editNumbers = () => {
+    const salaryInput = document.getElementById('mm-salary');
+    if (salaryInput) scrollToContent(salaryInput);
+  };
+  const deductionRows = [
+    { label: 'PCB tax', amount: results.pcbMonthly, note: 'Estimated monthly income tax.' },
+    { label: 'Employee EPF', amount: results.epfEmployee, note: 'Your contribution, deducted from salary.' },
+    { label: 'SOCSO', amount: results.socsoEmployee, note: 'PERKESO employee contribution.' },
+    { label: 'EIS', amount: results.eisEmployee, note: 'Employment Insurance System contribution.' },
+    { label: 'Work costs', amount: results.workExpenses, note: 'Travel, meals, parking and uniforms.' },
   ];
-  const activeInsightItem = insightItems.find((item) => item.key === activeInsight) ?? insightItems[0];
-  const handleFlowHover = (key: FlowKey) => {
-    if (supportsHover) setHighlightedFlow(key);
-  };
-  const handleFlowSelect = (key: FlowKey) => setHighlightedFlow(key);
 
-  return (
-    <section id="money-mirror" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          <div>
-            <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-              What do you earn <span className="text-gold">per hour?</span>
-            </h1>
-            <p data-reveal className="text-slate text-base md:text-lg mb-8 leading-relaxed">
-              See your pay after deductions, work costs and time.
-            </p>
-
-
-
-            <form className="money-form space-y-5 mb-8" noValidate onSubmit={viewResults}>
-              <NumberField id="mm-salary" label="Monthly salary (RM)" value={salary} onChange={setSalary} min={SALARY_MIN} max={SALARY_MAX} required placeholder="8000" hint="Before tax and deductions." submitted={submitted} />
-              <div className="money-time-fields">
-                <NumberField id="mm-hours" label="Work hours / week" value={hours} onChange={setHours} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" hint="Default: 44 hours." inputMode="numeric" submitted={submitted} />
-                <NumberField id="mm-commute" label="Commute hours / day" value={commute} onChange={setCommute} max={24} placeholder="0" submitted={submitted} />
-              </div>
-              <NumberField id="mm-expenses" label="Monthly work costs (RM)" value={expenses} onChange={setExpenses} placeholder="0" hint="Travel, meals, parking and uniforms." submitted={submitted} />
-              <div className="lesson-action"><button type="submit" className="primary-button">View my results</button></div>
-              <p className="field-hint">Results update as you type. No numbers are saved.</p>
-            </form>
-            <details className="hours-slider"><summary>Adjust hours with a slider</summary><input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => setHours(event.target.value)} aria-label="Hours worked per week" className="lesson-range" /></details>
-            <details className="example-presets mb-6"><summary>Try an example</summary>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {presets.map((preset) => (
-                  <button
-                    key={preset.name}
-                    aria-pressed={selectedPreset === preset.name}
-                    onClick={() => applyPreset(preset)}
-                    className={`text-left rounded-xl border p-3 transition-all duration-200 min-h-[82px] ${
-                      selectedPreset === preset.name
-                        ? 'bg-gold/15 border-gold/50'
-                        : 'bg-navy-surface border-navy-light text-white hover:border-gold/40'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="preset-mark" aria-hidden="true" />
-                      <span className="text-sm uppercase tracking-[0.12em] text-slate">{preset.badge}</span>
-                    </div>
-                    <p className={`mt-2 text-sm font-semibold ${selectedPreset === preset.name ? 'text-gold' : 'text-white'}`}>{preset.name}</p>
-                  </button>
-                ))}
-              </div>
-              {selectedPresetMeta && (
-                <p className="text-slate text-sm mt-3 rounded-xl border border-navy-light bg-navy-surface/40 px-3 py-2">{selectedPresetMeta.description}</p>
-              )}
-            </details>
-
-            {calculated && (
-              <div ref={resultsRef} id="money-mirror-results" tabIndex={-1} aria-label="Your cashflow results" className="mt-8 space-y-4">
-                <button type="button" className="money-edit-inputs" onClick={() => { const input = document.getElementById('mm-salary'); if (input) scrollToContent(input); }}>Edit my numbers</button>
-                <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-6">
-                  <p className="text-slate text-sm mb-1">True Hourly Rate</p>
-                  <p className="text-gold font-mono-data text-4xl md:text-5xl font-bold">
-                    RM {formatMoney(results.trueHourly)}
-                  </p>
-                </div>
-
-                <div data-result className="money-result-facts grid grid-cols-2 gap-4">
-                  <div className="bg-navy-surface border border-navy-light rounded-xl p-4">
-                    <p className="text-slate text-xs uppercase mb-1">Annual Hours Traded</p>
-                    <p className="text-white font-mono-data text-xl font-bold">{results.annualHours.toFixed(0)}</p>
-                  </div>
-                  <div className="bg-navy-surface border border-navy-light rounded-xl p-4">
-                    <p className="text-slate text-xs uppercase mb-1">Survival Without Work</p>
-                    <p className="text-crimson font-mono-data text-xl font-bold">{results.monthsSurvival.toFixed(1)} months</p>
-                  </div>
-                </div>
-
-                <div data-result className="bg-navy-surface border border-navy-light rounded-2xl p-5">
-                  <p className="text-slate text-xs uppercase mb-3">Quick insights</p>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {insightItems.map((item) => (
-                      <button
-                        key={item.key}
-                        type="button"
-                        aria-pressed={activeInsight === item.key}
-                        onClick={() => setActiveInsight(item.key)}
-                        className={`min-h-9 px-3 rounded-full border text-xs font-semibold transition-all ${
-                          activeInsight === item.key
-                            ? 'border-gold/45 bg-gold/15 text-gold'
-                            : 'border-navy-light bg-navy text-slate hover:border-gold/30'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                  <p className={`text-base font-bold ${activeInsightItem.tone}`}>{activeInsightItem.value}</p>
-                  <p className="text-slate text-sm mt-2 leading-relaxed">{activeInsightItem.detail}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <details className="money-breakdown"><summary>Where your salary goes</summary>
-          <div data-reveal className="bg-navy-surface/30 rounded-2xl border border-navy-light/50 p-5 md:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
-              <div>
-                <h2 className="text-white text-xl font-bold">From gross income to what you actually keep</h2>
-              </div>
-              <div className="bg-emerald/10 border border-emerald/20 rounded-xl px-4 py-3">
-                <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">You keep</p>
-                <p className="text-white font-mono-data text-2xl font-bold">{takeHomePercent.toFixed(0)}%</p>
-              </div>
+  return <section id="money-mirror" className="mm-worksheet" aria-labelledby="mm-heading">
+    <div className="mm-page">
+      <header className="mm-intro">
+        <h1 id="mm-heading">Your pay,<br />minus the guesswork.</h1>
+        <p>Four numbers. The full picture.</p>
+      </header>
+      <div className="mm-workspace">
+        <div className="mm-entry">
+          <form className="money-form" noValidate onSubmit={viewResults} aria-label="Your pay and working time">
+            <div className="mm-fields">
+              <NumberField validationMode="change" id="mm-salary" label="Monthly salary · RM" value={salary} onChange={edit(setSalary)} min={SALARY_MIN} max={SALARY_MAX} required placeholder="e.g. 8000" submitted={submitted} />
+              <NumberField validationMode="change" id="mm-expenses" label="Work costs · RM/month" value={expenses} onChange={edit(setExpenses)} placeholder="0" submitted={submitted} />
+              <NumberField validationMode="change" id="mm-hours" label="Work hours / week" value={hours} onChange={edit(setHours)} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" inputMode="numeric" submitted={submitted} />
+              <NumberField validationMode="change" id="mm-commute" label="Commute hours / day" value={commute} onChange={edit(setCommute)} max={24} placeholder="0" submitted={submitted} />
             </div>
-
-            {calculated ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="rounded-xl border border-gold/25 bg-gold/10 p-4">
-                    <p className="text-gold text-xs uppercase tracking-[0.12em] mb-1">Gross</p>
-                    <p className="text-white font-mono-data text-xl font-bold">RM {formatMoney(results.grossMonthly)}</p>
-                  </div>
-                  <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
-                    <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Statutory</p>
-                    <p className="text-white font-mono-data text-xl font-bold">RM {formatMoney(results.pcbMonthly + results.epfEmployee + results.socsoEmployee + results.eisEmployee)}</p>
-                  </div>
-                  <div className="rounded-xl border border-crimson/25 bg-crimson/10 p-4">
-                    <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-1">Total outflow</p>
-                    <p className="text-white font-mono-data text-xl font-bold">RM {formatMoney(totalOutflow)}</p>
-                  </div>
-                  <div className="rounded-xl border border-emerald/25 bg-emerald/10 p-4">
-                    <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-1">You keep</p>
-                    <p className="text-white font-mono-data text-xl font-bold">{netItem.percent.toFixed(1)}%</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="rounded-2xl border border-navy-light bg-navy-surface p-4">
-                    <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow breakdown</p>
-                    <div className="md:hidden flex flex-wrap gap-2 mb-3">
-                      {flowItems.map((item) => (
-                        <button
-                          key={`chip-${item.key}`}
-                          type="button"
-                          aria-pressed={highlightedFlow === item.key}
-                          onClick={() => handleFlowSelect(item.key)}
-                          className={`min-h-10 px-3 rounded-full border text-xs font-semibold transition-all ${
-                            highlightedFlow === item.key
-                              ? 'border-gold/45 bg-navy-surface text-white'
-                              : 'border-navy-light bg-navy text-slate'
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="rounded-lg bg-navy p-2 mb-3 flex h-3 overflow-hidden">
-                      {flowItems.map((item) => (
-                        <div key={`stack-${item.key}`} style={{ width: `${Math.max(2, item.percent)}%`, backgroundColor: item.color }} />
-                      ))}
-                    </div>
-                    <div className="space-y-2">
-                      {flowItems.map((item) => {
-                        const width = Math.max(item.key === 'net' ? 18 : 6, Math.min(100, item.percent));
-                        const isHighlighted = highlightedFlow === item.key;
-                        return (
-                          <button
-                            key={`bar-${item.key}`}
-                            type="button"
-                            onMouseEnter={() => handleFlowHover(item.key)}
-                            onFocus={() => handleFlowSelect(item.key)}
-                            aria-pressed={highlightedFlow === item.key}
-                          onClick={() => handleFlowSelect(item.key)}
-                            className={`w-full text-left rounded-lg border px-3 py-3 transition-all duration-200 ${
-                              isHighlighted ? 'border-gold/40 bg-navy-light' : 'border-navy-light/80 bg-navy-surface md:hover:border-gold/20'
-                            }`}
-                          >
-                            <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 mb-2">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <span className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-                                <p className={`text-sm font-semibold truncate ${item.key === 'net' ? 'text-emerald' : 'text-white'}`}>{item.label}</p>
-                              </div>
-                              <span className={`font-mono-data text-xs font-bold ${item.accent}`}>RM {formatMoney(item.amount)}</span>
-                              <span className="text-white font-mono-data text-sm font-bold">{item.percent.toFixed(1)}%</span>
-                            </div>
-                            <div className="h-2 rounded-full bg-navy-light overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-500"
-                                style={{ width: `${width}%`, backgroundColor: item.color }}
-                              />
-                            </div>
-                            <div className="mt-1 flex items-center justify-end">
-                              <p className="text-slate text-sm">{item.key === 'net' ? 'kept' : 'deduction'}</p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-gold/25 bg-navy-surface p-4">
-                      <p className="text-slate text-xs uppercase mb-1">Focused explanation</p>
-                      <p className={`text-base font-bold mb-1 ${highlightedItem.accent}`}>{highlightedItem.label} — {highlightedItem.percent.toFixed(1)}%</p>
-                      <p className="text-slate text-sm leading-relaxed">{highlightedItem.description}</p>
-                      <p className="text-white font-mono-data text-sm mt-2">RM {formatMoney(highlightedItem.amount)} / month</p>
-                    </div>
-                    <div className="rounded-xl border border-navy-light bg-navy-surface/70 p-4">
-                      <p className="text-slate text-xs uppercase mb-2">Tax model note</p>
-                      <p className="text-white text-sm leading-relaxed">
-                        PCB is estimated from Malaysian progressive tax with personal relief + EPF relief cap, then converted to monthly deduction.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="min-h-[420px] flex flex-col items-center justify-center text-center px-6">
-                <div className="w-20 h-20 rounded-full bg-navy-light flex items-center justify-center mb-4">
-                  <span className="text-3xl">🧪</span>
-                </div>
-                <p className="text-white text-base font-semibold mb-2">Your salary funnel will appear here</p>
-                <p className="text-slate text-sm max-w-sm">
-                  Enter a valid salary and the funnel will update live with clear labels, percentages, and the amount flowing out at each step.
-                </p>
-              </div>
-            )}
+            <p className="mm-defaults">Use salary before deductions. Blank fields use 44 work hours and zero costs or commute.</p>
+            <div className="mm-form-actions">
+              <button type="submit" className="mm-text-action">View my results<ArrowRight size={17} aria-hidden="true" /></button>
+              <button ref={examplesButtonRef} type="button" className="mm-text-action" aria-expanded={examplesOpen} aria-controls="mm-examples" onClick={() => setExamplesOpen(value => !value)}>Try an example<ChevronDown size={16} aria-hidden="true" /></button>
+            </div>
+          </form>
+          <div id="mm-examples" className="mm-examples" hidden={!examplesOpen}>
+            <p>Choose example numbers to explore.</p>
+            <div>{presets.map(preset => <button key={preset.name} type="button" aria-pressed={selectedPreset === preset.name} onClick={() => applyPreset(preset)}><span>{preset.name}</span><small aria-hidden="true">{preset.badge}</small></button>)}</div>
           </div>
+        </div>
+        <div className="mm-output">
+          {calculated ? <div id="money-mirror-results" ref={resultsRef} tabIndex={-1} aria-label="Your cashflow results" className="mm-result">
+            <p className="mm-status" role="status">{selectedPreset ? `Example · ${selectedPreset}` : 'Your numbers · live estimate'}</p>
+            <div className="mm-rate"><h2>What an hour<br />is worth</h2><p className="mm-amount"><span>RM</span> {formatMoney(results.trueHourly)}</p></div>
+            <dl className="mm-receipt">
+              <div><dt>Monthly take-home*</dt><dd>RM {formatMoney(results.netIncome)}</dd></div>
+              <div><dt>Work + travel / month</dt><dd>{(results.annualHours / 12).toFixed(1)} hours</dd></div>
+              <div><dt>Estimated deductions</dt><dd>RM {formatMoney(deductions)}</dd></div>
+            </dl>
+            <p className="mm-footnote">*After work costs of RM {formatMoney(results.workExpenses)}.</p>
+            <button type="button" className="mm-edit-action" onClick={editNumbers}>Adjust my numbers<ArrowUp size={18} aria-hidden="true" /></button>
+            {selectedPresetMeta && <p className="mm-example-note">{selectedPresetMeta.description}</p>}
+          </div> : <div className="mm-result mm-empty" aria-live="polite">
+            <h2>{hasInvalidInput ? 'Let’s check those numbers.' : 'Your estimate starts here.'}</h2>
+            <p>{hasInvalidInput ? 'Correct the highlighted field to see your updated result.' : 'Enter your monthly salary above. Your hourly pay and take-home amount will update here.'}</p>
+          </div>}
+          <details className="mm-deductions">
+            <summary>Deductions &amp; calculation<ChevronDown size={17} aria-hidden="true" /></summary>
+            {calculated && <>
+              <dl className="mm-breakdown-list"><div><dt>Gross monthly salary</dt><dd>RM {formatMoney(results.grossMonthly)}</dd></div>{deductionRows.map(row => <div key={row.label}><dt>{row.label}<small>{row.note}</small></dt><dd>RM {formatMoney(row.amount)}</dd></div>)}<div className="mm-total"><dt>What you keep</dt><dd>RM {formatMoney(results.netIncome)}</dd></div></dl>
+              <p>You keep {(results.netIncome / results.grossMonthly * 100).toFixed(1)}% of gross salary after deductions and work costs. Your employer’s estimated EPF contribution is RM {formatMoney(results.epfEmployer)}; it is not deducted from take-home pay.</p>
+            </>}
+            <p>We subtract estimated PCB, employee EPF, SOCSO, EIS and work costs from salary, then divide by work and commute hours. The time model uses 4.3 weeks per month and five commute days per week.</p>
+            <p>PCB uses Malaysian progressive tax with personal relief and the EPF relief cap. These are estimates, not a replacement for your payslip.</p>
           </details>
+          {calculated && <details className="mm-time-details">
+            <summary>What your time adds up to<ChevronDown size={17} aria-hidden="true" /></summary>
+            <dl className="mm-breakdown-list"><div><dt>Annual hours traded</dt><dd>{results.annualHours.toFixed(0)} hours</dd></div><div><dt>Equivalent full days</dt><dd>{Math.round(results.annualHours / 24)} days</dd></div><div><dt>Modelled survival without work</dt><dd>{results.monthsSurvival.toFixed(1)} months</dd></div></dl>
+            <p>The survival illustration assumes six months of net income set aside, with monthly spending at 70% of gross salary. It is not based on your actual savings. When work costs are zero, this illustration returns zero.</p>
+          </details>}
+          <details className="hours-slider">
+            <summary>Adjust hours with a slider<ChevronDown size={17} aria-hidden="true" /></summary>
+            <input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => edit(setHours)(event.target.value)} aria-label="Hours worked per week" className="lesson-range" />
+            <p>{hoursValue} hours / week</p>
+          </details>
+          <p className="mm-privacy">Live estimate · No account needed · Nothing saved</p>
         </div>
       </div>
-    </section>
-  );
+    </div>
+  </section>;
 }
-

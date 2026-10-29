@@ -135,16 +135,13 @@ input::placeholder, textarea::placeholder { color: var(--ledger-muted); opacity:
 /* The scrollport ends above navigation and action docks, so controls cover no content. */
 html, body, #root { height: 100%; overflow: hidden; }
 #main-content { position: fixed; top: var(--site-header-height); right: 0; bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); left: 0; padding: 0 max(0px, env(safe-area-inset-right)) 24px max(0px, env(safe-area-inset-left)); overflow-y: auto; overscroll-behavior-y: contain; scroll-padding-block: 16px; scrollbar-width: thin; scrollbar-color: var(--ledger-control) var(--ledger-ground); }
-#main-content:is([data-route=money-mirror], [data-route=wealth-thermometer]) { bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--lesson-dock-height)); }
+#main-content[data-route=wealth-thermometer] { bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--lesson-dock-height)); }
 #main-content[data-route=compounding] { bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--consultation-dock-height)); }
 .lesson-action { position: fixed; left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px); margin: 0; z-index: 25; }
 .dashboard { padding-bottom: 24px; }
 .lesson-screen .lesson-range { appearance: auto; width: 100%; background: transparent; }
-.hours-slider { margin-top: 8px; }
-.hours-slider > summary { min-height: 44px; padding-block: 8px; color: var(--ledger-accent); font-size: var(--text-small); cursor: pointer; }
-.hours-slider[open] { padding-bottom: 8px; }
 @media (min-width: 1024px) {
-  #main-content, #main-content:is([data-route=money-mirror], [data-route=wealth-thermometer]) { left: 232px; margin-left: 0; bottom: 0; padding-bottom: 24px; }
+  #main-content, #main-content[data-route=wealth-thermometer] { left: 232px; margin-left: 0; bottom: 0; padding-bottom: 24px; }
   #main-content[data-route=compounding] { bottom: 104px; }
   .lesson-action { position: static; margin-top: 24px; }
 }
@@ -184,12 +181,9 @@ html, body, #root { height: 100%; overflow: hidden; }
 .lesson-path-nav a[aria-current] { border-color: var(--ledger-accent); color: var(--ledger-accent); background: var(--ledger-raised); }
 .lesson-path-nav a:hover { border-color: var(--ledger-control); }
 .lesson-screen .primary-button { color: var(--ledger-on-accent); }
-.lesson-screen .money-form, .lesson-screen .wealth-form { padding: 20px; border: 1px solid var(--ledger-line); border-radius: var(--radius-panel); background: var(--ledger-surface); }
+.lesson-screen .wealth-form { padding: 20px; border: 1px solid var(--ledger-line); border-radius: var(--radius-panel); background: var(--ledger-surface); }
 .lesson-screen .number-field input { background: var(--ledger-surface); }
 .lesson-screen .number-field label { color: var(--ledger-ink); }
-.lesson-screen .money-breakdown { align-self: start; min-width: 0; background: var(--ledger-surface); border: 1px solid var(--ledger-line); border-radius: var(--radius-panel); }
-.money-breakdown > summary { min-height: 56px; padding: 16px 20px; color: var(--ledger-accent); font-size: var(--text-body); font-weight: 500; cursor: pointer; }
-.money-breakdown > div { border: 0; background: transparent; padding: 16px !important; }
 .lesson-screen [class*="bg-navy/"] { background: var(--ledger-raised); }
 .lesson-screen :is(.bg-gold, .bg-emerald, .bg-crimson):is(.text-navy, .text-white) { color: var(--ledger-on-accent); }
 @media (min-width: 768px) {

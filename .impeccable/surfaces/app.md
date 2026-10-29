@@ -17,3 +17,8 @@ FORM: Existing 4px spacing, 8px controls, 16px panels, 16px body/input floor, 44
 See .impeccable/surfaces/pocket-coach-quality.json. The selected code prototype and its 390px / 1440px renders are the critique reference, not an approved image-generation comp. Match the selected palette, first-viewport hierarchy, forest task panel, sage action, warm guide, familiar navigation and conversational first-sale composition. The latest mobile usability request supersedes the prototype composition: direct task access and clear editing/results now lead. Native controls, actual financial data, readable body text and protected fixed actions outrank decorative reproduction.
 
 Constraints: React/TypeScript/Vite/Tailwind; no new application dependencies. Preserve nine lessons, 28-product Malaysia ABO/AP catalog, formulas, 20-customer cap, optional acquisition/attrition, product scheduling and ephemeral financial inputs. Only appearance preferences persist. No invented completion, account balances, commercial proof, Co-Authored-By trailers or AI footers.
+
+
+## Money Mirror replacement
+
+On 29 October 2026 the user chose Quick Worksheet (proposal 2) for a complete Money Mirror rewrite. This page overrides the previous Pocket Coach form composition: serif editorial heading, graphite/off-white page, citron highlights, four underlined inputs, immediate live receipt, explicit examples and optional detailed deductions. Desktop places the worksheet beside results. Other screens retain Pocket Coach. See DESIGN.md's page override and docs/quick-worksheet-review.md.

@@ -65,13 +65,9 @@
   .lesson-screen > section { padding: 20px 16px 24px; }
   .lesson-screen h1 { margin-bottom: 8px; font-size: 1.5rem; line-height: 1.25; }
   .lesson-screen h1 + p { margin-bottom: 16px; }
-  .lesson-screen .money-form, .lesson-screen .wealth-form { padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .lesson-screen .wealth-form { padding: 0; border: 0; border-radius: 0; background: transparent; }
   .lesson-screen .lesson-action { position: static; margin-top: 20px; }
-  .lesson-screen .money-result-facts { grid-template-columns: minmax(0, 1fr); }
-  .money-result-facts > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; min-width: 0; }
-  .money-result-facts > div > p:first-child { flex: 1 1 10rem; margin: 0; }
-  .money-result-facts > div > p:last-child { margin: 0; }
-  .lesson-screen :is(#money-mirror-results, #wealth-results) .font-mono-data { overflow-wrap: anywhere; }
+  .lesson-screen #wealth-results .font-mono-data { overflow-wrap: anywhere; }
   .lesson-screen #wealth-thermometer [data-result].grid-cols-3 > div { flex-wrap: wrap; }
   .lesson-screen .form-group-heading:first-child { margin-top: 0; }
   .optional-income { border-block: 1px solid var(--ledger-line); padding-block: 4px; }
@@ -103,19 +99,11 @@
 }
 
 /* Compact numeric rows preserve label context without oversized empty fields. */
-.money-time-fields { display: grid; gap: 20px; }
-.money-edit-inputs { min-height: 44px; padding: 8px 0; color: var(--ledger-accent); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
 @media (max-width: 767px) {
-  .lesson-screen :is(.money-form, .wealth-form) { container-type: inline-size; }
-  .lesson-screen .money-form { margin-bottom: 12px; }
-  .lesson-screen .money-form > * + * { margin-top: 16px; }
-  .lesson-screen .money-form .field-hint { margin-top: 4px; font-size: var(--text-small); }
-  .lesson-screen .money-form .lesson-action { margin-top: 16px; }
-  .lesson-screen .hours-slider { margin-block: 0 8px; }
-  .lesson-screen .hours-slider summary { min-height: 44px; }
+  .lesson-screen .wealth-form { container-type: inline-size; }
   .lesson-screen h1 { text-wrap: balance; }
   @container (min-width: 18rem) {
-    .lesson-screen :is(.money-form, .wealth-form) .number-field {
+    .lesson-screen .wealth-form .number-field {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 7rem;
       grid-template-rows: auto auto;
@@ -124,14 +112,12 @@
       padding-block: 8px;
       border-bottom: 1px solid var(--ledger-line);
     }
-    .lesson-screen :is(.money-form, .wealth-form) .number-field > label { grid-column: 1; margin: 0; line-height: 1.4; align-self: end; }
-    .lesson-screen :is(.money-form, .wealth-form) .number-field > input { grid-column: 2; grid-row: 1 / 3; text-align: right; padding-inline: 10px; }
-    .lesson-screen :is(.money-form, .wealth-form) .number-field > div { grid-column: 1; align-self: start; }
-    .lesson-screen :is(.money-form, .wealth-form) .number-field .field-hint { margin-top: 4px; font-size: var(--text-small); line-height: 1.4; }
-    .lesson-screen :is(.money-form, .wealth-form) .number-field:has(input[aria-invalid=true]) > div { grid-column: 1 / -1; grid-row: 3; }
-    .lesson-screen :is(.money-form, .wealth-form) .number-field:has(input[aria-invalid=true]) > label { align-self: center; }
-    .lesson-screen .money-form .money-time-fields { display: contents; }
-    .lesson-screen .money-form .number-field,
+    .lesson-screen .wealth-form .number-field > label { grid-column: 1; margin: 0; line-height: 1.4; align-self: end; }
+    .lesson-screen .wealth-form .number-field > input { grid-column: 2; grid-row: 1 / 3; text-align: right; padding-inline: 10px; }
+    .lesson-screen .wealth-form .number-field > div { grid-column: 1; align-self: start; }
+    .lesson-screen .wealth-form .number-field .field-hint { margin-top: 4px; font-size: var(--text-small); line-height: 1.4; }
+    .lesson-screen .wealth-form .number-field:has(input[aria-invalid=true]) > div { grid-column: 1 / -1; grid-row: 3; }
+    .lesson-screen .wealth-form .number-field:has(input[aria-invalid=true]) > label { align-self: center; }
     .lesson-screen .wealth-form .number-field { margin-top: 0; }
     .lesson-screen .optional-income > div { gap: 0; }
   }

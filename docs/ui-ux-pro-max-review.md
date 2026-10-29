@@ -1,6 +1,6 @@
 # Pocket Coach — PR #3 UI/UX review
 
-The [input polish review](input-polish-review.md) records the latest Impeccable refinement. The [mobile density follow-up](mobile-density-review.md) records the preceding UI UX Pro Max changes and validation. The [earlier mobile review](mobile-pocket-coach-review.md) records the preceding journey redesign. Measurements below describe the initial Pocket Coach implementation at commit `02639fb`.
+The [Quick Worksheet review](quick-worksheet-review.md) records the current full Money Mirror replacement. The [input polish review](input-polish-review.md) records its superseded Impeccable refinement. The [mobile density follow-up](mobile-density-review.md) records the preceding UI UX Pro Max changes and validation. The [earlier mobile review](mobile-pocket-coach-review.md) records the preceding journey redesign. Measurements below describe the initial Pocket Coach implementation at commit `02639fb`.
 
 28 October 2026. Pocket Coach is the user-selected direction from three UI UX Pro Max / Impeccable proposals. This review covers Home, Learn, Settings, the first-sale consultation, and the shared theme, with regression checks for all nine lessons and the complete consultation.
 

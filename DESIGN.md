@@ -292,9 +292,9 @@ The forest Home task uses coach feature colors and 16px corners and contains its
 
 Home tools are quiet link rows with horizontal rules, outline icons, and an arrow. They use no resting panel fill or rounded card shell. Grouped learning cards use a surface background, thin outer boundary, panel corners, and internal dividers. Their lesson rows use 16px padding on phones and 20px vertical / 16px horizontal padding on wider screens, with a raised hover surface. Focus draws inside the clipped group so it remains visible.
 
-Phone salary and breathing-room forms sit directly on the page rather than inside another padded panel. Money Mirror and Wealth Thermometer use compact label-and-value rows when the phone form is at least 18rem wide: label and hint sit beside a 7rem numeric input. Rows have 8px vertical padding and quiet dividers; errors span the row. Below that relative width, including enlarged text, fields stack. Money Mirror puts its primary result action before the optional slider and examples, and provides an Edit my numbers return action. Phone Compound uses concise stage introductions and an underlined Edit plan / Results switch.
+Money Mirror has its own user-selected Quick Worksheet page design; see the page override below. Wealth Thermometer retains compact label-and-value rows on phones, stacking for enlarged text. Phone Compound retains concise stage introductions and an underlined Edit plan / Results switch.
 
-Money Mirror's secondary result facts become full-width rows on phones, with wrapping labels and values that remain readable at enlarged text sizes. Wealth Thermometer's empty result is one useful sentence prompting monthly expenses; zone labels use text and semantic color.
+Wealth Thermometer's empty result is one useful sentence prompting monthly expenses; zone labels use text and semantic color.
 
 ### Inputs / Fields
 
@@ -339,3 +339,16 @@ State changes use color, boundary, or brightness rather than layout movement. Sh
 - **Don't** add decorative panel shadows or hard offset shadows to these flat tonal surfaces.
 - **Don't** substitute an invented account balance or completion metric for educational examples and session context.
 - **Don't** persist calculator inputs alongside appearance preferences.
+
+
+## Page override: Money Mirror — Quick Worksheet
+
+The user selected proposal 2 for a complete Money Mirror rewrite on 29 October 2026. This override supersedes its earlier Pocket Coach form layout; other screens retain the shared system above. Implementation lives in `src/sections/MoneyMirror.tsx` and `src/sections/MoneyMirror.css`.
+
+The page uses an editorial off-white and graphite worksheet with a Georgia serif title, Inter controls, underlined numeric fields, thin receipt rules and citron result/action highlights. Light page colors are ground `#faf9f5`, ink `#242623`, muted `#62645c`, control `#81867b` and highlight `#e9ef9f`. Dark mode uses ground `#20231f`, ink `#f4f3e9`, muted `#c2c6b8`, control `#9aa48d` and highlight `#dce895`. The existing navigation shell and saved theme choice remain.
+
+Four inputs form a two-by-two worksheet, followed immediately by the live result and a short receipt. Fields begin empty. Salary is required; clearly stated optional defaults are 44 work hours, zero commute and zero work costs. Try an example reveals three named scenarios; choosing one labels the output as an example and returns focus to the disclosure control. Editing clears the example designation. View my results moves focus to the result without requiring submission for calculation. Invalid values remove the stale result.
+
+Compact field labels use 14px; input values use 22px with at least 48px targets. Below 18rem of form width the grid stacks, including at enlarged text sizes. Monetary results can wrap. At 1000px viewport width the input worksheet and result use two columns. All actions are in document flow, including on tablets; Money Mirror reserves no extra fixed-action dock.
+
+Detailed deductions, time illustrations and the optional hours slider follow as disclosures. The receipt explicitly qualifies take-home as after work costs. All six calculation functions and the three example data sets are preserved; no new dependencies or persistent financial storage are introduced.

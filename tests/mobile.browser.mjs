@@ -57,12 +57,25 @@ try {
     }
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
     await page.locator('#mm-salary').waitFor();
+    for (const id of ['mm-salary', 'mm-hours', 'mm-commute', 'mm-expenses']) {
+      const input = page.locator(`#${id}`);
+      assert.equal(await input.inputValue(), '', 'Phone worksheet starts without invented personal values');
+      const box = await input.boundingBox();
+      assert.ok(box.width >= 44 && box.height >= 44, `Usable numeric touch target: ${label} ${id}`);
+    }
+    assert.equal(await page.locator('#money-mirror-results').count(), 0);
     assert.equal(await nav.isVisible(), false, 'A lesson uses the full phone workspace');
     if (textSize === 16 && height >= 740) assert.ok(await inScrollport(page.locator('#mm-salary')), 'Salary entry is visible immediately after opening the tool');
     if (textSize === 16 && height >= 740) assert.ok(await inScrollport(page.getByRole('button', { name: 'View my results', exact: true })), 'The complete salary form and its action fit before scrolling');
     await page.locator('#mm-salary').fill('8000');
     await page.locator('#mm-hours').fill('44');
     await page.locator('#mm-commute').fill('1.5');
+    await page.locator('#mm-expenses').fill('500');
+    await page.locator('#money-mirror-results').waitFor();
+    assert.match(await page.locator('#money-mirror-results').innerText(), /27\.42/, 'Typing updates the hourly result without submitting');
+    assert.equal(await page.locator('#mm-expenses').evaluate(element => element === document.activeElement), true, 'Live updates preserve editing focus');
+    await page.locator('#mm-expenses').fill('-5');
+    assert.equal(await page.locator('#money-mirror-results').isVisible(), false, 'An invalid phone entry cannot leave a stale result visible');
     await page.locator('#mm-expenses').fill('500');
     await page.getByRole('button', { name: 'View my results', exact: true }).click();
     assert.equal(await page.locator('#money-mirror-results').evaluate(element => element === document.activeElement), true);

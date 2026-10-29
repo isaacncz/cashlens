@@ -7,6 +7,7 @@ const errors = [];
 const lessonIds = ['money-mirror', 'asset-liability', 'cashflow-quadrant', 'income-engine', 'rat-race', 'debt', 'salary-wealth', 'wealth-thermometer', 'literacy-playbook'];
 try {
   for (const width of [360, 390, 768, 1280]) {
+    console.log(`Checking navigation and calculators at ${width}px`);
     const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 768, hasTouch: true, reducedMotion: 'reduce', colorScheme: width === 360 ? 'dark' : 'light' });
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
@@ -40,6 +41,17 @@ try {
     } else assert.equal(navBox.x, 0, 'Desktop uses a sidebar');
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
     await page.locator('#mm-salary').waitFor();
+    for (const id of ['mm-salary', 'mm-hours', 'mm-commute', 'mm-expenses']) {
+      assert.equal(await page.locator(`#${id}`).inputValue(), '', 'The worksheet starts with empty personal inputs');
+    }
+    assert.equal(await page.locator('#money-mirror-results').count(), 0, 'No example result is presented as a personal estimate on arrival');
+    await page.getByRole('button', { name: 'Try an example', exact: true }).click();
+    await page.getByRole('button', { name: 'Fresh Grad', exact: true }).click();
+    for (const [id, value] of Object.entries({ 'mm-salary': '3500', 'mm-hours': '45', 'mm-commute': '2', 'mm-expenses': '450' })) {
+      assert.equal(await page.locator(`#${id}`).inputValue(), value, 'An explicitly chosen example fills the worksheet');
+    }
+    assert.equal(await page.getByRole('button', { name: 'Try an example', exact: true }).evaluate(element => element === document.activeElement), true, 'Choosing an example returns focus to the disclosure control');
+    await page.locator('#mm-salary').fill('');
     if (width < 768) await page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle').click();
     assert.equal(await page.getByRole('navigation', { name: 'Understand your money lessons' }).getByRole('link', { name: '1 Money Mirror', exact: true }).getAttribute('aria-current'), 'step', 'Lesson navigation uses its visible label as the accessible name');
     if (width < 768) await page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle').click();
@@ -51,6 +63,9 @@ try {
     await page.locator('#mm-commute').fill('1.5');
     await page.locator('#mm-expenses').fill('500');
     await page.locator('#money-mirror-results').waitFor();
+    assert.match(await page.locator('#money-mirror-results').innerText(), /27\.42/, 'Live hourly pay preserves the existing calculation');
+    assert.match(await page.locator('#money-mirror-results').innerText(), /6,071\.18/, 'The receipt preserves take-home pay after work costs');
+    assert.equal(await page.locator('#mm-expenses').evaluate(element => document.activeElement === element), true, 'Live calculations do not steal input focus');
     for (const input of await page.locator('.money-form input[type=number]').all()) {
       assert.equal(await input.getAttribute('type'), 'number');
       assert.ok(['numeric', 'decimal'].includes(await input.getAttribute('inputmode')));
@@ -62,6 +77,10 @@ try {
     await page.locator('#mm-expenses').fill('500');
     await page.getByRole('button', { name: 'View my results', exact: true }).click();
     assert.equal(await page.locator('#money-mirror-results').evaluate(element => document.activeElement === element), true);
+    const deductionDetails = page.locator('details').filter({ has: page.getByText('Deductions & calculation', { exact: true }) });
+    await deductionDetails.locator('summary').click();
+    assert.equal(await deductionDetails.getAttribute('open'), '', 'Detailed deductions remain available on demand');
+    assert.match(await deductionDetails.innerText(), /EPF/);
     await checkLayout();
     await open('Learn');
     assert.equal(await page.locator('.lesson-list a').count(), 9);
