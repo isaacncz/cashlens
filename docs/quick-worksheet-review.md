@@ -1,5 +1,7 @@
 # Money Mirror — Quick Worksheet
 
+The subsequent [Ink Blue theme review](ink-blue-review.md) records the selected production palette.
+
 29 October 2026. The user selected proposal 2 from three interactive replacement designs. This change replaces the entire Money Mirror page rather than further compressing its former input rows.
 
 ## Shipped design

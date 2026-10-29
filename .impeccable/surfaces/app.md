@@ -21,4 +21,4 @@ Constraints: React/TypeScript/Vite/Tailwind; no new application dependencies. Pr
 
 ## Money Mirror replacement
 
-On 29 October 2026 the user chose Quick Worksheet (proposal 2) for a complete Money Mirror rewrite. This page overrides the previous Pocket Coach form composition: serif editorial heading, graphite/off-white page, citron highlights, four underlined inputs, immediate live receipt, explicit examples and optional detailed deductions. Desktop places the worksheet beside results. Other screens retain Pocket Coach. See DESIGN.md's page override and docs/quick-worksheet-review.md.
+On 29 October 2026 the user chose Quick Worksheet (proposal 2) for a complete Money Mirror rewrite. This page overrides the previous Pocket Coach form composition: serif editorial heading, Ink Blue page, Ink Blue highlights, four underlined inputs, immediate live receipt, explicit examples and optional detailed deductions. Desktop places the worksheet beside results. Other screens retain Pocket Coach. See DESIGN.md's page override and docs/quick-worksheet-review.md.
