@@ -359,3 +359,10 @@ Detailed deductions, time illustrations and the optional hours slider follow as 
 The user authorized applying Ink Blue across the entire app after reviewing the worksheet-only scope. Global `--ledger-*`, `--site-*`, UI-library aliases and `--coach-*` light/dark roles in theme.css now own the palette. This supersedes earlier forest/sage/sand color descriptions above; component layouts and typography remain as documented. Home feature panels are navy, actions and selections use blue, and guide surfaces are pale blue. Green retains positive financial meaning; errors are red, warnings amber and category charts remain distinct.
 
 Money Mirror aliases these shared tokens and no longer overrides the route header or canvas separately. Sidebar, brand, lesson links, settings, Compound, dialogs, selection and carets inherit the same roles. Browser theme-color, install manifest and icons use Ink Blue. Preferences retain Light/Dark/Device and reduced motion. Cache global-blue-v10 upgrades existing installations.
+
+
+## Compound mobile polish
+
+The user changed the repeat-purchase default to 100%. Initialization, reset and invalid-rate fallback use that default; explicit rates from 0–100 remain available. The editor exposes a bordered numeric percentage entry beside the existing slider, and Results states the active repeat/retention assumption directly. The 100% default is a scenario assumption, not a prediction of customer behavior.
+
+On phones Results uses the page canvas without a padded nested panel, a compact section heading and a 190px chart. Tighter header/view-switch spacing keeps more of the complete chart in view. Plan duration uses an inline wrapping label/select row. Primary text and touch targets retain their sizes; the fixed action bar and safe-area scroll reservation remain. The Reset control retains a visible text label.

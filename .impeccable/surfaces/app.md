@@ -27,3 +27,6 @@ On 29 October 2026 the user chose Quick Worksheet (proposal 2) for a complete Mo
 ## Global color rollout
 
 The user subsequently authorized app-wide Ink Blue. Its shared light/dark tokens replace the previous Pocket Coach colors on every route, navigation, dialog, selection, caret and browser/install surface. Money Mirror now inherits shared colors. Existing layouts and semantic outcome/chart colors are retained.
+
+
+Compound mobile follow-up: default repeat purchases are now 100%; the editor supports direct percentage entry and Results exposes the active assumption. A flatter result panel and compact spacing show the full chart on a standard phone. All stage, product and advanced planning controls remain available.

@@ -12,7 +12,7 @@ Malaysians learning about personal cashflow and people exploring FMCG repeat-sal
 Make financial concepts tangible through nine interactive lessons and an ABO product repeat-sales calculator. Preserve all existing calculations, lessons, game choices and simulator controls.
 
 ## Capabilities and Constraints
-React, TypeScript, Vite and Tailwind. No new application dependencies. Malaysia MYR currency. Compounding uses April 2026 Malaysia ABO/AP prices for 28 products, a 1-month to 50-year horizon, a maximum of 20 customers, a default 50% repeat-purchase rate, optional annual attrition, and optional one-customer-per-year acquisition. Financial inputs stay in memory; theme/accessibility preferences may stay on this device. No existing transaction ledger or transaction reports; this redesign preserves educational tools rather than inventing a new financial product.
+React, TypeScript, Vite and Tailwind. No new application dependencies. Malaysia MYR currency. Compounding uses April 2026 Malaysia ABO/AP prices for 28 products, a 1-month to 50-year horizon, a maximum of 20 customers, a default 100% repeat-purchase rate, optional annual attrition, and optional one-customer-per-year acquisition. Financial inputs stay in memory; theme/accessibility preferences may stay on this device. No existing transaction ledger or transaction reports; this redesign preserves educational tools rather than inventing a new financial product.
 
 ## Brand Commitments
 CashflowLens.MY; Pocket Coach. The user selected proposal 2 from three UI UX Pro Max / Impeccable directions on 28 October 2026. Use warm ivory, forest task panels, sage actions, readable type and a guided learning flow. Preserve light/dark themes, familiar navigation and all existing educational tools.
@@ -22,7 +22,7 @@ WCAG AA contrast, semantic navigation and forms, visible keyboard focus, 44px to
 
 Light is the default theme for new visitors, including dark-mode devices. Explicit stored Light, Dark and Device selections are respected. Learning offers three ordered paths with three lessons each and a session-only last-opened lesson shortcut.
 
-Compound opens as a consultation: one toothpaste (ABO RM29.50), one customer, then repeat sales over a year. Users add products from year 2 with editable business-calendar start years and explore up to 50 years. Optional yearly customer acquisition starts off; the cap remains 20 and the repeat-purchase default remains 50%. The four stages can be visited directly, and calculator inputs remain ephemeral.
+Compound opens as a consultation: one toothpaste (ABO RM29.50), one customer, then repeat sales over a year. Users add products from year 2 with editable business-calendar start years and explore up to 50 years. Optional yearly customer acquisition starts off; the cap remains 20 and the repeat-purchase default remains 100%. The four stages can be visited directly, and calculator inputs remain ephemeral.
 
 Money Mirror uses the user-selected Quick Worksheet page direction (29 October 2026): an editorial cool-white/navy worksheet with Ink Blue highlights, four compact inputs and immediate live results. This page-specific replacement supersedes its previous Pocket Coach form styling while retaining the shared app navigation, themes, privacy and exact financial calculations.
 

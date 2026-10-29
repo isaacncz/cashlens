@@ -2,7 +2,7 @@ import type { ProductCategory, RepeatSalesProduct } from '../data/repeatSalesPro
 
 export const MAX_MONTHS = 600;
 export const MAX_CUSTOMERS = 20;
-export const DEFAULT_REPEAT_RATE = 50;
+export const DEFAULT_REPEAT_RATE = 100;
 export const NEW_CUSTOMERS_PER_YEAR = 1;
 export const PURCHASE_INTERVALS = [0, 1, 2, 3, 6, 12, 24, 60, 120] as const;
 export type PurchaseModel = 'repeat-purchases' | 'annual-attrition';

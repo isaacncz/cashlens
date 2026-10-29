@@ -312,3 +312,26 @@
   .rs-duration { margin-top: 12px; }
   .rs-plan-panel .rs-scenario-grid { gap: 16px; }
 }
+
+/* Phone polish: expose assumptions and put more of the projection in view. */
+.rs-rate-entry { display: flex; align-items: center; gap: 6px; margin-left: auto; color: var(--rs-gold); font-weight: 600; }
+.repeat-sales .rs-rate-entry input { width: 5rem; min-height: 48px; padding: 8px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--rs-panel); color: var(--rs-gold); text-align: center; font-variant-numeric: tabular-nums; }
+.rs-result-assumption { margin: 0 0 8px; color: var(--rs-ink); font-size: var(--text-small); font-weight: 500; }
+@media (max-width: 767px) {
+  .rs-intro { margin-bottom: 8px; }
+  .rs-step-select { margin-bottom: 8px; }
+  .rs-view-switch { margin-bottom: 12px; }
+  .rs-result { padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .rs-result-top { min-height: 28px; }
+  .rs-result-top h2 { font-size: var(--text-body); }
+  .rs-revenue-label { margin-top: 8px; }
+  .rs-result .rs-revenue { font-size: 2.5rem; margin-bottom: 8px; }
+  .rs-chart-heading { margin-top: 12px; padding-top: 8px; }
+  .rs-chart-heading h3 { font-size: var(--text-body); }
+  .rs-chart-plot { height: 190px; }
+  .rs-duration { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .rs-duration label { flex: 1 1 6rem; }
+  .rs-duration select { flex: 1 1 9rem; width: auto; min-width: 0; }
+  .rs-repeat-control { padding-top: 12px; border-top: 1px solid var(--rs-line); }
+  .rs-reset { font-size: var(--text-small) !important; width: auto; }
+}

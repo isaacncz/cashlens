@@ -7,8 +7,8 @@ import { chromium } from 'playwright';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const currentWorker = readFileSync(resolve(dist, 'sw.js'), 'utf8');
-assert.ok(currentWorker.includes('cashlens-global-blue-v10'), 'Build the mobile redesign before testing its worker update');
-const oldWorker = currentWorker.replace('cashlens-global-blue-v10', 'cashlens-ink-blue-v9');
+assert.ok(currentWorker.includes('cashlens-compound-v11'), 'Build the mobile redesign before testing its worker update');
+const oldWorker = currentWorker.replace('cashlens-compound-v11', 'cashlens-global-blue-v10');
 const manifest = JSON.parse(readFileSync(resolve(dist, 'manifest.webmanifest'), 'utf8'));
 let previousVersion = true;
 const mime = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };
@@ -50,8 +50,8 @@ try {
   const readManifest = () => page.evaluate(async () => (await fetch('./manifest.webmanifest')).json());
   const readMarker = () => page.evaluate(async () => (await fetch('./mobile-update-marker.txt')).text());
   assert.equal(await readMarker(), 'previous Pocket Coach');
-  await page.waitForFunction(async () => (await caches.open('cashlens-ink-blue-v9')).match('./mobile-update-marker.txt'));
-  assert.ok((await page.evaluate(() => caches.keys())).includes('cashlens-ink-blue-v9'));
+  await page.waitForFunction(async () => (await caches.open('cashlens-global-blue-v10')).match('./mobile-update-marker.txt'));
+  assert.ok((await page.evaluate(() => caches.keys())).includes('cashlens-global-blue-v10'));
 
   previousVersion = false;
   await page.evaluate(async () => {
@@ -65,8 +65,8 @@ try {
   assert.equal(updated.theme_color, '#f7f9fc');
   assert.equal(updated.background_color, '#f7f9fc');
   const cacheNames = await page.evaluate(() => caches.keys());
-  assert.ok(cacheNames.includes('cashlens-global-blue-v10'));
-  assert.ok(!cacheNames.includes('cashlens-ink-blue-v9'), 'Updating the worker clears the previous design cache');
+  assert.ok(cacheNames.includes('cashlens-compound-v11'));
+  assert.ok(!cacheNames.includes('cashlens-global-blue-v10'), 'Updating the worker clears the previous design cache');
   assert.equal(await readMarker(), 'mobile Pocket Coach', 'Previously cached resources are refreshed after activation');
 
   await page.reload({ waitUntil: 'networkidle' });
