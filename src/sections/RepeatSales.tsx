@@ -1,12 +1,13 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { ArrowRight, ChevronDown, Plus, RotateCcw, ShoppingBasket, UserRound, X } from 'lucide-react';
+import { ArrowRight, ChevronDown, Plus, RotateCcw, ShoppingBasket, UserRound } from 'lucide-react';
 import { repeatSalesProducts } from '../data/repeatSalesProducts';
 import { durationLabel, formatRinggit, DEFAULT_REPEAT_RATE, MAX_CUSTOMERS, MAX_MONTHS, projectRepeatSales, PURCHASE_INTERVALS } from '../lib/repeatSales';
 import type { PurchaseModel } from '../lib/repeatSales';
 import { scrollToContent } from '../lib/pageNavigation';
 import ProductPicker from './ProductPicker';
 import './RepeatSales.css';
+import './CompoundFlow.css';
 
 const FIRST_PRODUCT_ID = '124106';
 const presets = [1, 12, 24, 60, 120, 300, 600];
@@ -20,7 +21,9 @@ const RevenueChart = lazy(() => import('./RevenueChart'));
 
 export default function RepeatSales() {
   const [step, setStep] = useState(0);
-  const [mobileView, setMobileView] = useState<'plan' | 'results'>('results');
+  const [mobileView, setMobileView] = useState<'products' | 'settings' | 'results'>('results');
+  const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
+  const [collapsedDesktopProducts, setCollapsedDesktopProducts] = useState<string[]>([]);
   const [isPhone, setIsPhone] = useState(() => window.matchMedia('(max-width: 767px)').matches);
   const [firstId, setFirstId] = useState(FIRST_PRODUCT_ID);
   const [selectedIds, setSelectedIds] = useState<string[]>([FIRST_PRODUCT_ID]);
@@ -75,12 +78,12 @@ export default function RepeatSales() {
     media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
   }, []);
-  const goToStep = (value: number, focusHeading = true) => { focusStepHeading.current = focusHeading; setMobileView(value === 2 ? 'plan' : 'results'); setStep(value); };
-  const showView = (value: 'plan' | 'results') => {
+  const goToStep = (value: number, focusHeading = true) => { focusStepHeading.current = focusHeading; setMobileView(value === 2 ? 'products' : 'results'); setStep(value); };
+  const showView = (value: 'products' | 'settings' | 'results') => {
     setMobileView(value);
     requestAnimationFrame(() => {
       document.getElementById('main-content')?.scrollTo({ top: 0, behavior: 'instant' });
-      document.getElementById(value === 'plan' ? 'rs-plan-panel' : 'rs-projection')?.focus({ preventScroll: true });
+      document.getElementById(value === 'products' ? 'rs-plan-panel' : value === 'settings' ? 'rs-settings-panel' : 'rs-projection')?.focus({ preventScroll: true });
     });
   };
   const openPicker = (mode: 'first' | 'add') => { setPickerMode(mode); setPickerOpen(true); };
@@ -141,34 +144,41 @@ export default function RepeatSales() {
         <div className="rs-one-customer"><UserRound size={20} aria-hidden="true" /><span>1 customer buys 1 item</span></div>
       </div>
       <div className="rs-first-receipt"><h2>Your first sale</h2><p className="rs-revenue" aria-live="polite" aria-atomic="true"><span>RM </span>{formatRinggit(projection.total)}</p><p className="rs-muted">Malaysia ABO price · before costs</p><dl className="rs-first-facts"><div><dt>Product quantity</dt><dd>1 item</dd></div><div><dt>Customer</dt><dd>1 person</dd></div><div><dt>Price source</dt><dd>Apr 2026 · ABO</dd></div></dl></div>
-      <div className="rs-sale-next"><p className="rs-sale-question">What if this customer comes back?<span>Next, explore a year of repeat sales.</span></p><button type="button" className="primary-button rs-desktop-next" onClick={advance}>{nextLabel}<ArrowRight size={18} aria-hidden="true" /></button></div>
+      <div className="rs-sale-next"><button type="button" className="rs-build-plan" onClick={() => { goToStep(3); setMobileView('products'); openPicker('add'); }}>Build my product plan<ArrowRight size={18} aria-hidden="true" /></button><p className="rs-sale-question">What if this customer comes back?<span>Next, explore a year of repeat sales.</span></p><button type="button" className="primary-button rs-desktop-next" onClick={advance}>{nextLabel}<ArrowRight size={18} aria-hidden="true" /></button></div>
     </div> : <>
-      <div className="rs-view-switch" role="group" aria-label="Consultation view"><button type="button" aria-controls="rs-plan-panel" aria-pressed={mobileView === 'plan'} onClick={() => showView('plan')}>Edit plan</button><button type="button" aria-controls="rs-projection" aria-pressed={mobileView === 'results'} onClick={() => showView('results')}>Results</button></div>
+      <div className="rs-view-switch rs-section-switch" role="group" aria-label="Consultation view"><button type="button" aria-controls="rs-plan-panel" aria-pressed={mobileView === 'products'} onClick={() => showView('products')}>Products <span aria-hidden="true">{products.length}</span></button><button type="button" aria-controls="rs-settings-panel" aria-pressed={mobileView === 'settings'} onClick={() => showView('settings')}>Settings</button><button type="button" aria-controls="rs-projection" aria-pressed={mobileView === 'results'} onClick={() => showView('results')}>Results</button></div>
       <div className="rs-workspace">
-      <div id="rs-plan-panel" className="rs-plan-panel" role="region" aria-label="Edit revenue plan" tabIndex={-1} hidden={isPhone && mobileView !== 'plan'}>
-      {step === 3 && scenarioControls}
+      <div className="rs-editor">
+      <div id="rs-plan-panel" className="rs-plan-panel" role="region" aria-label="Products in your plan" tabIndex={-1} hidden={isPhone && mobileView !== 'products'}>
       <div className="rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
         <div className="rs-basket-heading"><div><h2>{step === 1 ? 'Your one product' : 'Your products'}</h2><p className="rs-muted">Malaysia ABO prices · Apr 2026</p></div>{step === 1 && <button type="button" className="rs-text-button" onClick={() => openPicker('first')}>Change</button>}</div>
         {step >= 2 && <button type="button" ref={addButtonRef} className="rs-add-products" onClick={() => openPicker('add')}><Plus size={18} aria-hidden="true" />Add products</button>}
         <div className="rs-plan">
           {introductions.map(({ year, count }) => <div className="rs-plan-year" key={year}><h3 className="rs-year-heading">Year {year}<span>{count} {count === 1 ? 'product' : 'products'}{year > 1 ? ' added' : ''}</span></h3>
-            {products.filter(product => product.startYear === year).map(product => <article className="rs-plan-product" key={product.id}>
-              <div className="rs-plan-product-heading"><h4>{product.name}</h4>{step >= 2 && <button className="rs-icon-button" type="button" aria-label={`Remove ${product.name}, ${product.size}`} onClick={() => removeProduct(product.id)}><X size={18} aria-hidden="true" /></button>}</div>
-              <div className="rs-plan-product-meta"><span>{product.size}</span><strong>RM {formatRinggit(product.aboPrice)}</strong></div>
-              {showSource && <p className="rs-muted">SKU {product.id} · source p.{product.page}</p>}
+            {products.filter(product => product.startYear === year).map(product => <details className="rs-compact-product" data-product-id={product.id} key={product.id} open={isPhone ? expandedProduct === product.id : !collapsedDesktopProducts.includes(product.id)}>
+              <summary onClick={event => { event.preventDefault(); if (isPhone) setExpandedProduct(previous => previous === product.id ? null : product.id); else setCollapsedDesktopProducts(previous => previous.includes(product.id) ? previous.filter(id => id !== product.id) : [...previous, product.id]); }}>
+                <span className="rs-compact-name">{product.name}<small>{product.size} · {cycleLabel(product.every)}</small></span><span className="rs-compact-price">RM {formatRinggit(product.aboPrice)}<small>ABO / pack</small></span><ChevronDown size={18} aria-hidden="true" />
+              </summary>
+              <div className="rs-compact-controls">
               <div className={`rs-product-controls${step === 1 ? ' rs-single-control' : ''}`}>
-                {step >= 2 && <label>Start year{product.id === firstId ? <span className="rs-fixed-year">Year 1</span> : <select id={`rs-start-${product.id}`} aria-label={`Start year for ${product.name}, ${product.size}`} value={product.startYear} onChange={event => changeStartYear(product.id, Number(event.target.value))}>{startYears.map(year => <option key={year} value={year}>Year {year}</option>)}</select>}</label>}
+                {step >= 2 && <label>Starts buying{product.id === firstId ? <span className="rs-fixed-year">Year 1</span> : <select id={`rs-start-${product.id}`} aria-label={`Start year for ${product.name}, ${product.size}`} value={product.startYear} onChange={event => changeStartYear(product.id, Number(event.target.value))}>{startYears.map(year => <option key={year} value={year}>Year {year}</option>)}</select>}</label>}
                 <label>Buy again<select aria-label={`Purchase interval for ${product.name}, ${product.size}`} value={product.every} onChange={event => { setIntervals(previous => ({ ...previous, [product.id]: Number(event.target.value) })); setActivity({ id: product.id, kind: 'updated' }); }}>{PURCHASE_INTERVALS.map(interval => <option key={interval} value={interval}>{cycleLabel(interval)}</option>)}</select></label>
               </div>
               {product.type === 'filter' && product.every > 0 && <p className="rs-muted rs-filter-note">First replacement after {durationLabel(product.every)}.</p>}
-            </article>)}
+              {showSource && <p className="rs-muted">SKU {product.id} · source p.{product.page}</p>}
+              {step >= 2 && <button className="rs-text-button" type="button" aria-label={`Remove product: ${product.name}, ${product.size}`} onClick={() => removeProduct(product.id)}>Remove product</button>}
+              </div>
+            </details>)}
           </div>)}
           {!products.length && <div className="rs-no-results"><ShoppingBasket size={24} aria-hidden="true" /><p>Your basket is empty.</p><button type="button" className="rs-text-button" onClick={() => openPicker('add')}>Add a product</button></div>}
         </div>
         {step >= 2 && <><div className="rs-basket-value"><span>Year 1 first order / customer</span><strong>RM {formatRinggit(firstOrder)}</strong></div><div className="rs-basket-footer"><span>{selected.length} in your plan</span><button className="rs-text-button" type="button" disabled={!selected.length} onClick={() => { setSelectedIds([]); setActivity(null); }}>Clear basket</button></div></>}
       </div>
-      {step < 3 && scenarioControls}
+      </div>
+      <div id="rs-settings-panel" className="rs-plan-panel rs-settings-panel" role="region" aria-label="Plan settings" tabIndex={-1} hidden={isPhone && mobileView !== 'settings'}>
+      {scenarioControls}
       {assumptions}
+      </div>
       </div>
       <div className="rs-result" hidden={isPhone && mobileView !== 'results'} id="rs-projection" ref={projectionRef} tabIndex={-1} aria-label="Revenue projection">
         <div className="rs-result-top"><h2>Revenue over {durationLabel(horizon)}</h2></div>
@@ -186,7 +196,7 @@ export default function RepeatSales() {
 
       </div>
     </div></>}
-    <div className="rs-mobile-summary" data-view={mobileView}><div className="rs-mobile-summary-copy"><span>{step === 0 ? '1 item · 1 customer' : `${products.length} ${products.length === 1 ? 'product' : 'products'} · ${durationLabel(horizon)}`}</span><p><span>RM </span>{formatRinggit(projection.total)}</p><span>{step === 0 ? 'First sale · before costs' : 'Revenue before costs'}</span></div><button type="button" onClick={() => step === 0 ? advance() : mobileView === 'plan' ? showView('results') : step < 3 ? advance() : showView('plan')}><span>{step === 0 ? nextLabel : mobileView === 'plan' ? 'View results' : step < 3 ? nextLabel : 'Edit plan'}</span><ArrowRight size={18} aria-hidden="true" /></button></div>
-    <ProductPicker open={pickerOpen} mode={pickerMode} catalog={catalog} selectedIds={selectedIds} firstId={firstId} total={pickerMode === 'first' ? firstProduct.aboPrice : projection.total} months={horizon} showSource={showSource} onClose={() => { setPickerOpen(false); if (pickerMode === 'add') setMobileView('results'); }} onToggle={toggleProduct} onChooseFirst={chooseFirst} />
+    <div className="rs-mobile-summary" data-view={mobileView}><div className="rs-mobile-summary-copy"><span>{step === 0 ? '1 item · 1 customer' : `${products.length} ${products.length === 1 ? 'product' : 'products'} · ${durationLabel(horizon)}`}</span><p><span>RM </span>{formatRinggit(projection.total)}</p><span>{step === 0 ? 'First sale · before costs' : 'Revenue before costs'}</span></div><button type="button" onClick={() => step === 0 ? advance() : mobileView !== 'results' ? showView('results') : step < 3 ? advance() : showView('products')}><span>{step === 0 ? nextLabel : mobileView !== 'results' ? 'View results' : step < 3 ? nextLabel : 'Edit plan'}</span><ArrowRight size={18} aria-hidden="true" /></button></div>
+    <ProductPicker open={pickerOpen} mode={pickerMode} catalog={catalog} selectedIds={selectedIds} firstId={firstId} total={pickerMode === 'first' ? firstProduct.aboPrice : projection.total} months={horizon} showSource={showSource} onClose={() => { setPickerOpen(false); if (pickerMode === 'add') { setExpandedProduct(null); setMobileView(isPhone ? 'products' : 'results'); if (isPhone) requestAnimationFrame(() => document.getElementById('rs-plan-panel')?.focus({ preventScroll: true })); } }} onToggle={toggleProduct} onChooseFirst={chooseFirst} />
   </section>;
 }

@@ -6,7 +6,7 @@ THESIS: Make a first-time learner’s next money decision feel approachable, wit
 
 OWN-WORLD: A personal field guide and community learning space. Warm ivory supports quiet reading; deep forest contains the next useful task; sage highlights its action; a sand-toned guide points to three learning paths. Inter, flat tonal surfaces, monetary alignment and restrained boundaries carry the world across screens.
 
-STORY: Home asks what the user wants to understand and opens Money Mirror, breathing room, repeat sales, or all lessons directly. Learn uses one native path selector and short grouped lesson rows, with a session-only Continue link. Lesson entry puts the actual tool before optional examples and path navigation. On phones, a clear back header replaces the destination bar inside tools; result actions follow form fields. Compound uses a native four-stage selector and separate Edit plan / Results views on phones, while desktop keeps both visible. Scenario controls precede products in the long-term editor. One action bar switches between editing, results and the next stage. All nine lessons and financial behavior remain available.
+STORY: Home asks what the user wants to understand and opens Money Mirror, breathing room, repeat sales, or all lessons directly. Learn uses one native path selector and short grouped lesson rows, with a session-only Continue link. Lesson entry puts the actual tool before optional examples and path navigation. On phones, a clear back header replaces the destination bar inside tools; result actions follow form fields. Compound uses a native four-stage selector and separate Products / Settings / Results views on phones, while desktop keeps both visible. Scenario controls precede products in the long-term editor. One action bar switches between editing, results and the next stage. All nine lessons and financial behavior remain available.
 
 FIRST VIEWPORT: At 375px, a 56px header and 72px destination navigation frame the Home launcher. Its useful heading uses 24px, with one compact forest cashflow task and two plain secondary tool rows; the lesson browser link follows directly. Money Mirror opens with salary entry in view; a back header replaces the bottom destination bar, and its submit action stays after inputs. Compound reserves only its 76px action bar below the content. The first-sale amount and qualification lead into the next action. Later stages show either editable assumptions/products or the amount/chart, with a native stage selector and two clear view controls. Desktop keeps its 232px sidebar, shared palette and simultaneous editor/results composition.
 
@@ -30,3 +30,8 @@ The user subsequently authorized app-wide Ink Blue. Its shared light/dark tokens
 
 
 Compound mobile follow-up: default repeat purchases are now 100%; the editor supports direct percentage entry and Results exposes the active assumption. A flatter result panel and compact spacing show the full chart on a standard phone. All stage, product and advanced planning controls remain available.
+
+
+## Compound product workflow
+
+The approved follow-up replaces the crowded catalog and combined editor with a compact full-height catalog and phone Products / Settings / Results sections. Selected products have expandable timing controls; Done returns to Products. Build my product plan opens the full planner directly. Preserve the guided examples, all product/model controls, Ink Blue, 100% default and accessible mobile/desktop behavior.

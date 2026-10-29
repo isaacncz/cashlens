@@ -24,7 +24,9 @@ try {
     const main = page.locator('#main-content');
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
     const views = page.getByRole('group', { name: 'Consultation view' });
-    const edit = () => views.getByRole('button', { name: 'Edit plan', exact: true }).click();
+    const edit = () => views.getByRole('button', { name: 'Products', exact: true }).click();
+    const settings = () => views.getByRole('button', { name: 'Settings', exact: true }).click();
+    const expandProduct = async name => { const summary = page.locator('details.rs-compact-product > summary').filter({ hasText: name.split(', ')[0] }); if (!await summary.evaluate(element => element.parentElement.open)) await summary.click(); };
     const results = () => views.getByRole('button', { name: 'Results', exact: true }).click();
     const layout = async () => {
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Document fits: ${label}`);
@@ -97,23 +99,49 @@ try {
     const dock = page.locator('.rs-mobile-summary');
     assert.ok(await dock.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Action bar reflows: ${label}`);
     if (height >= 740 && textSize === 16) assert.ok(await inScrollport(page.locator('.rs-first-receipt')), 'The first-sale amount is visible on arrival');
+    if (width === 375 && textSize === 16) {
+      await page.getByRole('button', { name: 'Build my product plan', exact: true }).click();
+      const directPicker = page.getByRole('dialog');
+      await directPicker.waitFor();
+      assert.equal(await directPicker.locator('.rs-product').count(), 28, 'Direct plan opens the full catalog');
+      const catalogBox = await directPicker.getByRole('region', { name: 'Product catalog' }).boundingBox();
+      let completeRows = 0;
+      for (const row of await directPicker.locator('.rs-product').all()) {
+        const box = await row.boundingBox();
+        if (box.y >= catalogBox.y && box.y + box.height <= catalogBox.y + catalogBox.height) completeRows++;
+      }
+      assert.ok(completeRows >= 8, 'Eight complete catalog rows fit at 375px');
+      await directPicker.getByRole('button', { name: 'Selected (1)', exact: true }).click();
+      assert.equal(await directPicker.locator('.rs-product').count(), 1, 'Selected filter shows the current selection');
+      await directPicker.getByRole('button', { name: 'All products', exact: true }).click();
+      await directPicker.getByRole('checkbox', { name: 'Select Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true }).check();
+      await directPicker.getByRole('button', { name: 'Selected (2)', exact: true }).click();
+      assert.equal(await directPicker.locator('.rs-product').count(), 2);
+      await directPicker.getByRole('button', { name: 'Done', exact: true }).click();
+      assert.equal(await page.locator('#rs-step').inputValue(), '3', 'Direct plan opens the full planner');
+      assert.ok(await page.locator('#rs-plan-panel').isVisible());
+      await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    }
     await page.getByRole('button', { name: 'See repeat sales', exact: true }).click();
     await page.locator('.rs-result').waitFor();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 118.00');
     assert.equal(await page.locator('#rs-plan-panel').isVisible(), false);
-    await edit();
+    await settings();
     assert.equal(await page.locator('.rs-result').isVisible(), false);
     const rateInput = page.getByRole('spinbutton', { name: 'Repeat purchase rate percent', exact: true });
     assert.equal(await rateInput.inputValue(), '100', 'Repeat purchases start at 100%');
     await rateInput.fill('50');
     await page.getByRole('button', { name: 'View results', exact: true }).click();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 73.75', 'Exact percentage entry updates the projection');
-    await edit();
+    await settings();
     await rateInput.fill('100');
+    await edit();
+    await expandProduct('Glister Multi-Action Toothpaste, 200g');
     await page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true }).selectOption('1');
     await page.getByRole('button', { name: 'View results', exact: true }).click();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 354.00', 'One action shows the result of an edited plan');
     await edit();
+    await expandProduct('Glister Multi-Action Toothpaste, 200g');
     await page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true }).selectOption('3');
     await results();
     await page.getByRole('button', { name: 'Add products in year 2', exact: true }).click();
@@ -127,12 +155,15 @@ try {
     await picker.getByRole('button', { name: 'Done', exact: true }).click();
     await picker.waitFor({ state: 'hidden' });
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 712.00');
-    assert.ok(await page.locator('.rs-result').isVisible(), 'Closing product selection shows the updated result');
+    assert.ok(await page.locator('#rs-plan-panel').isVisible(), 'Closing product selection lets people review their selected products');
+    assert.equal(await page.locator('#rs-plan-panel').evaluate(element => element === document.activeElement), true, 'Selection returns focus to the product list');
+    assert.equal(await page.locator('details.rs-compact-product[open]').count(), 0, 'Product controls remain collapsed until requested');
+    await results();
     await page.getByLabel('Step 3 of 4', { exact: true }).focus();
     await page.getByLabel('Step 3 of 4', { exact: true }).selectOption('3');
     assert.equal(await page.locator('#rs-step').evaluate(element => element === document.activeElement), true, 'Changing consultation stages preserves selector focus');
-    await edit();
-    if (height >= 812 && textSize === 16) assert.ok(await inScrollport(page.locator('#rs-customers')), 'Long-term customer input appears before the product list and chart');
+    await settings();
+    if (height >= 812 && textSize === 16) assert.ok(await inScrollport(page.locator('#rs-customers')), 'Customer input is immediately accessible in its own settings section');
     await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('12');
     await page.locator('#rs-customers').fill('2');
     await page.locator('#rs-customers').blur();

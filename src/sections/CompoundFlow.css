@@ -1,0 +1,37 @@
+/* Products, assumptions and outcomes have distinct places on phones. */
+.repeat-sales .rs-editor { min-width: 0; }
+.repeat-sales .rs-settings-panel { margin-top: 24px; }
+.repeat-sales .rs-compact-product { margin: 0; border: 0; border-top: 1px solid var(--rs-line); border-radius: 0; background: transparent; }
+.repeat-sales .rs-compact-product > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto 18px; align-items: center; gap: 10px; min-height: 72px; padding: 12px 0; list-style: none; cursor: pointer; }
+.repeat-sales .rs-compact-product > summary::-webkit-details-marker { display: none; }
+.repeat-sales .rs-compact-name { font-size: var(--text-body); font-weight: 500; line-height: 1.4; min-width: 0; }
+.repeat-sales .rs-compact-product small { display: block; margin-top: 4px; color: var(--rs-muted); font-size: var(--text-small); font-weight: 400; line-height: 1.4; }
+.repeat-sales .rs-compact-price { color: var(--rs-ink); font-size: var(--text-small); font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.repeat-sales .rs-compact-controls { padding: 0 0 12px; }
+.repeat-sales .rs-compact-controls .rs-product-controls { margin-top: 0; }
+.repeat-sales .rs-compact-product[open] > summary > svg { transform: rotate(180deg); }
+@media (max-width: 767px) {
+  .repeat-sales .rs-section-switch { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .repeat-sales .rs-section-switch button { display: flex; align-items: center; justify-content: center; gap: 4px; padding-inline: 4px; font-size: var(--text-small); }
+  .repeat-sales .rs-section-switch button span { font-size: var(--text-caption); }
+  .repeat-sales .rs-settings-panel { margin-top: 0; }
+  .repeat-sales .rs-basket { padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .repeat-sales .rs-basket-heading { margin-bottom: 12px; }
+  .repeat-sales .rs-basket-heading h2 { font-size: var(--text-body); }
+  .repeat-sales .rs-basket-heading p { font-size: var(--text-small); }
+  .repeat-sales .rs-add-products { margin-bottom: 16px; }
+  .repeat-sales .rs-compact-product > summary { padding-block: 10px; }
+  .repeat-sales .rs-plan-year + .rs-plan-year { margin-top: 16px; }
+  .repeat-sales .rs-basket-value { margin-top: 12px; padding-top: 12px; flex-wrap: wrap; }
+  .repeat-sales .rs-basket-footer { margin-top: 8px; }
+}
+@media (max-width: 359px) {
+  .repeat-sales .rs-compact-product > summary { grid-template-columns: minmax(0, 1fr) 18px; }
+  .repeat-sales .rs-compact-price { grid-column: 1; grid-row: 2; text-align: left; display: flex; gap: 8px; align-items: baseline; }
+  .repeat-sales .rs-compact-price small { margin: 0; }
+  .repeat-sales .rs-compact-product > summary > svg { grid-column: 2; grid-row: 1 / 3; }
+}
+
+.rs-build-plan { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 48px; padding: 12px; margin-top: 16px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--ledger-raised); color: var(--rs-gold); font-weight: 600; }
+
+@media (max-width: 767px) { .repeat-sales .rs-editor { display: contents; } }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cashlens-clarify-v12';
+const CACHE_NAME = 'cashlens-compound-flow-v13';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

@@ -24,7 +24,9 @@ try {
       assert.ok(await page.locator('#main-content').evaluate(element => element.scrollWidth <= element.clientWidth + 1), `No content overflow at ${width}px: ${page.url()}`);
     };
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
-    const editPlan = async () => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: 'Edit plan', exact: true }).click(); };
+    const editPlan = async () => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: 'Products', exact: true }).click(); };
+    const settings = async () => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: 'Settings', exact: true }).click(); };
+    const expandProduct = async name => { if (width < 768) { const summary = page.locator('details.rs-compact-product > summary').filter({ hasText: name.split(', ')[0] }); if (!await summary.evaluate(element => element.parentElement.open)) await summary.click(); } };
     const results = async () => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: 'Results', exact: true }).click(); };
     const open = async name => {
       if (!await nav.isVisible()) await page.locator('.workspace-header a').click();
@@ -137,11 +139,12 @@ try {
     await page.getByRole('button', { name: 'See repeat sales', exact: true }).click();
     await page.locator('.rs-chart').waitFor();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 118.00');
-    assert.equal(await page.locator('.rs-plan-product').count(), 1);
+    assert.equal(await page.locator('details.rs-compact-product').count(), 1);
     assert.equal(await page.locator('.rs-chart [data-series="total"]').count(), 1);
     assert.equal(await page.locator('.rs-chart [data-category]').count(), 0, 'Total revenue is the default chart');
     await editPlan();
     const toothpasteCycle = page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true });
+    await expandProduct('Glister Multi-Action Toothpaste, 200g');
     await toothpasteCycle.selectOption('1');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 354.00');
     await toothpasteCycle.selectOption('3');
@@ -149,7 +152,7 @@ try {
     await page.getByRole('button', { name: 'Add products in year 2', exact: true }).click();
     await picker.waitFor();
     assert.equal(await picker.locator('.rs-product').count(), 28);
-    assert.equal(await picker.locator('.rs-product-price strong').first().innerText(), 'RM 9.50');
+    assert.equal(await picker.locator('.rs-product-price').first().innerText(), 'RM 9.50');
     await page.keyboard.press('Shift+Tab');
     assert.ok(await picker.evaluate(element => element.contains(document.activeElement)), 'Native picker contains keyboard focus');
     await page.keyboard.press('Escape');
@@ -161,23 +164,24 @@ try {
     await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
     await page.getByRole('checkbox', { name: 'Select Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true }).check();
     await page.getByRole('checkbox', { name: 'Select Satinique Smooth Moisture Shampoo, 280ml', exact: true }).check();
-    assert.ok((await picker.locator('.rs-picker-footer').innerText()).includes('RM 712.00'));
+    assert.ok((await picker.locator('.rs-picker-footer').innerText()).includes('3 products selected'));
     await picker.getByRole('button', { name: 'Done', exact: true }).click();
     await picker.waitFor({ state: 'hidden' });
-    assert.equal(await page.locator('.rs-plan-product').count(), 3);
+    assert.equal(await page.locator('details.rs-compact-product').count(), 3);
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 712.00');
     assert.ok((await page.locator('.rs-context').innerText()).includes('1 customer'));
     assert.equal(await page.locator('.rs-basket-value strong').innerText(), 'RM 29.50');
     await editPlan();
     const shampooYear = page.getByRole('combobox', { name: 'Start year for Satinique Smooth Moisture Shampoo, 280ml', exact: true });
     const dishYear = page.getByRole('combobox', { name: 'Start year for Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true });
+    await expandProduct('Satinique Smooth Moisture Shampoo, 280ml');
     await shampooYear.selectOption('3');
     await page.waitForFunction(() => document.activeElement.id === 'rs-start-126449');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 376.00', 'A year-3 product cannot affect year-2 revenue');
     await shampooYear.selectOption('2');
     await results();
     await page.getByRole('button', { name: 'Explore long term', exact: true }).click();
-    await editPlan();
+    await settings();
     await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('600');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 29,224.00');
     const growth = page.getByRole('checkbox', { name: 'Add customers each year', exact: true });
@@ -206,8 +210,11 @@ try {
     assert.equal(await page.locator('.rs-chart-reading').innerText(), '1 year · RM 118.00');
     // Restoring all start years to 1 preserves the original calculator's reference totals.
     await editPlan();
+    await expandProduct('Satinique Smooth Moisture Shampoo, 280ml');
     await shampooYear.selectOption('1');
+    await expandProduct('Dish Drops Concentrated Dishwashing Liquid, 1L');
     await dishYear.selectOption('1');
+    await settings();
     await growth.check();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 481,140.00');
     await page.locator('#rs-customers').fill('100');
@@ -224,6 +231,7 @@ try {
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 175,790.00');
     await page.getByRole('radio', { name: 'Repeat purchases', exact: true }).check();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 175,790.00');
+    await editPlan();
     await page.getByRole('button', { name: 'Clear basket', exact: true }).click();
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 0.00');
     assert.ok(await page.getByText('Your basket is empty.', { exact: true }).isVisible());

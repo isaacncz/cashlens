@@ -27,3 +27,5 @@ Compound opens as a consultation: one toothpaste (ABO RM29.50), one customer, th
 Money Mirror uses the user-selected Quick Worksheet page direction (29 October 2026): an editorial cool-white/navy worksheet with Ink Blue highlights, four compact inputs and immediate live results. This page-specific replacement supersedes its previous Pocket Coach form styling while retaining the shared app navigation, themes, privacy and exact financial calculations.
 
 Ink Blue is now the app-wide color authority, including Home, all nine lessons, Learn, Settings, Compound, navigation, dialogs and browser/install chrome in both themes. Earlier Pocket Coach color commitments are superseded; its layouts and the selected Quick Worksheet layout remain. Positive financial outcomes retain semantic green.
+
+Compound now separates mobile Products, Settings and Results, uses a compact full-screen product catalog and lets users build a full product plan directly. Closing product selection returns to the selected list for review; timing controls are disclosed per product. Keep all existing financial/model capabilities available.
