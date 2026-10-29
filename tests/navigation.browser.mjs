@@ -12,6 +12,14 @@ try {
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     const checkLayout = async () => {
+      const dark = await page.locator('html').getAttribute('data-theme') === 'dark';
+      const ground = dark ? 'rgb(17, 30, 48)' : 'rgb(247, 249, 252)';
+      await page.waitForFunction(expected => getComputedStyle(document.querySelector('.site-header')).backgroundColor === expected, ground);
+      assert.equal(await page.locator('meta[name="theme-color"]').getAttribute('content'), dark ? '#111e30' : '#f7f9fc', 'Browser chrome follows the shared palette across routes');
+      if (width >= 1024) {
+        assert.equal(await page.locator('.app-navigation').evaluate(element => getComputedStyle(element).backgroundColor), ground, 'Desktop sidebar shares the page/header theme');
+      }
+
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `No document overflow at ${width}px`);
       assert.ok(await page.locator('#main-content').evaluate(element => element.scrollWidth <= element.clientWidth + 1), `No content overflow at ${width}px: ${page.url()}`);
     };

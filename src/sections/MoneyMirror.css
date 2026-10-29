@@ -1,30 +1,15 @@
-/* Quick Worksheet — user-selected Ink Blue, with matching light/dark roles. */
-#money-mirror, .app-shell:has(#main-content[data-route=money-mirror]) {
-  --mm-ground: #F7F9FC;
-  --mm-ink: #203754;
-  --mm-muted: #52647B;
-  --mm-line: #CCD6E3;
-  --mm-control: #73859C;
-  --mm-highlight: #255BC5;
-  --mm-on-highlight: #FFFFFF;
-  --mm-tint: #E7EEFC;
-  --mm-error: #AD303E;
+/* Quick Worksheet inherits the shared Ink Blue palette in both modes. */
+#money-mirror {
+  --mm-ground: var(--ledger-ground);
+  --mm-ink: var(--ledger-ink);
+  --mm-muted: var(--ledger-muted);
+  --mm-line: var(--ledger-line);
+  --mm-control: var(--ledger-control);
+  --mm-highlight: var(--ledger-accent);
+  --mm-on-highlight: var(--ledger-on-accent);
+  --mm-tint: var(--ledger-raised);
+  --mm-error: var(--ledger-negative);
 }
-:root[data-theme=dark] #money-mirror, :root[data-theme=dark] .app-shell:has(#main-content[data-route=money-mirror]) {
-  --mm-ground: #111E30;
-  --mm-ink: #EDF3FF;
-  --mm-muted: #B2C2D8;
-  --mm-line: #3D526E;
-  --mm-control: #869CBB;
-  --mm-highlight: #A5C2FF;
-  --mm-on-highlight: #142440;
-  --mm-tint: #243A5E;
-  --mm-error: #FFAEB8;
-}
-#main-content[data-route=money-mirror] { background: var(--mm-ground); }
-.app-shell:has(#main-content[data-route=money-mirror]) .site-header { background: var(--mm-ground); color: var(--mm-ink); border-color: var(--mm-line); }
-.app-shell:has(#main-content[data-route=money-mirror]) :is(.workspace-header, .site-brand) { color: var(--mm-ink); }
-.app-shell:has(#main-content[data-route=money-mirror]) .workspace-header a { color: var(--mm-highlight); }
 #money-mirror { max-width: 1100px; min-height: 100%; margin-inline: auto; padding: 24px 20px 32px; background: var(--mm-ground); color: var(--mm-ink); }
 #money-mirror .mm-page { max-width: 940px; margin-inline: auto; }
 #money-mirror .mm-intro { margin-bottom: 24px; }

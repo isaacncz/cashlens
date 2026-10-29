@@ -1,41 +1,41 @@
 ---
-name: CashflowLens.MY — Pocket Coach
+name: CashflowLens.MY — Ink Blue
 description: A welcoming field guide for the next small money decision.
 colors:
-  ground: rgb(247 244 235)
-  surface: rgb(255 254 249)
-  raised: rgb(233 238 227)
-  ink: rgb(35 58 47)
-  muted: rgb(89 100 84)
-  accent: rgb(39 92 72)
+  ground: '#F7F9FC'
+  surface: '#FFFFFF'
+  raised: '#E7EEFC'
+  ink: '#203754'
+  muted: '#52647B'
+  accent: '#255BC5'
   positive: rgb(35 106 71)
-  negative: rgb(171 48 48)
+  negative: '#AD303E'
   warning: rgb(142 95 33)
   info: rgb(52 94 123)
-  line: rgb(214 217 202)
-  control: rgb(116 133 113)
-  on-accent: '#fffef9'
-  coach-feature: '#275c48'
-  coach-on-feature: '#fffef9'
-  coach-feature-muted: '#dbe5d5'
-  coach-button: '#e7eddb'
-  coach-on-button: '#234532'
-  coach-guide: '#eee8d8'
-  dark-ground: rgb(18 28 23)
-  dark-surface: rgb(26 39 31)
-  dark-raised: rgb(36 53 42)
-  dark-ink: rgb(238 244 239)
-  dark-muted: rgb(182 201 187)
-  dark-accent: rgb(160 209 178)
+  line: '#CCD6E3'
+  control: '#73859C'
+  on-accent: '#FFFFFF'
+  coach-feature: '#203754'
+  coach-on-feature: '#FFFFFF'
+  coach-feature-muted: '#DCE8FA'
+  coach-button: '#E7EEFC'
+  coach-on-button: '#203754'
+  coach-guide: '#E7EEFC'
+  dark-ground: '#111E30'
+  dark-surface: '#192B44'
+  dark-raised: '#243A5E'
+  dark-ink: '#EDF3FF'
+  dark-muted: '#B2C2D8'
+  dark-accent: '#A5C2FF'
   dark-positive: rgb(142 218 171)
-  dark-negative: rgb(255 168 163)
+  dark-negative: '#FFAEB8'
   dark-warning: rgb(232 198 129)
   dark-info: rgb(154 203 232)
-  dark-line: rgb(61 82 68)
-  dark-control: rgb(123 151 131)
-  dark-on-accent: '#122018'
-  dark-coach-feature: '#244b39'
-  dark-coach-guide: '#303a2d'
+  dark-line: '#3D526E'
+  dark-control: '#869CBB'
+  dark-on-accent: '#142440'
+  dark-coach-feature: '#243A5E'
+  dark-coach-guide: '#243A5E'
 typography:
   display:
     fontFamily: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
@@ -91,7 +91,7 @@ typography:
     fontWeight: 400
     lineHeight: 1.6
 rounded:
-  control: 8px
+  control: '#73859C'
   panel: 16px
   legacy-base: 0.75rem
 spacing:
@@ -170,7 +170,7 @@ components:
     padding: 20px
 ---
 
-# Design System: CashflowLens.MY — Pocket Coach
+# Design System: CashflowLens.MY — Ink Blue
 
 ## Overview
 
@@ -352,3 +352,10 @@ Four inputs form a two-by-two worksheet, followed immediately by the live result
 Compact field labels use 14px; input values use 22px with at least 48px targets. Below 18rem of form width the grid stacks, including at enlarged text sizes. Monetary results can wrap. At 1000px viewport width the input worksheet and result use two columns. All actions are in document flow, including on tablets; Money Mirror reserves no extra fixed-action dock.
 
 Detailed deductions, time illustrations and the optional hours slider follow as disclosures. The receipt explicitly qualifies take-home as after work costs. All six calculation functions and the three example data sets are preserved; no new dependencies or persistent financial storage are introduced.
+
+
+## Global Ink Blue theme — current color authority
+
+The user authorized applying Ink Blue across the entire app after reviewing the worksheet-only scope. Global `--ledger-*`, `--site-*`, UI-library aliases and `--coach-*` light/dark roles in theme.css now own the palette. This supersedes earlier forest/sage/sand color descriptions above; component layouts and typography remain as documented. Home feature panels are navy, actions and selections use blue, and guide surfaces are pale blue. Green retains positive financial meaning; errors are red, warnings amber and category charts remain distinct.
+
+Money Mirror aliases these shared tokens and no longer overrides the route header or canvas separately. Sidebar, brand, lesson links, settings, Compound, dialogs, selection and carets inherit the same roles. Browser theme-color, install manifest and icons use Ink Blue. Preferences retain Light/Dark/Device and reduced motion. Cache global-blue-v10 upgrades existing installations.

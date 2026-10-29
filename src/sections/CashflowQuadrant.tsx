@@ -214,10 +214,10 @@ export default function CashflowQuadrant() {
                   </div>
                   <div className="relative">
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald/10 text-emerald border border-emerald/25" title="Income entering the system">Green = income in</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-crimson/10 text-crimson border border-crimson/25" title="Time and lifestyle drain">Red = deduction / time out</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: 'rgba(220,38,38,0.12)', color: TAX_OUT, borderColor: 'rgba(220,38,38,0.35)' }} title="Tax flow">Red = tax out</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gold/10 text-gold border border-gold/25" title="Locked or retained wealth">Gold = savings / net</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald/10 text-emerald border border-emerald/25" title="Income entering the system">Income in</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-crimson/10 text-crimson border border-crimson/25" title="Time and lifestyle drain">Deduction / time out</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: 'rgb(var(--ledger-negative-rgb) / .12)', color: TAX_OUT, borderColor: 'rgb(var(--ledger-negative-rgb) / .35)' }} title="Tax flow">Tax out</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gold/10 text-gold border border-gold/25" title="Locked or retained wealth">Savings / net</span>
                     </div>
                     <svg width="100%" height="260" viewBox="0 0 300 260">
                       {/* Income source */}

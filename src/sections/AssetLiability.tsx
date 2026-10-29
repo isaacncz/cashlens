@@ -114,7 +114,7 @@ export default function AssetLiability() {
   const getCardStyle = (item: DraggableItem) => {
     if (feedback?.id === item.id) {
       return feedback.correct
-        ? 'border-emerald shadow-[0_0_16px_rgba(16,185,129,0.4)]'
+        ? 'border-emerald shadow-[0_0_16px_rgb(var(--ledger-positive-rgb) / .4)]'
         : 'border-crimson shadow-[0_0_16px_rgb(var(--ledger-negative-rgb) / .4)] animate-shake';
     }
     return 'border-navy-light hover:border-gold/30';
@@ -261,7 +261,7 @@ export default function AssetLiability() {
 
           <div
             className="min-h-[280px] bg-navy-surface/50 border-2 border-crimson/40 rounded-2xl p-6 transition-all duration-300"
-            style={{ boxShadow: liabilities.length > 0 ? '0 0 30px rgba(220,38,38,0.15)' : 'none' }}
+            style={{ boxShadow: liabilities.length > 0 ? '0 0 30px rgb(var(--ledger-negative-rgb) / .15)' : 'none' }}
           >
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-crimson" />
