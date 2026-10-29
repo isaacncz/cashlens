@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cashlens-pocket-coach-v6';
+const CACHE_NAME = 'cashlens-pocket-coach-v7';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
