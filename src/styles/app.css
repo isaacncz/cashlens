@@ -130,6 +130,13 @@ input::placeholder, textarea::placeholder { color: var(--ledger-muted); opacity:
 .number-field > label { display: block; margin-bottom: 8px; color: var(--ledger-ink); font-size: var(--text-body); font-weight: 500; }
 .number-field input { display: block; width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--ledger-surface); color: var(--ledger-ink); font-size: var(--text-body); font-variant-numeric: tabular-nums; }
 .number-field input[aria-invalid=true] { border-color: var(--ledger-negative); }
+.number-input { display: flex; align-items: stretch; min-height: 52px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--ledger-surface); overflow: hidden; }
+.number-input:focus-within { border-color: var(--ledger-accent); box-shadow: inset 0 0 0 1px var(--ledger-accent); }
+.number-input[data-invalid=true] { border-color: var(--ledger-negative); box-shadow: inset 0 0 0 1px var(--ledger-negative); }
+.number-input > span { display: grid; place-items: center; flex-shrink: 0; padding: 0 12px; color: var(--ledger-muted); font-size: var(--text-small); font-weight: 500; }
+.number-input > span:first-child { background: var(--ledger-raised); }
+.number-field .number-input input { flex: 1; min-width: 0; min-height: 50px; padding: 0 14px; border: 0; border-radius: 0; background: transparent; text-align: right; }
+.number-field .number-input input:focus-visible { outline: none; }
 .field-hint { color: var(--ledger-muted); font-size: var(--text-body); margin-top: 8px; }
 .form-group-heading { margin: 24px 0 12px; font-size: var(--text-subtitle); font-weight: 550; }
 /* The scrollport ends above navigation and action docks, so controls cover no content. */

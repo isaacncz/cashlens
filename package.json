@@ -11,7 +11,8 @@
     "test:browser": "node tests/navigation.browser.mjs",
     "preview": "vite preview",
     "test:pwa": "node tests/pwa-update.browser.mjs",
-    "test:mobile": "node tests/mobile.browser.mjs"
+    "test:mobile": "node tests/mobile.browser.mjs",
+    "test:compound": "node tests/compound.browser.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

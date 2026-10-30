@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
+import { checkCompoundFlow } from './compound-flow.mjs';
 
 const baseUrl = process.env.CASHLENS_TEST_URL ?? 'http://localhost:3010/';
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
@@ -23,11 +24,6 @@ try {
     const label = `${width}×${height}, ${textSize}px text`;
     const main = page.locator('#main-content');
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
-    const views = page.getByRole('group', { name: 'Consultation view' });
-    const edit = () => views.getByRole('button', { name: 'Products', exact: true }).click();
-    const settings = () => views.getByRole('button', { name: 'Settings', exact: true }).click();
-    const expandProduct = async name => { const summary = page.locator('details.rs-compact-product > summary').filter({ hasText: name.split(', ')[0] }); if (!await summary.evaluate(element => element.parentElement.open)) await summary.click(); };
-    const results = () => views.getByRole('button', { name: 'Results', exact: true }).click();
     const layout = async () => {
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Document fits: ${label}`);
       assert.ok(await main.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Content reflows: ${label} ${page.url()}`);
@@ -54,7 +50,7 @@ try {
     await layout();
     if (textSize === 16 && width >= 375 && height >= 812) {
       for (const href of ['money-mirror', 'wealth-thermometer', 'compounding', 'learn']) {
-        assert.ok(await inScrollport(page.locator(`.dashboard a[href$="#${href}"]`)), `Every Home task is available without scrolling: ${label} ${href}`);
+        assert.ok(await inScrollport(page.locator(`.dashboard a[href$="#${href}"]`).first()), `Every Home task is available without scrolling: ${label} ${href}`);
       }
     }
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
@@ -89,94 +85,18 @@ try {
     assert.equal(await page.locator('#money-mirror-results').evaluate(element => element === document.activeElement), true);
     await layout();
     await page.getByRole('link', { name: 'Back to lessons', exact: true }).click();
-    await page.locator('.library-filter').waitFor();
+    await page.locator('.path-filter').waitFor();
     assert.equal(await page.locator('.lesson-list a').count(), 9);
-    await page.getByLabel('Learning path', { exact: true }).focus();
-    await page.getByLabel('Learning path', { exact: true }).selectOption('practice');
+    const pathFilter = page.getByRole('group', { name: 'Learning path', exact: true });
+    for (const chip of await pathFilter.getByRole('button').all()) assert.ok((await chip.boundingBox()).height >= 44, `Path filter touch target: ${label}`);
+    await pathFilter.getByRole('button', { name: 'Practice', exact: true }).click();
     assert.equal(await page.locator('.lesson-list a').count(), 3);
-    assert.equal(await page.locator('.library-heading [role=status]').innerText(), '3 lessons · Put it into practice');
-    assert.equal(await page.getByLabel('Learning path', { exact: true }).evaluate(element => element === document.activeElement), true);
-    await page.getByLabel('Learning path', { exact: true }).selectOption('all');
+    assert.equal(await page.locator('.library-status').innerText(), '3 lessons · Put it into practice');
+    assert.equal(await pathFilter.getByRole('button', { name: 'Practice', exact: true }).evaluate(element => element === document.activeElement), true);
+    await pathFilter.getByRole('button', { name: 'All', exact: true }).click();
     await layout();
     await nav.getByRole('link', { name: 'Compound', exact: true }).click();
-    await page.locator('.rs-first-receipt').waitFor();
-    assert.equal(await nav.isVisible(), false, 'Compound has one action bar instead of two bottom bars');
-    await layout();
-    const dock = page.locator('.rs-mobile-summary');
-    assert.ok(await dock.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Action bar reflows: ${label}`);
-    if (height >= 740 && textSize === 16) assert.ok(await inScrollport(page.locator('.rs-first-receipt')), 'The first-sale amount is visible on arrival');
-    if (width === 375 && textSize === 16) {
-      await page.getByRole('button', { name: 'Build my product plan', exact: true }).click();
-      const directPicker = page.getByRole('dialog');
-      await directPicker.waitFor();
-      assert.equal(await directPicker.locator('.rs-product').count(), 28, 'Direct plan opens the full catalog');
-      const catalogBox = await directPicker.getByRole('region', { name: 'Product catalog' }).boundingBox();
-      let completeRows = 0;
-      for (const row of await directPicker.locator('.rs-product').all()) {
-        const box = await row.boundingBox();
-        if (box.y >= catalogBox.y && box.y + box.height <= catalogBox.y + catalogBox.height) completeRows++;
-      }
-      assert.ok(completeRows >= 8, 'Eight complete catalog rows fit at 375px');
-      await directPicker.getByRole('button', { name: 'Selected (1)', exact: true }).click();
-      assert.equal(await directPicker.locator('.rs-product').count(), 1, 'Selected filter shows the current selection');
-      await directPicker.getByRole('button', { name: 'All products', exact: true }).click();
-      await directPicker.getByRole('checkbox', { name: 'Select Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true }).check();
-      await directPicker.getByRole('button', { name: 'Selected (2)', exact: true }).click();
-      assert.equal(await directPicker.locator('.rs-product').count(), 2);
-      await directPicker.getByRole('button', { name: 'Done', exact: true }).click();
-      assert.equal(await page.locator('#rs-step').inputValue(), '3', 'Direct plan opens the full planner');
-      assert.ok(await page.locator('#rs-plan-panel').isVisible());
-      await page.getByRole('button', { name: 'Reset', exact: true }).click();
-    }
-    await page.getByRole('button', { name: 'See repeat sales', exact: true }).click();
-    await page.locator('.rs-result').waitFor();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 118.00');
-    assert.equal(await page.locator('#rs-plan-panel').isVisible(), false);
-    await settings();
-    assert.equal(await page.locator('.rs-result').isVisible(), false);
-    const rateInput = page.getByRole('spinbutton', { name: 'Repeat purchase rate percent', exact: true });
-    assert.equal(await rateInput.inputValue(), '100', 'Repeat purchases start at 100%');
-    await rateInput.fill('50');
-    await page.getByRole('button', { name: 'View results', exact: true }).click();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 73.75', 'Exact percentage entry updates the projection');
-    await settings();
-    await rateInput.fill('100');
-    await edit();
-    await expandProduct('Glister Multi-Action Toothpaste, 200g');
-    await page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true }).selectOption('1');
-    await page.getByRole('button', { name: 'View results', exact: true }).click();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 354.00', 'One action shows the result of an edited plan');
-    await edit();
-    await expandProduct('Glister Multi-Action Toothpaste, 200g');
-    await page.getByRole('combobox', { name: 'Purchase interval for Glister Multi-Action Toothpaste, 200g', exact: true }).selectOption('3');
-    await results();
-    await page.getByRole('button', { name: 'Add products in year 2', exact: true }).click();
-    const picker = page.getByRole('dialog');
-    await picker.waitFor();
-    assert.ok(await picker.evaluate(element => element.scrollWidth <= element.clientWidth + 1), `Product sheet reflows: ${label}`);
-    await picker.getByRole('searchbox', { name: 'Find a product' }).fill('Dish Drops');
-    await picker.getByRole('checkbox', { name: 'Select Dish Drops Concentrated Dishwashing Liquid, 1L', exact: true }).check();
-    await picker.getByRole('searchbox', { name: 'Find a product' }).fill('Smooth Moisture');
-    await picker.getByRole('checkbox', { name: 'Select Satinique Smooth Moisture Shampoo, 280ml', exact: true }).check();
-    await picker.getByRole('button', { name: 'Done', exact: true }).click();
-    await picker.waitFor({ state: 'hidden' });
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 712.00');
-    assert.ok(await page.locator('#rs-plan-panel').isVisible(), 'Closing product selection lets people review their selected products');
-    assert.equal(await page.locator('#rs-plan-panel').evaluate(element => element === document.activeElement), true, 'Selection returns focus to the product list');
-    assert.equal(await page.locator('details.rs-compact-product[open]').count(), 0, 'Product controls remain collapsed until requested');
-    await results();
-    await page.getByLabel('Step 3 of 4', { exact: true }).focus();
-    await page.getByLabel('Step 3 of 4', { exact: true }).selectOption('3');
-    assert.equal(await page.locator('#rs-step').evaluate(element => element === document.activeElement), true, 'Changing consultation stages preserves selector focus');
-    await settings();
-    if (height >= 812 && textSize === 16) assert.ok(await inScrollport(page.locator('#rs-customers')), 'Customer input is immediately accessible in its own settings section');
-    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('12');
-    await page.locator('#rs-customers').fill('2');
-    await page.locator('#rs-customers').blur();
-    await page.getByRole('button', { name: 'View results', exact: true }).click();
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 236.00', 'Switching views retains scenario inputs and product scheduling');
-    const dockBox = await dock.boundingBox(), area = await main.boundingBox();
-    assert.ok(area.y + area.height <= dockBox.y + 1, `Action bar clearance: ${label}`);
+    await checkCompoundFlow(page, width);
     await layout();
     await page.getByRole('link', { name: 'Back to home', exact: true }).click();
     await page.locator('.dashboard').waitFor();

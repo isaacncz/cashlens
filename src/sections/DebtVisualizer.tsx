@@ -1,13 +1,18 @@
 import { formatMoney } from '../lib/currency';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 type QuadrantLevel = 0 | 1 | 2 | 3;
 
 const quadrantLabels = ['E — Employee', 'S — Self-employed', 'B — Business Owner', 'I — Investor'];
-const quadrantColors = ['var(--ledger-negative)', 'var(--ledger-muted)', 'var(--ledger-positive)', 'var(--ledger-accent)'];
+const quadrantMessages = [
+  'As an Employee, ALL debt crushes you. You have no asset income to cover the payments. A car loan is a chain, not a tool.',
+  'As Self-employed, you earn more but have no safety net. Debt is risky — one bad month and everything unravels.',
+  'As a Business Owner, debt becomes leverage. Your business income covers the loans, and the assets appreciate in your name.',
+  'As an Investor, debt AMPLIFIES your returns. An ASB loan at 5% earning 5.5% is free money working for you while you sleep.',
+];
 
 export default function DebtVisualizer() {
-  const sectionRef = useRef<HTMLDivElement>(null);
   const [sliderValue, setSliderValue] = useState<QuadrantLevel>(0);
 
 
@@ -24,293 +29,127 @@ export default function DebtVisualizer() {
       title: 'Cashflow test',
       badDebt: 'Fails',
       goodDebt: rentalSurplus > 0 ? 'Passes' : 'Borderline',
-      goodTone: rentalSurplus > 0 ? 'text-emerald' : 'text-gold',
+      goodTone: rentalSurplus > 0 ? 'tone-good' : 'tone-warn',
       helper: 'Does the debt put more money in than it takes out each month?',
     },
     {
       title: 'Asset backing',
       badDebt: 'Weak',
       goodDebt: 'Strong',
-      goodTone: 'text-emerald',
+      goodTone: 'tone-good',
       helper: 'Is there a cash-producing asset behind the loan?',
     },
     {
       title: 'Time freedom',
       badDebt: 'More work needed',
       goodDebt: sliderValue >= 2 ? 'Improves freedom' : 'Needs skill first',
-      goodTone: sliderValue >= 2 ? 'text-emerald' : 'text-gold',
+      goodTone: sliderValue >= 2 ? 'tone-good' : 'tone-warn',
       helper: 'Does this debt reduce dependence on your salary over time?',
     },
   ];
 
   return (
-    <section id="debt" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          Not All Debt{' '}
-          <span className="text-gold">Is Created Equal.</span>
-        </h1>
-        <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
-          Slide to see how the same debt crushes or amplifies, depending on your quadrant.
-        </p>
+    <section id="debt" className="lesson" aria-labelledby="debt-heading">
+      <header className="lesson-intro">
+        <h1 id="debt-heading">Not all debt is equal.</h1>
+        <p>Pick your quadrant. Watch the same two loans change direction.</p>
+      </header>
 
-        <div data-reveal className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-crimson/10 border border-crimson/30 rounded-2xl p-5">
-            <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-2">Bad debt drag</p>
-            <p className="text-white text-2xl font-bold font-mono-data">- RM {formatMoney(carMonthlyCost)}</p>
-            <p className="text-slate text-sm mt-2">Car debt pulls cash out of your pocket every month.</p>
-          </div>
-          <div className="bg-emerald/10 border border-emerald/30 rounded-2xl p-5">
-            <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-2">Good debt output</p>
-            <p className="text-white text-2xl font-bold font-mono-data">+ RM {formatMoney(rentalSurplus)}</p>
-            <p className="text-slate text-sm mt-2">Rental debt can create monthly surplus instead of monthly stress.</p>
-          </div>
-          <div className="bg-gold/10 border border-gold/30 rounded-2xl p-5">
-            <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Live leverage swing</p>
-            <p className={`text-2xl font-bold font-mono-data ${leverageSwing >= 0 ? 'text-emerald' : 'text-crimson'}`}>
-              {leverageSwing >= 0 ? '+' : '-'} RM {Math.abs(leverageSwing).toFixed(0)}
-            </p>
-            <p className="text-slate text-sm mt-2">The same borrowed money changes direction based on how you use it.</p>
-          </div>
-        </div>
-
-        {/* Two Cards */}
-        <div data-reveal className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-          {/* Bad Debt Card */}
-          <div className="bg-navy-surface border-2 border-crimson rounded-2xl p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-crimson/20 flex items-center justify-center">
-                <span className="text-crimson text-lg">⚠</span>
-              </div>
-              <div>
-                <h2 className="text-crimson font-bold text-xl uppercase tracking-wider">Bad Debt</h2>
-                <p className="text-slate text-sm">Makes you look rich. Makes you poor.</p>
-              </div>
-            </div>
-
-            {/* Car Loan */}
-            <div className="mb-6 bg-navy/50 rounded-xl p-5 border border-crimson/20">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">🚗</span>
-                <div>
-                  <p className="text-white font-medium">Car Loan — Honda Civic</p>
-                  <p className="text-slate text-xs">RM 100K. Loses 20% value when driven out.</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Monthly payment + costs</span>
-                  <span className="text-crimson font-mono-data font-bold">RM {formatMoney(carMonthlyCost)}</span>
-                </div>
-                <div className="w-full bg-navy-light rounded-full h-2">
-                  <div className="bg-crimson h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 30 * multiplier)}%` }} />
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Total paid over 7 years</span>
-                  <span className="text-crimson font-mono-data">RM {formatMoney(carTotalPaid)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Car value at end</span>
-                  <span className="text-slate font-mono-data">~RM 30,000</span>
-                </div>
-              </div>
-              <p className="text-crimson text-xs italic mt-3">"The car makes you look rich. It makes you poor."</p>
-            </div>
-
-            {/* PTPTN */}
-            <div className="bg-navy/50 rounded-xl p-5 border border-crimson/20">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">🎓</span>
-                <div>
-                  <p className="text-white font-medium">PTPTN — Education Debt</p>
-                  <p className="text-slate text-xs">RM 30K. Service charge. No asset backing.</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Debt remaining</span>
-                  <span className="text-crimson font-mono-data font-bold">RM {formatMoney(ptptnBurden)}</span>
-                </div>
-                <div className="w-full bg-navy-light rounded-full h-2">
-                  <div className="bg-crimson h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 50 * multiplier)}%` }} />
-                </div>
-                <p className="text-slate text-xs">417,000+ defaulters in Malaysia</p>
-              </div>
-              <p className="text-crimson text-xs italic mt-3">"You paid for a degree that trades time for money."</p>
-            </div>
-          </div>
-
-          {/* Good Debt Card */}
-          <div className="bg-navy-surface border-2 border-emerald rounded-2xl p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-emerald/20 flex items-center justify-center">
-                <span className="text-emerald text-lg">✓</span>
-              </div>
-              <div>
-                <h2 className="text-emerald font-bold text-xl uppercase tracking-wider">Good Debt</h2>
-                <p className="text-slate text-sm">The bank's money works for you.</p>
-              </div>
-            </div>
-
-            {/* Rental Property */}
-            <div className="mb-6 bg-navy/50 rounded-xl p-5 border border-emerald/20">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">🏠</span>
-                <div>
-                  <p className="text-white font-medium">Rental Property Loan</p>
-                  <p className="text-slate text-xs">RM 500K. Tenant pays your mortgage.</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Monthly rental income</span>
-                  <span className="text-emerald font-mono-data font-bold">RM {formatMoney(rentalIncome)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Mortgage payment</span>
-                  <span className="text-slate font-mono-data">RM 1,800</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Monthly surplus</span>
-                  <span className="text-emerald font-mono-data font-bold">+ RM {formatMoney(rentalSurplus)}</span>
-                </div>
-                <div className="w-full bg-navy-light rounded-full h-2">
-                  <div className="bg-emerald h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 25 * multiplier)}%` }} />
-                </div>
-                <div className="bg-gold/10 border border-gold/30 rounded-lg px-3 py-2 mt-2">
-                  <p className="text-gold text-xs">
-                    <span className="font-bold">RPGT Timer:</span> Sell after year 6 = 0% tax. Before = 15%.
-                  </p>
-                </div>
-              </div>
-              <p className="text-emerald text-xs italic mt-3">"Tenant pays your debt. Property appreciates."</p>
-            </div>
-
-            {/* ASB Loan */}
-            <div className="bg-navy/50 rounded-xl p-5 border border-emerald/20">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">🏦</span>
-                <div>
-                  <p className="text-white font-medium">ASB Loan</p>
-                  <p className="text-slate text-xs">Borrow to invest. Dividend covers interest.</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Loan interest</span>
-                  <span className="text-slate font-mono-data">~5% p.a.</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">ASB dividend yield</span>
-                  <span className="text-emerald font-mono-data">~5.50 sen/unit</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate">Net effect</span>
-                  <span className="text-emerald font-mono-data font-bold">Positive spread</span>
-                </div>
-                <div className="w-full bg-navy-light rounded-full h-2">
-                  <div className="bg-emerald h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 20 * multiplier)}%` }} />
-                </div>
-              </div>
-              <p className="text-emerald text-xs italic mt-3">"The bank's money works for you."</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Leverage Lever Slider */}
-        <div data-reveal className="bg-navy-surface border border-navy-light rounded-2xl p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5">
-            <div>
-              <p className="text-white text-sm font-medium">Your Quadrant</p>
-              <p className="text-slate text-xs mt-1">Move the slider and watch the monthly impact update immediately.</p>
-            </div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold w-fit" style={{ backgroundColor: `color-mix(in srgb, ${quadrantColors[sliderValue]} 18%, transparent)`, color: quadrantColors[sliderValue] }}>
-              {quadrantLabels[sliderValue]}
-            </span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="3"
-            step="1"
-            value={sliderValue}
-            onChange={e => setSliderValue(parseInt(e.target.value) as QuadrantLevel)}
-            className="w-full h-3 rounded-full appearance-none cursor-pointer mb-4"
-            style={{ background: `linear-gradient(to right, var(--ledger-negative), var(--ledger-muted), var(--ledger-positive), var(--ledger-accent))` }}
-            aria-label="Debt leverage by quadrant"
-          />
-          <div className="flex justify-between text-xs text-slate mb-6">
+      <div className="lesson-stack">
+        <fieldset className="segmented-field">
+          <legend>Your quadrant</legend>
+          <div className="segmented">
             {quadrantLabels.map((label, i) => (
-              <span key={i} className={i === sliderValue ? 'font-bold' : ''} style={{ color: i === sliderValue ? quadrantColors[i] : undefined }}>
-                {label.split(' — ')[0]}
-              </span>
+              <label key={label}>
+                <input type="radio" name="debt-quadrant" value={i} checked={sliderValue === i} onChange={() => setSliderValue(i as QuadrantLevel)} aria-label={label} />
+                <span aria-hidden="true">{label.split(' — ')[0]}</span>
+              </label>
             ))}
           </div>
+          <p className="segmented-caption">{quadrantLabels[sliderValue]}</p>
+        </fieldset>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-            <div className="bg-navy/50 rounded-xl p-4 border border-crimson/20">
-              <p className="text-slate text-xs uppercase mb-1">Bad debt result</p>
-              <p className="text-crimson font-mono-data text-lg font-bold">RM {formatMoney(carMonthlyCost)} out</p>
-            </div>
-            <div className="bg-navy/50 rounded-xl p-4 border border-emerald/20">
-              <p className="text-slate text-xs uppercase mb-1">Good debt result</p>
-              <p className="text-emerald font-mono-data text-lg font-bold">RM {formatMoney(rentalSurplus)} in</p>
-            </div>
-            <div className="bg-navy/50 rounded-xl p-4 border border-gold/20">
-              <p className="text-slate text-xs uppercase mb-1">What changes</p>
-              <p className="text-white text-sm leading-relaxed">The higher your quadrant, the more likely debt is backed by cash-producing assets instead of wages alone.</p>
-            </div>
-          </div>
+        <section className="lesson-card" aria-label="Monthly result" aria-live="polite">
+          <dl className="lesson-rows">
+            <div><dt>Car loan <small>Bad debt drag</small></dt><dd className="tone-bad">- RM {formatMoney(carMonthlyCost)}</dd></div>
+            <div><dt>Rental property <small>Good debt output</small></dt><dd className="tone-good">+ RM {formatMoney(rentalSurplus)}</dd></div>
+          </dl>
+          <div className="lesson-total"><span>Live leverage swing</span><strong className={leverageSwing >= 0 ? 'tone-good' : 'tone-bad'}>{leverageSwing >= 0 ? '+' : '-'} RM {Math.abs(leverageSwing).toFixed(0)}</strong></div>
+          <p className="lesson-muted">{quadrantMessages[sliderValue]}</p>
+          <p className="lesson-muted">The higher your quadrant, the more likely debt is backed by cash-producing assets instead of wages alone.</p>
+        </section>
 
-          {/* Dynamic Insight */}
-          <div className="bg-navy/50 rounded-xl p-5 border" style={{ borderColor: `color-mix(in srgb, ${quadrantColors[sliderValue]} 25%, transparent)` }}>
-            <p className="text-sm" style={{ color: quadrantColors[sliderValue] }}>
-              {sliderValue === 0 && "As an Employee, ALL debt crushes you. You have no asset income to cover the payments. A car loan is a chain, not a tool."}
-              {sliderValue === 1 && "As Self-employed, you earn more but have no safety net. Debt is risky — one bad month and everything unravels."}
-              {sliderValue === 2 && "As a Business Owner, debt becomes leverage. Your business income covers the loans, and the assets appreciate in your name."}
-              {sliderValue === 3 && "As an Investor, debt AMPLIFIES your returns. An ASB loan at 5% earning 5.5% is free money working for you while you sleep."}
-            </p>
-          </div>
-        </div>
-
-        <div data-reveal className="mt-8 bg-navy-surface border border-navy-light rounded-2xl p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
+        <div className="lesson-disclosures">
+          <details className="lesson-disclosure">
+            <summary><span><span>Bad debt examples</span><span>Car loan · PTPTN</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
             <div>
-              <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Debt literacy checklist</p>
-              <h2 className="text-white text-xl font-bold">Before you borrow, ask these 3 questions.</h2>
-            </div>
-            <p className="text-slate text-sm max-w-md">This teaches a reusable rule, not just a single example: debt should improve cashflow, be backed by an asset, and move you closer to time freedom.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {debtRules.map((rule) => (
-              <div key={rule.title} className="bg-navy/50 border border-navy-light rounded-xl p-5">
-                <p className="text-white font-semibold mb-2">{rule.title}</p>
-                <p className="text-slate text-sm mb-4">{rule.helper}</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between rounded-lg bg-crimson/10 border border-crimson/20 px-3 py-2">
-                    <span className="text-crimson text-sm font-medium">Bad debt</span>
-                    <span className="text-crimson text-sm font-bold">{rule.badDebt}</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg bg-emerald/10 border border-emerald/20 px-3 py-2">
-                    <span className="text-emerald text-sm font-medium">Good debt</span>
-                    <span className={`text-sm font-bold ${rule.goodTone}`}>{rule.goodDebt}</span>
-                  </div>
-                </div>
+              <div>
+                <h3>Car Loan — Honda Civic</h3>
+                <p>RM 100K. Loses 20% value when driven out.</p>
+                <dl className="lesson-rows">
+                  <div><dt>Monthly payment + costs</dt><dd className="tone-bad">RM {formatMoney(carMonthlyCost)}</dd></div>
+                  <div><dt>Total paid over 7 years</dt><dd className="tone-bad">RM {formatMoney(carTotalPaid)}</dd></div>
+                  <div><dt>Car value at end</dt><dd>~RM 30,000</dd></div>
+                </dl>
+                <p className="lesson-quote">"The car makes you look rich. It makes you poor."</p>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom Quote */}
-        <div data-reveal className="mt-10 text-center">
-          <p className="text-slate text-lg italic max-w-2xl mx-auto">
-            "In Malaysia, banks love to lend you money for cars and credit cards. They rarely promote ASB loans. <span className="text-gold">Ask why.</span>"
-          </p>
+              <div>
+                <h3>PTPTN — Education Debt</h3>
+                <p>RM 30K. Service charge. No asset backing.</p>
+                <dl className="lesson-rows">
+                  <div><dt>Debt remaining</dt><dd className="tone-bad">RM {formatMoney(ptptnBurden)}</dd></div>
+                </dl>
+                <p>417,000+ defaulters in Malaysia</p>
+                <p className="lesson-quote">"You paid for a degree that trades time for money."</p>
+              </div>
+            </div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>Good debt examples</span><span>Rental property · ASB loan</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <div>
+                <h3>Rental Property Loan</h3>
+                <p>RM 500K. Tenant pays your mortgage.</p>
+                <dl className="lesson-rows">
+                  <div><dt>Monthly rental income</dt><dd className="tone-good">RM {formatMoney(rentalIncome)}</dd></div>
+                  <div><dt>Mortgage payment</dt><dd>RM 1,800</dd></div>
+                  <div><dt>Monthly surplus</dt><dd className="tone-good">+ RM {formatMoney(rentalSurplus)}</dd></div>
+                </dl>
+                <p><strong>RPGT Timer:</strong> Sell after year 6 = 0% tax. Before = 15%.</p>
+                <p className="lesson-quote">"Tenant pays your debt. Property appreciates."</p>
+              </div>
+              <div>
+                <h3>ASB Loan</h3>
+                <p>Borrow to invest. Dividend covers interest.</p>
+                <dl className="lesson-rows">
+                  <div><dt>Loan interest</dt><dd>~5% p.a.</dd></div>
+                  <div><dt>ASB dividend yield</dt><dd className="tone-good">~5.50 sen/unit</dd></div>
+                  <div><dt>Net effect</dt><dd className="tone-good">Positive spread</dd></div>
+                </dl>
+                <p className="lesson-quote">"The bank's money works for you."</p>
+              </div>
+            </div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>Before you borrow</span><span>A 3-question check</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <p>This teaches a reusable rule, not just a single example: debt should improve cashflow, be backed by an asset, and move you closer to time freedom.</p>
+              {debtRules.map(rule => (
+                <div key={rule.title}>
+                  <h3>{rule.title}</h3>
+                  <p>{rule.helper}</p>
+                  <dl className="lesson-rows">
+                    <div><dt>Bad debt</dt><dd className="tone-bad">{rule.badDebt}</dd></div>
+                    <div><dt>Good debt</dt><dd className={rule.goodTone}>{rule.goodDebt}</dd></div>
+                  </dl>
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
       </div>
 
+      <p className="lesson-quote">"In Malaysia, banks love to lend you money for cars and credit cards. They rarely promote ASB loans. <strong>Ask why.</strong>"</p>
     </section>
   );
 }
-

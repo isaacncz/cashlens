@@ -1,5 +1,7 @@
 import { formatMoney } from '../lib/currency';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { Car, ChevronDown, GraduationCap, House, Landmark, Laptop, PiggyBank, Smartphone, TrendingUp } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface GameState {
   year: number;
@@ -17,7 +19,7 @@ interface GameState {
 interface Decision {
   text: string;
   effect: (s: GameState) => Partial<GameState>;
-  icon: string;
+  icon: LucideIcon;
 }
 
 interface Event {
@@ -48,7 +50,7 @@ const decisions: Decision[] = [
   {
     text: 'Buy a new Myvi — RM 600/month for 7 years',
     effect: s => ({ expenses: s.expenses + 600, carPayment: s.carPayment + 600 }),
-    icon: '🚗',
+    icon: Car,
   },
   {
     text: 'Start ASB auto-deduction — RM 200/month',
@@ -56,7 +58,7 @@ const decisions: Decision[] = [
       asbBalance: s.asbBalance + 2400,
       passiveIncome: s.passiveIncome + 10,
     }),
-    icon: '🏦',
+    icon: Landmark,
   },
   {
     text: 'Aggressively pay PTPTN — RM 500/month',
@@ -64,12 +66,12 @@ const decisions: Decision[] = [
       ptptnDebt: Math.max(0, s.ptptnDebt - 6000),
       expenses: s.expenses + 500,
     }),
-    icon: '🎓',
+    icon: GraduationCap,
   },
   {
     text: 'Upgrade to iPhone — RM 200/month installment',
     effect: s => ({ expenses: s.expenses + 200 }),
-    icon: '📱',
+    icon: Smartphone,
   },
   {
     text: 'Invest in dividend stocks — RM 300/month',
@@ -77,7 +79,7 @@ const decisions: Decision[] = [
       passiveIncome: s.passiveIncome + 25,
       expenses: s.expenses + 300,
     }),
-    icon: '📈',
+    icon: TrendingUp,
   },
   {
     text: 'Minimal lifestyle, max savings — RM 400/month to ASB',
@@ -85,17 +87,17 @@ const decisions: Decision[] = [
       asbBalance: s.asbBalance + 4800,
       passiveIncome: s.passiveIncome + 20,
     }),
-    icon: '💰',
+    icon: PiggyBank,
   },
   {
     text: 'Side hustle — freelance on weekends',
     effect: s => ({ salary: s.salary + 500 }),
-    icon: '💻',
+    icon: Laptop,
   },
   {
     text: 'Rent out a spare room — RM 500/month income',
     effect: s => ({ passiveIncome: s.passiveIncome + 500 }),
-    icon: '🏠',
+    icon: House,
   },
 ];
 
@@ -222,7 +224,6 @@ function advanceGameState(current: GameState, updates: Partial<GameState> = {}):
 }
 
 export default function RatRace() {
-  const sectionRef = useRef<HTMLDivElement>(null);
   const [game, setGame] = useState<GameState>(initialState);
   const [currentDecisions, setCurrentDecisions] = useState<[Decision, Decision] | null>([decisions[1], decisions[2]]);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
@@ -309,409 +310,267 @@ export default function RatRace() {
   const playerTier = freedomXp >= 140 ? 'Investor Mindset' : freedomXp >= 70 ? 'Freedom Builder' : freedomXp >= 25 ? 'Cashflow Rookie' : 'Fresh Grad';
   const wheelSpinDuration = `${Math.max(1.5, 8 - workHarderClicks * 0.2)}s`;
 
+  const toneClass = (tone: 'good' | 'bad' | 'neutral') => tone === 'good' ? 'tone-good' : tone === 'bad' ? 'tone-bad' : 'tone-neutral';
+
   return (
-    <section id="rat-race" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <p data-reveal className="text-crimson text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 05 / Rat Race Simulator
-        </p>
-        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          Work Harder.{' '}
-          <span className="text-crimson">Never Leave the Wheel.</span>
-        </h1>
-        <div data-reveal className="bg-navy-surface/50 border border-navy-light rounded-2xl p-5 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Mission starts immediately</p>
-              <p className="text-slate text-sm">You are a fresh graduate: RM 3,500/month salary, RM 30,000 PTPTN debt. Tap a choice to play Year 1 right away.</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 rounded-full bg-gold/10 border border-gold/20 text-gold text-xs font-semibold">{playerTier}</span>
-              <span className="px-3 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-xs font-semibold">XP {freedomXp}</span>
-              <span className="px-3 py-1 rounded-full bg-navy border border-navy-light text-white text-xs font-semibold">Smart streak {smartStreak}</span>
-            </div>
+    <section id="rat-race" className="lesson" aria-labelledby="rat-race-heading">
+      <header className="lesson-intro">
+        <h1 id="rat-race-heading">Work harder. Never leave the wheel.</h1>
+        <p>You are a fresh graduate: RM 3,500/month salary, RM 30,000 PTPTN debt. Tap a choice to play Year 1 right away.</p>
+      </header>
+
+      <div className="lesson-stack">
+        <section className="lesson-card rr-status" aria-label="Your situation">
+          <div className="rr-status-head">
+            <p><strong>Age {game.age}</strong> · Year {game.year}</p>
+            <p>Freedom <strong className={freedomPercent >= 80 ? 'tone-good' : freedomPercent >= 40 ? 'tone-warn' : 'tone-bad'}>{freedomPercent.toFixed(0)}%</strong></p>
           </div>
-        </div>
+          <div className="meter" aria-hidden="true"><span style={{ width: `${Math.max(2, freedomPercent)}%` }} /></div>
+          <dl className="stat-strip">
+            <div><dt>Salary</dt><dd>RM {formatMoney(game.salary)}</dd></div>
+            <div><dt>Expenses</dt><dd className="tone-bad">RM {formatMoney(game.expenses)}</dd></div>
+            <div><dt>Passive</dt><dd className="tone-good">RM {formatMoney(game.passiveIncome)}</dd></div>
+          </dl>
+          <p className="lesson-muted">{playerTier} · XP {freedomXp} · Smart streak {smartStreak}</p>
+        </section>
 
-        <div data-reveal className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Left Panel - Game Status */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Status Panel */}
-              <div className="bg-navy-surface border border-navy-light rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-slate text-xs uppercase">Year {game.year}</p>
-                    <p className="text-white text-2xl font-bold font-mono-data">Age {game.age}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-slate text-xs uppercase">Freedom</p>
-                    <p className={`font-mono-data text-lg font-bold ${freedomPercent >= 80 ? 'text-emerald' : freedomPercent >= 40 ? 'text-gold' : 'text-crimson'}`}>
-                      {freedomPercent.toFixed(0)}%
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate text-sm">Monthly Salary</span>
-                    <span className="text-gold font-mono-data font-bold">RM {formatMoney(game.salary)}</span>
-                  </div>
-                  <div className="w-full bg-navy-light rounded-full h-2">
-                    <div className="bg-gold h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, game.salary / 100)}%` }} />
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate text-sm">Monthly Expenses</span>
-                    <span className="text-crimson font-mono-data font-bold">RM {formatMoney(game.expenses)}</span>
-                  </div>
-                  <div className="w-full bg-navy-light rounded-full h-2">
-                    <div className="bg-crimson h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, game.expenses / 100)}%` }} />
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate text-sm">Passive Income</span>
-                    <span className="text-emerald font-mono-data font-bold">RM {formatMoney(game.passiveIncome)}</span>
-                  </div>
-                  <div className="w-full bg-navy-light rounded-full h-2">
-                    <div className="bg-emerald h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, freedomPercent)}%` }} />
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2 border-t border-navy-light">
-                    <span className="text-slate text-sm">PTPTN Debt</span>
-                    <span className="text-crimson font-mono-data">RM {formatMoney(game.ptptnDebt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate text-sm">ASB Balance</span>
-                    <span className="text-gold font-mono-data">RM {formatMoney(game.asbBalance)}</span>
-                  </div>
-                  <div className="bg-navy/60 border border-navy-light rounded-xl p-4 mt-2">
-                    <p className="text-slate text-xs uppercase mb-1">Monthly gap right now</p>
-                    <p className={`font-mono-data text-xl font-bold ${monthlyGap >= 0 ? 'text-emerald' : 'text-crimson'}`}>
-                      {monthlyGap >= 0 ? '+' : '-'} RM {formatMoney(Math.abs(monthlyGap))}
-                    </p>
-                    <p className="text-slate text-xs mt-2">Positive means your passive income already covers your lifestyle.</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-navy/60 border border-navy-light rounded-xl p-4">
-                      <p className="text-slate text-xs uppercase mb-1">Freedom XP</p>
-                      <p className="text-gold font-mono-data text-xl font-bold">{freedomXp}</p>
-                    </div>
-                    <div className="bg-navy/60 border border-navy-light rounded-xl p-4">
-                      <p className="text-slate text-xs uppercase mb-1">Smart streak</p>
-                      <p className="text-emerald font-mono-data text-xl font-bold">{smartStreak}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Work Harder Button */}
-              {!game.completed && (
-                <button
-                  onClick={workHarder}
-                  className="w-full py-3 border border-crimson/50 text-crimson rounded-lg hover:bg-crimson/10 transition-all duration-200 text-sm"
-                >
-                  Work Harder ({workHarderClicks}x clicked)
-                </button>
-              )}
-              {message && (
-                <p className="text-crimson text-sm italic animate-pulse">{message}</p>
-              )}
-
-              {/* Game Log */}
-              {logs.length > 0 && (
-                <div className="bg-navy-surface/50 border border-navy-light rounded-xl p-4 max-h-40 overflow-y-auto">
-                  {logs.map((log, i) => (
-                    <p key={i} className="text-slate text-xs mb-1">{log}</p>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Right Panel - Wheel & Decisions */}
-            <div className="lg:col-span-3">
-              {/* Wheel Visualization */}
-              <div className="bg-navy-surface border border-navy-light rounded-2xl p-6 mb-6 flex justify-center">
-                <svg width="280" height="280" viewBox="0 0 280 280">
-                  <defs>
-                    <radialGradient id="wheelSurface" cx="50%" cy="40%" r="65%">
-                      <stop offset="0%" stopColor={'var(--ledger-raised)'} />
-                      <stop offset="55%" stopColor={'var(--ledger-raised)'} />
-                      <stop offset="100%" stopColor={'var(--ledger-surface)'} />
-                    </radialGradient>
-                    <linearGradient id="wheelRim" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor={'var(--ledger-negative)'} />
-                      <stop offset="45%" stopColor={'var(--ledger-negative)'} />
-                      <stop offset="100%" stopColor={'var(--ledger-negative)'} />
-                    </linearGradient>
-                    <linearGradient id="wheelSpoke" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor={'var(--ledger-negative)'} stopOpacity="0.95" />
-                      <stop offset="100%" stopColor={'var(--ledger-negative)'} stopOpacity="0.35" />
-                    </linearGradient>
-                    <filter id="wheelGlow" x="-40%" y="-40%" width="180%" height="180%">
-                      <feGaussianBlur stdDeviation="4" result="blur" />
-                      <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
-                    </filter>
-                    <filter id="spokeGlow" x="-60%" y="-60%" width="220%" height="220%">
-                      <feGaussianBlur stdDeviation="1.2" result="soft" />
-                      <feMerge>
-                        <feMergeNode in="soft" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
-                    </filter>
-                    <linearGradient id="ratBody" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor={'var(--ledger-accent)'} />
-                      <stop offset="100%" stopColor={'var(--ledger-warning)'} />
-                    </linearGradient>
-                  </defs>
-
-                  <circle cx="140" cy="140" r="120" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="2" opacity="0.4" filter="url(#wheelGlow)" />
-                  <circle cx="140" cy="140" r="114" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="1.2" opacity="0.45" />
-
-                  {/* Wheel */}
-                  <g style={{ animation: game.completed && game.won ? 'none' : `wheelSpin ${wheelSpinDuration} linear infinite`, transformOrigin: '140px 140px' }}>
-                    <circle cx="140" cy="140" r="110" fill="url(#wheelSurface)" stroke="url(#wheelRim)" strokeWidth="4" filter="url(#wheelGlow)" />
-                    <circle cx="140" cy="140" r="100" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="1.6" opacity="0.42" />
-                    {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, index) => {
-                      const start = (deg * Math.PI) / 180;
-                      const end = ((deg + 45) * Math.PI) / 180;
-                      const x1 = 140 + Math.cos(start) * 106;
-                      const y1 = 140 + Math.sin(start) * 106;
-                      const x2 = 140 + Math.cos(end) * 106;
-                      const y2 = 140 + Math.sin(end) * 106;
-                      return (
-                        <path
-                          key={`slice-${deg}`}
-                          d={`M140 140 L${x1} ${y1} A106 106 0 0 1 ${x2} ${y2} Z`}
-                          fill={index % 2 === 0 ? 'var(--ledger-raised)' : 'var(--ledger-surface)'}
-                          opacity="0.58"
-                        />
-                      );
-                    })}
-                    {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
-                      const rad = (deg * Math.PI) / 180;
-                      return (
-                        <line
-                          key={deg}
-                          x1="140"
-                          y1="140"
-                          x2={140 + Math.cos(rad) * 104}
-                          y2={140 + Math.sin(rad) * 104}
-                          stroke="url(#wheelSpoke)"
-                          strokeWidth="2"
-                          filter="url(#spokeGlow)"
-                        />
-                      );
-                    })}
-                    {Array.from({ length: 48 }).map((_, i) => {
-                      const deg = (i / 48) * 360;
-                      const rad = (deg * Math.PI) / 180;
-                      const isMajor = i % 6 === 0;
-                      return (
-                        <line
-                          key={`tick-${i}`}
-                          x1={140 + Math.cos(rad) * (isMajor ? 101 : 105)}
-                          y1={140 + Math.sin(rad) * (isMajor ? 101 : 105)}
-                          x2={140 + Math.cos(rad) * 110}
-                          y2={140 + Math.sin(rad) * 110}
-                          stroke={'var(--ledger-negative)'}
-                          strokeWidth={isMajor ? 1.8 : 0.8}
-                          opacity={isMajor ? 0.95 : 0.65}
-                        />
-                      );
-                    })}
-                  </g>
-
-                  <path d="M140 16 L148 32 L132 32 Z" fill={'var(--ledger-negative)'} opacity="0.95" filter="url(#wheelGlow)" />
-
-                  {/* Rat runner */}
-                  <g
-                    opacity={game.completed && game.won ? 0.35 : 1}
-                    style={{ animation: game.completed && game.won ? 'none' : 'ratRunBob 0.75s ease-in-out infinite', transformOrigin: '140px 56px' }}
-                  >
-                    <ellipse cx="140" cy="63" rx="14" ry="8" fill={'var(--ledger-surface)'} opacity="0.45" />
-                    <ellipse cx="140" cy="54" rx="9.5" ry="7" fill="url(#ratBody)" />
-                    <ellipse cx="150" cy="53" rx="4.8" ry="4" fill="url(#ratBody)" />
-                    <circle cx="147.2" cy="48.8" r="2.4" fill={'var(--ledger-accent)'} />
-                    <circle cx="143.2" cy="49.3" r="2.1" fill={'var(--ledger-accent)'} />
-                    <circle cx="151.8" cy="52.6" r="0.9" fill={'var(--ledger-raised)'} />
-                    <line x1="154.3" y1="53.1" x2="158.8" y2="52.5" stroke={'var(--ledger-accent)'} strokeWidth="0.9" />
-                    <line x1="154.3" y1="53.8" x2="158.8" y2="54.1" stroke={'var(--ledger-accent)'} strokeWidth="0.9" />
-                    <path d="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" fill="none" stroke={'var(--ledger-warning)'} strokeWidth="2.2" strokeLinecap="round">
-                      {!game.completed && <animate attributeName="d" values="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62;M132 57 Q123 61 120 67 Q119 70 122 70 Q126 68 128 65 Q132 61 136 62;M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" dur="0.65s" repeatCount="indefinite" />}
-                    </path>
-                    <rect x="136.5" y="59.7" width="3.8" height="7" rx="1.2" fill={'var(--ledger-accent)'} />
-                    <rect x="142" y="59.7" width="3.8" height="7" rx="1.2" fill={'var(--ledger-accent)'} />
-                  </g>
-
-                  {/* Center hub */}
-                  <circle cx="140" cy="140" r="10" fill={'var(--ledger-surface)'} opacity="0.75" />
-                  <circle cx="140" cy="140" r="6" fill={'var(--ledger-negative)'} opacity="0.9" />
-                  {!game.completed && <circle cx="140" cy="140" r="14" fill="none" stroke={'var(--ledger-negative)'} opacity="0.3">
-                    <animate attributeName="r" values="12;16;12" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.35;0.1;0.35" dur="1.8s" repeatCount="indefinite" />
-                  </circle>}
-                  {/* Freedom bridge */}
-                  {game.completed && game.won && (
-                    <>
-                      <path d="M 220 140 Q 250 100 260 60" stroke={'var(--ledger-accent)'} strokeWidth="4" fill="none" strokeLinecap="round">
-                        <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="1.5s" fill="freeze" />
-                      </path>
-                      {/* Escaped avatar */}
-                      <circle cx="260" cy="55" r="8" fill={'var(--ledger-positive)'} />
-                      <rect x="254" y="63" width="12" height="16" rx="3" fill={'var(--ledger-positive)'} />
-                      {/* Confetti */}
-                      {confettiPieces.map((piece, i) => (
-                        <rect key={i} x={piece.x} y={piece.y}
-                          width="4" height="8" fill={piece.color} opacity="0.8">
-                          <animateTransform attributeName="transform" type="rotate"
-                            from={`0 ${piece.rotationX} ${piece.rotationY}`} to={`360 ${piece.rotationX} ${piece.rotationY}`}
-                            dur={piece.duration} repeatCount="indefinite" />
-                        </rect>
-                      ))}
-                    </>
-                  )}
-                  {/* Labels */}
-                  <text x="140" y="242" textAnchor="middle" fill={'var(--ledger-negative)'} fontSize="12" fontWeight="700" letterSpacing="2.1" opacity="1">RAT RACE</text>
-                  {game.completed && game.won && (
-                    <text x="260" y="40" textAnchor="middle" fill={'var(--ledger-positive)'} fontSize="10" fontWeight="bold">FREEDOM!</text>
-                  )}
-                </svg>
-              </div>
-
-              {/* Decision Cards */}
-              {!game.completed && currentDecisions && (
-                <div className="space-y-4">
-                  <div className="bg-navy-surface/50 border border-navy-light rounded-xl p-4">
-                    <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Coach's lens</p>
-                    <p className="text-slate text-sm">A strong choice should increase passive income, reduce debt, or buy back time without permanently locking in higher expenses.</p>
-                  </div>
-                  <p className="text-slate text-sm text-center">Year {game.year} — Choose your path:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {currentDecisions.map((d, i) => {
-                      const impactChips = getImpactPreview(game, d.effect(game));
-                      const coaching = getDecisionCoaching(game, d.effect(game));
-                      const xpReward = Math.max(8, Math.round(Math.max(scoreDecision(game, d.effect(game)), 0) / 80));
-
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => makeDecision(d)}
-                          className="bg-navy-surface border border-navy-light rounded-xl p-5 text-left hover:border-gold/40 hover:shadow-elevated transition-all duration-200 group"
-                        >
-                          <span className="text-3xl mb-3 block">{d.icon}</span>
-                          <span
-                            className={`inline-flex px-2.5 py-1 rounded-full text-sm font-semibold border mb-3 ${
-                              coaching.tone === 'good'
-                                ? 'bg-emerald/10 text-emerald border-emerald/30'
-                                : coaching.tone === 'bad'
-                                  ? 'bg-crimson/10 text-crimson border-crimson/30'
-                                  : 'bg-gold/10 text-gold border-gold/30'
-                            }`}
-                          >
-                            {coaching.label}
-                          </span>
-                          <p className="text-white text-sm font-medium group-hover:text-gold transition-colors mb-4">{d.text}</p>
-                          <p className="text-slate text-xs mb-3">Reward: +{xpReward} XP if this builds freedom.</p>
-                          <div className="flex flex-wrap gap-2">
-                            {impactChips.map(chip => (
-                              <span
-                                key={`${d.text}-${chip.label}`}
-                                className={`px-2.5 py-1 rounded-full text-sm font-semibold border ${
-                                  chip.tone === 'good'
-                                    ? 'bg-emerald/10 text-emerald border-emerald/30'
-                                    : chip.tone === 'bad'
-                                      ? 'bg-crimson/10 text-crimson border-crimson/30'
-                                      : 'bg-navy/70 text-slate border-navy-light'
-                                }`}
-                              >
-                                {chip.label}: {chip.value}
-                              </span>
-                            ))}
-                          </div>
-                          <p className="text-slate text-xs mt-4">Real-time preview: this is the immediate impact before year-end growth and inflation.</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Random Event */}
-              {!game.completed && currentEvent && (
-                <div className="bg-navy-surface border border-gold/30 rounded-2xl p-6">
-                  <p className="text-gold text-sm font-medium mb-1">Life Event!</p>
-                  <p className="text-white text-base mb-4">{currentEvent.text}</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {currentEvent.choices.map((c, i) => {
-                      const impactChips = getImpactPreview(game, c.effect(game));
-
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => handleEvent(c)}
-                          className={`rounded-lg text-sm font-medium transition-all duration-200 p-4 text-left ${
-                            i === 0 ? 'bg-crimson/20 border border-crimson/40 text-crimson hover:bg-crimson/30' : 'bg-emerald/20 border border-emerald/40 text-emerald hover:bg-emerald/30'
-                          }`}
-                        >
-                          <p className="mb-3">{c.label}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {impactChips.map(chip => (
-                              <span
-                                key={`${c.label}-${chip.label}`}
-                                className={`px-2.5 py-1 rounded-full text-sm font-semibold border ${
-                                  chip.tone === 'good'
-                                    ? 'bg-emerald/10 text-emerald border-emerald/30'
-                                    : chip.tone === 'bad'
-                                      ? 'bg-crimson/10 text-crimson border-crimson/30'
-                                      : 'bg-navy/70 text-slate border-navy-light'
-                                }`}
-                              >
-                                {chip.label}: {chip.value}
-                              </span>
-                            ))}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Game Over */}
-              {game.completed && (
-                <div id="rat-race-summary" className={`rounded-2xl p-8 text-center ${game.won ? 'bg-emerald/10 border-2 border-emerald' : 'bg-crimson/10 border-2 border-crimson'}`}>
-                  {game.won ? (
-                    <>
-                      <p className="text-emerald text-3xl font-bold mb-2">You Escaped the Rat Race!</p>
-                      <p className="text-slate text-sm mb-4">
-                        At age {game.age}, your passive income of RM {formatMoney(game.passiveIncome)}/month covers your expenses.
-                      </p>
-                      <p className="text-gold text-lg italic">"You can balik kampung permanently."</p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-crimson text-3xl font-bold mb-2">Time's Up.</p>
-                      <p className="text-slate text-sm mb-4">
-                        43 years on the wheel. You worked hard. But you never left.
-                      </p>
-                      <p className="text-slate text-sm italic">
- Passive income: RM {formatMoney(game.passiveIncome)} — still short of RM {formatMoney(game.expenses)} expenses.
-                      </p>
-                    </>
-                  )}
-                  <button
-                    onClick={resetGame}
-                    className="mt-6 px-6 py-3 bg-navy-surface border border-navy-light text-white rounded-lg hover:border-gold/40 transition-all duration-200"
-                  >
-                    Play Again
+        {!game.completed && currentDecisions && (
+          <section className="lesson-stack" aria-labelledby="rr-choices-heading">
+            <h2 id="rr-choices-heading" className="lesson-heading">Year {game.year} — choose your path</h2>
+            <div className="choice-list">
+              {currentDecisions.map((d, i) => {
+                const impactChips = getImpactPreview(game, d.effect(game));
+                const coaching = getDecisionCoaching(game, d.effect(game));
+                const xpReward = Math.max(8, Math.round(Math.max(scoreDecision(game, d.effect(game)), 0) / 80));
+                const Icon = d.icon;
+                return (
+                  <button key={i} type="button" className="choice-card" onClick={() => makeDecision(d)}>
+                    <Icon size={22} strokeWidth={1.8} aria-hidden="true" />
+                    <span>
+                      <strong>{d.text}</strong>
+                      <small className={toneClass(coaching.tone)}>{coaching.label} · +{xpReward} XP if this builds freedom</small>
+                      <ul className="impact-list">{impactChips.map(chip => <li key={`${d.text}-${chip.label}`}>{chip.label}: <strong className={toneClass(chip.tone)}>{chip.value}</strong></li>)}</ul>
+                    </span>
                   </button>
-                </div>
-              )}
+                );
+              })}
             </div>
-          </div>
+            <p className="lesson-muted">Real-time preview: this is the immediate impact before year-end growth and inflation.</p>
+          </section>
+        )}
+
+        {!game.completed && currentEvent && (
+          <section className="lesson-stack" aria-labelledby="rr-event-heading">
+            <h2 id="rr-event-heading" className="lesson-heading">Life event: {currentEvent.text}</h2>
+            <div className="choice-list">
+              {currentEvent.choices.map((c, i) => {
+                const impactChips = getImpactPreview(game, c.effect(game));
+                return (
+                  <button key={i} type="button" className="choice-card" onClick={() => handleEvent(c)}>
+                    <span>
+                      <strong>{c.label}</strong>
+                      <ul className="impact-list">{impactChips.map(chip => <li key={`${c.label}-${chip.label}`}>{chip.label}: <strong className={toneClass(chip.tone)}>{chip.value}</strong></li>)}</ul>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {game.completed && (
+          <section id="rat-race-summary" className="lesson-card rr-summary" aria-live="polite">
+            {game.won ? (
+              <>
+                <h2 className="tone-good">You Escaped the Rat Race!</h2>
+                <p>At age {game.age}, your passive income of RM {formatMoney(game.passiveIncome)}/month covers your expenses.</p>
+                <p className="lesson-quote">"You can balik kampung permanently."</p>
+              </>
+            ) : (
+              <>
+                <h2 className="tone-bad">Time's Up.</h2>
+                <p>43 years on the wheel. You worked hard. But you never left.</p>
+                <p className="lesson-muted">Passive income: RM {formatMoney(game.passiveIncome)} — still short of RM {formatMoney(game.expenses)} expenses.</p>
+              </>
+            )}
+            <button type="button" className="lesson-button" onClick={resetGame}>Play Again</button>
+          </section>
+        )}
+
+        <div className="lesson-disclosures">
+          <details className="lesson-disclosure">
+            <summary><span><span>Full status</span><span>Debt, savings and monthly gap</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <dl className="lesson-rows">
+                <div><dt>PTPTN Debt</dt><dd className="tone-bad">RM {formatMoney(game.ptptnDebt)}</dd></div>
+                <div><dt>ASB Balance</dt><dd>RM {formatMoney(game.asbBalance)}</dd></div>
+                <div><dt>Monthly gap right now <small>Positive means your passive income already covers your lifestyle.</small></dt><dd className={monthlyGap >= 0 ? 'tone-good' : 'tone-bad'}>{monthlyGap >= 0 ? '+' : '-'} RM {formatMoney(Math.abs(monthlyGap))}</dd></div>
+              </dl>
+              {logs.length > 0 && <div><h3>Your choices so far</h3><ul className="rr-log">{logs.map((log, i) => <li key={i}>{log}</li>)}</ul></div>}
+            </div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>Coach's lens</span><span>What makes a strong choice</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div><p>A strong choice should increase passive income, reduce debt, or buy back time without permanently locking in higher expenses.</p></div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>The wheel</span><span>Why working harder alone keeps you in place</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <div className="rr-wheel">
+            <svg width="280" height="280" viewBox="0 0 280 280" role="img" aria-label="A rat runs on a spinning wheel">
+              <defs>
+                <radialGradient id="wheelSurface" cx="50%" cy="40%" r="65%">
+                  <stop offset="0%" stopColor={'var(--ledger-raised)'} />
+                  <stop offset="55%" stopColor={'var(--ledger-raised)'} />
+                  <stop offset="100%" stopColor={'var(--ledger-surface)'} />
+                </radialGradient>
+                <linearGradient id="wheelRim" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor={'var(--ledger-negative)'} />
+                  <stop offset="45%" stopColor={'var(--ledger-negative)'} />
+                  <stop offset="100%" stopColor={'var(--ledger-negative)'} />
+                </linearGradient>
+                <linearGradient id="wheelSpoke" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={'var(--ledger-negative)'} stopOpacity="0.95" />
+                  <stop offset="100%" stopColor={'var(--ledger-negative)'} stopOpacity="0.35" />
+                </linearGradient>
+                <filter id="wheelGlow" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="spokeGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="1.2" result="soft" />
+                  <feMerge>
+                    <feMergeNode in="soft" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <linearGradient id="ratBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor={'var(--ledger-accent)'} />
+                  <stop offset="100%" stopColor={'var(--ledger-warning)'} />
+                </linearGradient>
+              </defs>
+
+              <circle cx="140" cy="140" r="120" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="2" opacity="0.4" filter="url(#wheelGlow)" />
+              <circle cx="140" cy="140" r="114" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="1.2" opacity="0.45" />
+
+              {/* Wheel */}
+              <g style={{ animation: game.completed && game.won ? 'none' : `wheelSpin ${wheelSpinDuration} linear infinite`, transformOrigin: '140px 140px' }}>
+                <circle cx="140" cy="140" r="110" fill="url(#wheelSurface)" stroke="url(#wheelRim)" strokeWidth="4" filter="url(#wheelGlow)" />
+                <circle cx="140" cy="140" r="100" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="1.6" opacity="0.42" />
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, index) => {
+                  const start = (deg * Math.PI) / 180;
+                  const end = ((deg + 45) * Math.PI) / 180;
+                  const x1 = 140 + Math.cos(start) * 106;
+                  const y1 = 140 + Math.sin(start) * 106;
+                  const x2 = 140 + Math.cos(end) * 106;
+                  const y2 = 140 + Math.sin(end) * 106;
+                  return (
+                    <path
+                      key={`slice-${deg}`}
+                      d={`M140 140 L${x1} ${y1} A106 106 0 0 1 ${x2} ${y2} Z`}
+                      fill={index % 2 === 0 ? 'var(--ledger-raised)' : 'var(--ledger-surface)'}
+                      opacity="0.58"
+                    />
+                  );
+                })}
+                {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
+                  const rad = (deg * Math.PI) / 180;
+                  return (
+                    <line
+                      key={deg}
+                      x1="140"
+                      y1="140"
+                      x2={140 + Math.cos(rad) * 104}
+                      y2={140 + Math.sin(rad) * 104}
+                      stroke="url(#wheelSpoke)"
+                      strokeWidth="2"
+                      filter="url(#spokeGlow)"
+                    />
+                  );
+                })}
+                {Array.from({ length: 48 }).map((_, i) => {
+                  const deg = (i / 48) * 360;
+                  const rad = (deg * Math.PI) / 180;
+                  const isMajor = i % 6 === 0;
+                  return (
+                    <line
+                      key={`tick-${i}`}
+                      x1={140 + Math.cos(rad) * (isMajor ? 101 : 105)}
+                      y1={140 + Math.sin(rad) * (isMajor ? 101 : 105)}
+                      x2={140 + Math.cos(rad) * 110}
+                      y2={140 + Math.sin(rad) * 110}
+                      stroke={'var(--ledger-negative)'}
+                      strokeWidth={isMajor ? 1.8 : 0.8}
+                      opacity={isMajor ? 0.95 : 0.65}
+                    />
+                  );
+                })}
+              </g>
+
+              <path d="M140 16 L148 32 L132 32 Z" fill={'var(--ledger-negative)'} opacity="0.95" filter="url(#wheelGlow)" />
+
+              {/* Rat runner */}
+              <g
+                opacity={game.completed && game.won ? 0.35 : 1}
+                style={{ animation: game.completed && game.won ? 'none' : 'ratRunBob 0.75s ease-in-out infinite', transformOrigin: '140px 56px' }}
+              >
+                <ellipse cx="140" cy="63" rx="14" ry="8" fill={'var(--ledger-surface)'} opacity="0.45" />
+                <ellipse cx="140" cy="54" rx="9.5" ry="7" fill="url(#ratBody)" />
+                <ellipse cx="150" cy="53" rx="4.8" ry="4" fill="url(#ratBody)" />
+                <circle cx="147.2" cy="48.8" r="2.4" fill={'var(--ledger-accent)'} />
+                <circle cx="143.2" cy="49.3" r="2.1" fill={'var(--ledger-accent)'} />
+                <circle cx="151.8" cy="52.6" r="0.9" fill={'var(--ledger-raised)'} />
+                <line x1="154.3" y1="53.1" x2="158.8" y2="52.5" stroke={'var(--ledger-accent)'} strokeWidth="0.9" />
+                <line x1="154.3" y1="53.8" x2="158.8" y2="54.1" stroke={'var(--ledger-accent)'} strokeWidth="0.9" />
+                <path d="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" fill="none" stroke={'var(--ledger-warning)'} strokeWidth="2.2" strokeLinecap="round">
+                  {!game.completed && <animate attributeName="d" values="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62;M132 57 Q123 61 120 67 Q119 70 122 70 Q126 68 128 65 Q132 61 136 62;M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" dur="0.65s" repeatCount="indefinite" />}
+                </path>
+                <rect x="136.5" y="59.7" width="3.8" height="7" rx="1.2" fill={'var(--ledger-accent)'} />
+                <rect x="142" y="59.7" width="3.8" height="7" rx="1.2" fill={'var(--ledger-accent)'} />
+              </g>
+
+              {/* Center hub */}
+              <circle cx="140" cy="140" r="10" fill={'var(--ledger-surface)'} opacity="0.75" />
+              <circle cx="140" cy="140" r="6" fill={'var(--ledger-negative)'} opacity="0.9" />
+              {!game.completed && <circle cx="140" cy="140" r="14" fill="none" stroke={'var(--ledger-negative)'} opacity="0.3">
+                <animate attributeName="r" values="12;16;12" dur="1.8s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.35;0.1;0.35" dur="1.8s" repeatCount="indefinite" />
+              </circle>}
+              {/* Freedom bridge */}
+              {game.completed && game.won && (
+                <>
+                  <path d="M 220 140 Q 250 100 260 60" stroke={'var(--ledger-accent)'} strokeWidth="4" fill="none" strokeLinecap="round">
+                    <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="1.5s" fill="freeze" />
+                  </path>
+                  {/* Escaped avatar */}
+                  <circle cx="260" cy="55" r="8" fill={'var(--ledger-positive)'} />
+                  <rect x="254" y="63" width="12" height="16" rx="3" fill={'var(--ledger-positive)'} />
+                  {/* Confetti */}
+                  {confettiPieces.map((piece, i) => (
+                    <rect key={i} x={piece.x} y={piece.y}
+                      width="4" height="8" fill={piece.color} opacity="0.8">
+                      <animateTransform attributeName="transform" type="rotate"
+                        from={`0 ${piece.rotationX} ${piece.rotationY}`} to={`360 ${piece.rotationX} ${piece.rotationY}`}
+                        dur={piece.duration} repeatCount="indefinite" />
+                    </rect>
+                  ))}
+                </>
+              )}
+              {/* Labels */}
+              <text x="140" y="242" textAnchor="middle" fill={'var(--ledger-negative)'} fontSize="12" fontWeight="700" letterSpacing="2.1" opacity="1">RAT RACE</text>
+              {game.completed && game.won && (
+                <text x="260" y="40" textAnchor="middle" fill={'var(--ledger-positive)'} fontSize="10" fontWeight="bold">FREEDOM!</text>
+              )}
+            </svg>
+              </div>
+              {!game.completed && <button type="button" className="lesson-button" onClick={workHarder}>Work Harder ({workHarderClicks}x clicked)</button>}
+              {message && <p className="tone-bad" role="status">{message}</p>}
+            </div>
+          </details>
+        </div>
       </div>
 
       <style>{`
@@ -728,4 +587,3 @@ export default function RatRace() {
     </section>
   );
 }
-
