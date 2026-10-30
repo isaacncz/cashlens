@@ -10,7 +10,7 @@ import './RepeatSales.css';
 import './CompoundFlow.css';
 
 const FIRST_PRODUCT_ID = '124106';
-const presets = [1, 12, 24, 60, 120, 300, 600];
+const presets = [1, 12, 24, 36, 48, 60, 120, 240, 300, 600];
 const startYears = Array.from({ length: 50 }, (_, index) => index + 1);
 const steps = ['First sale', 'Repeat sales', 'More products', 'Long term'];
 const shortSteps = ['First sale', 'Repeat', 'Basket', 'Long term'];
@@ -30,12 +30,12 @@ export default function RepeatSales() {
   const [selectedIds, setSelectedIds] = useState<string[]>([FIRST_PRODUCT_ID]);
   const [intervals, setIntervals] = useState<Record<string, number>>({});
   const [productYears, setProductYears] = useState<Record<string, number>>({});
-  const [months, setMonths] = useState(60);
+  const [months, setMonths] = useState(240);
   const [customers, setCustomers] = useState(1);
   const [customerInput, setCustomerInput] = useState('1');
   const [rate, setRate] = useState(DEFAULT_REPEAT_RATE);
   const [purchaseModel, setPurchaseModel] = useState<PurchaseModel>('repeat-purchases');
-  const [addCustomerEachYear, setAddCustomerEachYear] = useState(false);
+  const [addCustomerEachYear, setAddCustomerEachYear] = useState(true);
   const [customersPerYear, setCustomersPerYear] = useState(1);
   const [showCategories, setShowCategories] = useState(false);
   const [showSource, setShowSource] = useState(false);
@@ -114,8 +114,8 @@ export default function RepeatSales() {
     requestAnimationFrame(() => document.getElementById(`rs-start-${id}`)?.focus({ preventScroll: true }));
   };
   const reset = () => {
-    setCustomersPerYear(1); goToStep(0); setFirstId(FIRST_PRODUCT_ID); setSelectedIds([FIRST_PRODUCT_ID]); setIntervals({}); setProductYears({}); setMonths(60); changeCustomers(1);
-    setRate(DEFAULT_REPEAT_RATE); setPurchaseModel('repeat-purchases'); setAddCustomerEachYear(false); setShowCategories(false); setShowSource(false); setActivity(null); setPickerOpen(false);
+    setCustomersPerYear(1); goToStep(0); setFirstId(FIRST_PRODUCT_ID); setSelectedIds([FIRST_PRODUCT_ID]); setIntervals({}); setProductYears({}); setMonths(240); changeCustomers(1);
+    setRate(DEFAULT_REPEAT_RATE); setPurchaseModel('repeat-purchases'); setAddCustomerEachYear(true); setShowCategories(false); setShowSource(false); setActivity(null); setPickerOpen(false);
     if (headingRef.current) scrollToContent(headingRef.current);
   };
 
@@ -153,11 +153,12 @@ export default function RepeatSales() {
       <div className="rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
         <div className="rs-basket-heading"><div><h2>{step === 1 ? 'Your one product' : 'Your products'}</h2><p className="rs-muted">Malaysia ABO prices · Apr 2026</p></div>{step === 1 && <button type="button" className="rs-text-button" onClick={() => openPicker('first')}>Change</button>}</div>
         {step >= 2 && <button type="button" ref={addButtonRef} className="rs-add-products" onClick={() => openPicker('add')}><Plus size={18} aria-hidden="true" />Add products</button>}
+        {step >= 2 && <p className="rs-muted">Open a product and change “Starts buying” to plan year 3, year 4 or later. Products are grouped by start year and keep repeating at your chosen interval.</p>}
         <div className="rs-plan">
           {introductions.map(({ year, count }) => <div className="rs-plan-year" key={year}><h3 className="rs-year-heading">Year {year}<span>{count} {count === 1 ? 'product' : 'products'}{year > 1 ? ' added' : ''}</span></h3>
             {products.filter(product => product.startYear === year).map(product => <details className="rs-compact-product" data-product-id={product.id} key={product.id} open={isPhone ? expandedProduct === product.id : !collapsedDesktopProducts.includes(product.id)}>
               <summary onClick={event => { event.preventDefault(); if (isPhone) setExpandedProduct(previous => previous === product.id ? null : product.id); else setCollapsedDesktopProducts(previous => previous.includes(product.id) ? previous.filter(id => id !== product.id) : [...previous, product.id]); }}>
-                <span className="rs-compact-name">{product.name}<small>{product.size} · {cycleLabel(product.every)}</small></span><span className="rs-compact-price">RM {formatRinggit(product.aboPrice)}<small>ABO / pack</small></span><ChevronDown size={18} aria-hidden="true" />
+                <span className="rs-compact-name">{product.name}<small>{product.size} · {cycleLabel(product.every)}{step >= 2 && <> · From year {product.startYear}</>}</small></span><span className="rs-compact-price">RM {formatRinggit(product.aboPrice)}<small>ABO / pack</small></span><ChevronDown size={18} aria-hidden="true" />
               </summary>
               <div className="rs-compact-controls">
               <div className={`rs-product-controls${step === 1 ? ' rs-single-control' : ''}`}>
