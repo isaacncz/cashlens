@@ -22,7 +22,7 @@ WCAG AA contrast, semantic navigation and forms, visible keyboard focus, 44px to
 
 Light is the default theme for new visitors, including dark-mode devices. Explicit stored Light, Dark and Device selections are respected. Learning offers three ordered paths with three lessons each and a session-only last-opened lesson shortcut.
 
-Compound opens as a consultation: one toothpaste (ABO RM29.50), one customer, then repeat sales over a year. Users add products from year 2 with editable business-calendar start years and explore up to 50 years. Optional yearly customer acquisition starts off; the cap remains 20 and the repeat-purchase default remains 100%. The four stages can be visited directly, and calculator inputs remain ephemeral.
+Compound opens as a consultation: one toothpaste (ABO RM29.50), one customer, then repeat sales over a year. Users add products from year 2 with editable business-calendar start years and explore up to 50 years. The long-term plan defaults to 20 years with yearly customer acquisition enabled; the cap remains 20 and the repeat-purchase default remains 100%. The four stages can be visited directly, and calculator inputs remain ephemeral.
 
 Money Mirror uses the user-selected Quick Worksheet page direction (29 October 2026): an editorial cool-white/navy worksheet with Ink Blue highlights, four compact inputs and immediate live results. This page-specific replacement supersedes its previous Pocket Coach form styling while retaining the shared app navigation, themes, privacy and exact financial calculations.
 
