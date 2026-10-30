@@ -106,3 +106,11 @@
 }
 
 #money-mirror :is(.mm-text-action, .mm-amount, summary svg) { color: var(--mm-highlight); }
+
+#money-mirror .mm-hours-field { min-width: 0; }
+#money-mirror .mm-hours-field .hours-slider { margin-top: 0; border-top: 0; }
+#money-mirror .mm-hours-field .hours-slider summary { justify-content: flex-start; gap: 8px; min-height: 44px; padding: 8px 0; color: var(--mm-highlight); }
+#money-mirror .hours-slider p { margin: 0 0 8px; }
+#money-mirror .mm-empty h2 { margin-bottom: 0; font-size: 1rem; }
+#money-mirror .mm-output > details { margin-top: 12px; }
+#money-mirror .mm-privacy { margin-top: 12px; }

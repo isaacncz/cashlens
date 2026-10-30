@@ -113,13 +113,13 @@ input::placeholder, textarea::placeholder { color: var(--ledger-muted); opacity:
 .lesson-screen .bg-gold.text-navy { color: var(--ledger-on-accent); }
 .lesson-screen [data-reveal], .lesson-screen [data-result] { opacity: 1; }
 .lesson-screen :is(.shadow-elevated, [class*="shadow-["]) { box-shadow: none; }
-.lesson-screen input[type=range] { height: 44px; accent-color: var(--ledger-accent); }
+.lesson-screen input[type=range] { appearance: none; width: 100%; height: 44px; background: transparent; accent-color: var(--ledger-accent); }
 .lesson-screen :is(.rounded-3xl, .rounded-2xl) { border-radius: var(--radius-panel); }
 .lesson-screen :is(.gap-12, .lg\:gap-16) { gap: 24px; }
 .lesson-screen .border-2 { border-width: 1px; }
 .lesson-screen .mb-10 { margin-bottom: 24px; }
 .lesson-screen .text-gradient-gold { color: var(--ledger-accent); background: none; -webkit-text-fill-color: currentColor; }
-.lesson-screen input[type=range]::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; background: var(--ledger-accent); border: 3px solid var(--ledger-surface); border-radius: 50%; box-shadow: none; }
+.lesson-screen input[type=range]::-webkit-slider-thumb { appearance: none; margin-top: -10px; width: 24px; height: 24px; background: var(--ledger-accent); border: 3px solid var(--ledger-surface); border-radius: 50%; box-shadow: none; }
 .lesson-screen input[type=range]::-moz-range-thumb { width: 20px; height: 20px; background: var(--ledger-accent); border: 3px solid var(--ledger-surface); border-radius: 50%; box-shadow: none; }
 @media (min-width: 768px) { .lesson-screen > section { padding-inline: 32px; } }
 @media (max-width: 1023px) {
@@ -139,7 +139,7 @@ html, body, #root { height: 100%; overflow: hidden; }
 #main-content[data-route=compounding] { bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--consultation-dock-height)); }
 .lesson-action { position: fixed; left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px); margin: 0; z-index: 25; }
 .dashboard { padding-bottom: 24px; }
-.lesson-screen .lesson-range { appearance: auto; width: 100%; background: transparent; }
+.lesson-screen .lesson-range { appearance: none; width: 100%; background: transparent; }
 @media (min-width: 1024px) {
   #main-content, #main-content[data-route=wealth-thermometer] { left: 232px; margin-left: 0; bottom: 0; padding-bottom: 24px; }
   #main-content[data-route=compounding] { bottom: 104px; }
@@ -211,3 +211,8 @@ html, body, #root { height: 100%; overflow: hidden; }
   .dashboard-tools .tool-card + .tool-card { border-top: 0; }
   .library-page .page-heading { margin-bottom: 20px; }
 }
+
+/* Explicit tracks avoid native/custom rendering differences on mobile browsers. */
+.lesson-screen input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--ledger-control); }
+.lesson-screen input[type=range]::-moz-range-track { height: 4px; border-radius: 4px; background: var(--ledger-control); }
+.lesson-screen input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--ledger-accent); }

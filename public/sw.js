@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cashlens-compound-flow-v13';
+const CACHE_NAME = 'cashlens-light-controls-v14';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

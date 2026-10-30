@@ -375,3 +375,8 @@ Compound language: results name the projected period, qualify revenue as before 
 The user approved the working mobile plan and delegated implementation to Terra. Mobile catalog browsing uses a full-height native dialog: compact complete product names, size/price metadata, search/category controls, All/Selected filters, selection count and Done. Catalog selection does not present projected revenue as a basket price. The main flow offers Build my product plan to bypass guided examples and start the full planner.
 
 Products, Settings and Results give each task a separate phone section. Selected products remain grouped by actual business-calendar start year, with one compact row per product. Purchase timing and removal controls expand only when editing a product; desktop retains exposed controls. Closing the catalog returns to Products for review. Settings carries customer/time/repeat assumptions; View results connects both editing sections to the projection. Financial behavior and the 100% repeat default are preserved. Ink Blue, full names, touch targets, keyboard access and enlarged text remain requirements.
+
+
+## Light-theme control repair
+
+Lesson range controls use explicit WebKit/Firefox tracks and thumb styling, with a 44px interaction area and shared control/accent colors. This avoids mixing a custom thumb with an unspecified native track. Money Mirror places its optional Use slider disclosure beside the work-hours field, with an accessible hour-value description. The empty result uses one concise prompt; supporting disclosures/privacy use tighter spacing. Numeric entry, calculations and Ink Blue are unchanged.

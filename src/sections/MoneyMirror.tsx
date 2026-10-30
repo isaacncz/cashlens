@@ -218,7 +218,14 @@ export default function MoneyMirror() {
             <div className="mm-fields">
               <NumberField validationMode="change" id="mm-salary" label="Monthly salary · RM" value={salary} onChange={edit(setSalary)} min={SALARY_MIN} max={SALARY_MAX} required placeholder="e.g. 8000" submitted={submitted} />
               <NumberField validationMode="change" id="mm-expenses" label="Work costs · RM/month" value={expenses} onChange={edit(setExpenses)} placeholder="0" submitted={submitted} />
-              <NumberField validationMode="change" id="mm-hours" label="Work hours / week" value={hours} onChange={edit(setHours)} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" inputMode="numeric" submitted={submitted} />
+              <div className="mm-hours-field">
+                <NumberField validationMode="change" id="mm-hours" label="Work hours / week" value={hours} onChange={edit(setHours)} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" inputMode="numeric" submitted={submitted} />
+                <details className="hours-slider">
+                  <summary>Use slider<ChevronDown size={17} aria-hidden="true" /></summary>
+                  <input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => edit(setHours)(event.target.value)} aria-label="Hours worked per week" aria-valuetext={`${hoursValue} hours per week`} className="lesson-range" />
+                  <p>{hoursValue} hours / week</p>
+                </details>
+              </div>
               <NumberField validationMode="change" id="mm-commute" label="Commute hours / day" value={commute} onChange={edit(setCommute)} max={24} placeholder="0" submitted={submitted} />
             </div>
             <p className="mm-defaults">Use salary before deductions. Blank fields use 44 work hours and zero costs or commute.</p>
@@ -245,8 +252,7 @@ export default function MoneyMirror() {
             <button type="button" className="mm-edit-action" onClick={editNumbers}>Adjust my numbers<ArrowUp size={18} aria-hidden="true" /></button>
             {selectedPresetMeta && <p className="mm-example-note">{selectedPresetMeta.description}</p>}
           </div> : <div className="mm-result mm-empty" aria-live="polite">
-            <h2>{hasInvalidInput ? 'Let’s check those numbers.' : 'Your estimate starts here.'}</h2>
-            <p>{hasInvalidInput ? 'Correct the highlighted field to see your updated result.' : 'Enter your monthly salary above. Your hourly pay and take-home amount will update here.'}</p>
+            <h2>{hasInvalidInput ? 'Check the highlighted field.' : 'Enter salary to see your estimate.'}</h2>
           </div>}
           <details className="mm-deductions">
             <summary>Deductions &amp; calculation<ChevronDown size={17} aria-hidden="true" /></summary>
@@ -262,12 +268,7 @@ export default function MoneyMirror() {
             <dl className="mm-breakdown-list"><div><dt>Annual hours traded</dt><dd>{results.annualHours.toFixed(0)} hours</dd></div><div><dt>Equivalent full days</dt><dd>{Math.round(results.annualHours / 24)} days</dd></div><div><dt>Modelled survival without work</dt><dd>{results.monthsSurvival.toFixed(1)} months</dd></div></dl>
             <p>The survival illustration assumes six months of net income set aside, with monthly spending at 70% of gross salary. It is not based on your actual savings. When work costs are zero, this illustration returns zero.</p>
           </details>}
-          <details className="hours-slider">
-            <summary>Adjust hours with a slider<ChevronDown size={17} aria-hidden="true" /></summary>
-            <input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => edit(setHours)(event.target.value)} aria-label="Hours worked per week" className="lesson-range" />
-            <p>{hoursValue} hours / week</p>
-          </details>
-          <p className="mm-privacy">Live estimate · No account needed · Nothing saved</p>
+          <p className="mm-privacy">Your numbers stay in this session.</p>
         </div>
       </div>
     </div>
