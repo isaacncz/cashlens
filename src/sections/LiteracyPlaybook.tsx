@@ -1,8 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useState } from 'react';
 
 const rules = [
   {
@@ -39,34 +35,20 @@ export default function LiteracyPlaybook() {
   const [activeMyth, setActiveMyth] = useState(0);
   const [doneActions, setDoneActions] = useState<number[]>([]);
 
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const els = sectionRef.current.querySelectorAll('[data-reveal]');
-    gsap.fromTo(els, { opacity: 0, y: 32 }, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: 'power3.out',
-      stagger: 0.08,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 82%', once: true },
-    });
-  }, []);
+
 
   const toggleAction = (index: number) => {
     setDoneActions((prev) => (prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]));
   };
 
   return (
-    <section id="literacy-playbook" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#081424' }}>
+    <section id="literacy-playbook" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <p data-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 09 / Financial Literacy Playbook
-        </p>
-        <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
+        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
           Learn The Rule.
           {' '}
           <span className="text-gold">Use It Anywhere.</span>
-        </h2>
+        </h1>
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-2xl">
           Financial literacy only matters if you can apply it. Tap through the myths and action steps.
         </p>
@@ -75,7 +57,7 @@ export default function LiteracyPlaybook() {
           {rules.map((rule) => (
             <div key={rule.title} className="bg-navy-surface border border-navy-light rounded-2xl p-6">
               <p className={`text-sm font-semibold uppercase tracking-[0.12em] mb-3 ${rule.tone}`}>Rule</p>
-              <h3 className="text-white text-xl font-bold mb-3">{rule.title}</h3>
+              <h2 className="text-white text-xl font-bold mb-3">{rule.title}</h2>
               <p className="text-slate text-sm leading-relaxed">{rule.body}</p>
             </div>
           ))}
@@ -91,6 +73,7 @@ export default function LiteracyPlaybook() {
                   type="button"
                   onMouseEnter={() => setActiveMyth(index)}
                   onFocus={() => setActiveMyth(index)}
+                  aria-pressed={activeMyth === index}
                   onClick={() => setActiveMyth(index)}
                   className={`min-h-9 px-3 rounded-full border text-xs font-semibold transition-all ${
                     activeMyth === index
@@ -116,6 +99,7 @@ export default function LiteracyPlaybook() {
                 <button
                   key={action}
                   type="button"
+                  aria-pressed={doneActions.includes(index)}
                   onClick={() => toggleAction(index)}
                   className={`w-full text-left flex items-start gap-3 rounded-xl border p-4 transition-all ${
                     doneActions.includes(index)

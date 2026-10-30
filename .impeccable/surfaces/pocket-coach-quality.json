@@ -1,0 +1,41 @@
+{
+  "label": "Pocket Coach",
+  "kind": "pick",
+  "selectedBy": "user",
+  "selectedOn": "2026-10-28",
+  "seed": "seed:f5b4cdd313293934",
+  "mode": "operate",
+  "buildPath": "code",
+  "thesis": "A welcoming guide that makes the next small action obvious.",
+  "palette": {
+    "ground": "#f7f4eb",
+    "surface": "#fffef9",
+    "ink": "#233a2f",
+    "accent": "#275c48",
+    "guide": "#eee8d8",
+    "featureAction": "#e7eddb"
+  },
+  "type": "Self-hosted Inter; 32\u201342px Home display; 16px body and inputs; tabular monetary values.",
+  "materials": [
+    "warm ivory canvas",
+    "forest task panel",
+    "sage action",
+    "flat light consultation surface",
+    "thin boundaries"
+  ],
+  "firstViewport": "Home introduction, forest Money Mirror task and inline sage action, four mobile destinations. Desktop sidebar and wide task panel.",
+  "signature": "One task framed in forest, with a warm guide leading into three learning paths.",
+  "crossSurface": "Forest Continue panel in Learn; warm forms and path navigation; conversational first-sale product story beside a qualified revenue amount; matching appearance settings.",
+  "risk": "Familiar and approachable; lower density than a dedicated scenario workspace.",
+  "referenceHtml": ".impeccable/mocks/decision/pocket-coach.html",
+  "referenceCaptures": [
+    ".impeccable/review/proposals/pocket-coach-home-390.png",
+    ".impeccable/review/proposals/pocket-coach-home-1440.png",
+    ".impeccable/review/proposals/pocket-coach-compound-390.png",
+    ".impeccable/review/proposals/pocket-coach-compound-1440.png"
+  ],
+  "claims": [
+    "All money examples and before-costs revenue are labeled.",
+    "Visiting a lesson never implies completion."
+  ]
+}

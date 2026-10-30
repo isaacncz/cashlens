@@ -1,26 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { formatMoney } from '../lib/currency';
+import { useState, useRef } from 'react';
 
 type QuadrantLevel = 0 | 1 | 2 | 3;
 
 const quadrantLabels = ['E — Employee', 'S — Self-employed', 'B — Business Owner', 'I — Investor'];
-const quadrantColors = ['#DC2626', '#8892B0', '#10B981', '#FFD700'];
+const quadrantColors = ['var(--ledger-negative)', 'var(--ledger-muted)', 'var(--ledger-positive)', 'var(--ledger-accent)'];
 
 export default function DebtVisualizer() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [sliderValue, setSliderValue] = useState<QuadrantLevel>(0);
 
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const els = sectionRef.current.querySelectorAll('[data-reveal]');
-    gsap.fromTo(els, { opacity: 0, y: 40 }, {
-      opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-    });
-  }, []);
+
 
   const multiplier = 1 + sliderValue * 0.5; // 1x to 2.5x
   const carMonthlyCost = 1500 * multiplier;
@@ -54,15 +44,12 @@ export default function DebtVisualizer() {
   ];
 
   return (
-    <section id="debt" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
+    <section id="debt" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <p data-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 06 / Debt Visualizer
-        </p>
-        <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
+        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
           Not All Debt{' '}
           <span className="text-gold">Is Created Equal.</span>
-        </h2>
+        </h1>
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
           Slide to see how the same debt crushes or amplifies, depending on your quadrant.
         </p>
@@ -70,12 +57,12 @@ export default function DebtVisualizer() {
         <div data-reveal className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-crimson/10 border border-crimson/30 rounded-2xl p-5">
             <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-2">Bad debt drag</p>
-            <p className="text-white text-2xl font-bold font-mono-data">- RM {carMonthlyCost.toFixed(0)}</p>
+            <p className="text-white text-2xl font-bold font-mono-data">- RM {formatMoney(carMonthlyCost)}</p>
             <p className="text-slate text-sm mt-2">Car debt pulls cash out of your pocket every month.</p>
           </div>
           <div className="bg-emerald/10 border border-emerald/30 rounded-2xl p-5">
             <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-2">Good debt output</p>
-            <p className="text-white text-2xl font-bold font-mono-data">+ RM {rentalSurplus.toFixed(0)}</p>
+            <p className="text-white text-2xl font-bold font-mono-data">+ RM {formatMoney(rentalSurplus)}</p>
             <p className="text-slate text-sm mt-2">Rental debt can create monthly surplus instead of monthly stress.</p>
           </div>
           <div className="bg-gold/10 border border-gold/30 rounded-2xl p-5">
@@ -96,7 +83,7 @@ export default function DebtVisualizer() {
                 <span className="text-crimson text-lg">⚠</span>
               </div>
               <div>
-                <h3 className="text-crimson font-bold text-xl uppercase tracking-wider">Bad Debt</h3>
+                <h2 className="text-crimson font-bold text-xl uppercase tracking-wider">Bad Debt</h2>
                 <p className="text-slate text-sm">Makes you look rich. Makes you poor.</p>
               </div>
             </div>
@@ -113,14 +100,14 @@ export default function DebtVisualizer() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Monthly payment + costs</span>
-                  <span className="text-crimson font-mono-data font-bold">RM {carMonthlyCost.toFixed(0)}</span>
+                  <span className="text-crimson font-mono-data font-bold">RM {formatMoney(carMonthlyCost)}</span>
                 </div>
                 <div className="w-full bg-navy-light rounded-full h-2">
                   <div className="bg-crimson h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 30 * multiplier)}%` }} />
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Total paid over 7 years</span>
-                  <span className="text-crimson font-mono-data">RM {carTotalPaid.toLocaleString()}</span>
+                  <span className="text-crimson font-mono-data">RM {formatMoney(carTotalPaid)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Car value at end</span>
@@ -142,7 +129,7 @@ export default function DebtVisualizer() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Debt remaining</span>
-                  <span className="text-crimson font-mono-data font-bold">RM {ptptnBurden.toLocaleString()}</span>
+                  <span className="text-crimson font-mono-data font-bold">RM {formatMoney(ptptnBurden)}</span>
                 </div>
                 <div className="w-full bg-navy-light rounded-full h-2">
                   <div className="bg-crimson h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 50 * multiplier)}%` }} />
@@ -160,7 +147,7 @@ export default function DebtVisualizer() {
                 <span className="text-emerald text-lg">✓</span>
               </div>
               <div>
-                <h3 className="text-emerald font-bold text-xl uppercase tracking-wider">Good Debt</h3>
+                <h2 className="text-emerald font-bold text-xl uppercase tracking-wider">Good Debt</h2>
                 <p className="text-slate text-sm">The bank's money works for you.</p>
               </div>
             </div>
@@ -177,7 +164,7 @@ export default function DebtVisualizer() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Monthly rental income</span>
-                  <span className="text-emerald font-mono-data font-bold">RM {rentalIncome.toFixed(0)}</span>
+                  <span className="text-emerald font-mono-data font-bold">RM {formatMoney(rentalIncome)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Mortgage payment</span>
@@ -185,7 +172,7 @@ export default function DebtVisualizer() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Monthly surplus</span>
-                  <span className="text-emerald font-mono-data font-bold">+ RM {rentalSurplus.toFixed(0)}</span>
+                  <span className="text-emerald font-mono-data font-bold">+ RM {formatMoney(rentalSurplus)}</span>
                 </div>
                 <div className="w-full bg-navy-light rounded-full h-2">
                   <div className="bg-emerald h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, 25 * multiplier)}%` }} />
@@ -237,7 +224,7 @@ export default function DebtVisualizer() {
               <p className="text-white text-sm font-medium">Your Quadrant</p>
               <p className="text-slate text-xs mt-1">Move the slider and watch the monthly impact update immediately.</p>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold w-fit" style={{ backgroundColor: quadrantColors[sliderValue] + '30', color: quadrantColors[sliderValue] }}>
+            <span className="px-3 py-1 rounded-full text-xs font-bold w-fit" style={{ backgroundColor: `color-mix(in srgb, ${quadrantColors[sliderValue]} 18%, transparent)`, color: quadrantColors[sliderValue] }}>
               {quadrantLabels[sliderValue]}
             </span>
           </div>
@@ -249,7 +236,7 @@ export default function DebtVisualizer() {
             value={sliderValue}
             onChange={e => setSliderValue(parseInt(e.target.value) as QuadrantLevel)}
             className="w-full h-3 rounded-full appearance-none cursor-pointer mb-4"
-            style={{ background: `linear-gradient(to right, #DC2626, #8892B0, #10B981, #FFD700)` }}
+            style={{ background: `linear-gradient(to right, var(--ledger-negative), var(--ledger-muted), var(--ledger-positive), var(--ledger-accent))` }}
             aria-label="Debt leverage by quadrant"
           />
           <div className="flex justify-between text-xs text-slate mb-6">
@@ -263,11 +250,11 @@ export default function DebtVisualizer() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
             <div className="bg-navy/50 rounded-xl p-4 border border-crimson/20">
               <p className="text-slate text-xs uppercase mb-1">Bad debt result</p>
-              <p className="text-crimson font-mono-data text-lg font-bold">RM {carMonthlyCost.toFixed(0)} out</p>
+              <p className="text-crimson font-mono-data text-lg font-bold">RM {formatMoney(carMonthlyCost)} out</p>
             </div>
             <div className="bg-navy/50 rounded-xl p-4 border border-emerald/20">
               <p className="text-slate text-xs uppercase mb-1">Good debt result</p>
-              <p className="text-emerald font-mono-data text-lg font-bold">RM {rentalSurplus.toFixed(0)} in</p>
+              <p className="text-emerald font-mono-data text-lg font-bold">RM {formatMoney(rentalSurplus)} in</p>
             </div>
             <div className="bg-navy/50 rounded-xl p-4 border border-gold/20">
               <p className="text-slate text-xs uppercase mb-1">What changes</p>
@@ -276,7 +263,7 @@ export default function DebtVisualizer() {
           </div>
 
           {/* Dynamic Insight */}
-          <div className="bg-navy/50 rounded-xl p-5 border" style={{ borderColor: quadrantColors[sliderValue] + '40' }}>
+          <div className="bg-navy/50 rounded-xl p-5 border" style={{ borderColor: `color-mix(in srgb, ${quadrantColors[sliderValue]} 25%, transparent)` }}>
             <p className="text-sm" style={{ color: quadrantColors[sliderValue] }}>
               {sliderValue === 0 && "As an Employee, ALL debt crushes you. You have no asset income to cover the payments. A car loan is a chain, not a tool."}
               {sliderValue === 1 && "As Self-employed, you earn more but have no safety net. Debt is risky — one bad month and everything unravels."}
@@ -290,7 +277,7 @@ export default function DebtVisualizer() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
             <div>
               <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Debt literacy checklist</p>
-              <h3 className="text-white text-xl font-bold">Before you borrow, ask these 3 questions.</h3>
+              <h2 className="text-white text-xl font-bold">Before you borrow, ask these 3 questions.</h2>
             </div>
             <p className="text-slate text-sm max-w-md">This teaches a reusable rule, not just a single example: debt should improve cashflow, be backed by an asset, and move you closer to time freedom.</p>
           </div>
@@ -323,28 +310,6 @@ export default function DebtVisualizer() {
         </div>
       </div>
 
-      <style>{`
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background: #FFD700;
-          border: 3px solid #0A192F;
-          cursor: pointer;
-          box-shadow: 0 0 12px rgba(255,215,0,0.5);
-        }
-        input[type="range"]::-moz-range-thumb {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background: #FFD700;
-          border: 3px solid #0A192F;
-          cursor: pointer;
-          box-shadow: 0 0 12px rgba(255,215,0,0.5);
-        }
-      `}</style>
     </section>
   );
 }

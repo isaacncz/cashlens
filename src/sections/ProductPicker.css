@@ -1,0 +1,48 @@
+/* A compact, full-height catalog keeps browsing separate from plan settings. */
+.rs-product-picker .rs-picker-content { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
+.rs-product-picker .rs-picker-header { align-items: center; padding: 12px 16px 8px; }
+.rs-product-picker .rs-picker-header h2 { font-size: 1.125rem; font-weight: 600; }
+.rs-product-picker .rs-picker-header p { margin: 2px 0 0; font-size: .875rem; }
+.rs-product-picker .rs-catalog-tools { gap: 8px; padding: 0 16px; }
+.rs-product-picker .rs-catalog-count { align-items: center; flex-wrap: wrap; gap: 4px 12px; padding: 8px 16px; }
+.rs-product-picker .rs-catalog-count > span { font-size: .75rem; }
+.rs-catalog-views { display: flex; gap: 4px; flex-wrap: wrap; }
+.rs-product-picker .rs-catalog-views button { min-height: 44px; padding: 8px 10px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--rs-muted); font-size: .875rem; }
+.rs-product-picker .rs-catalog-views button[aria-pressed=true] { background: var(--ledger-raised); color: var(--rs-gold); font-weight: 600; }
+.rs-product-picker .rs-products { padding: 0 12px; }
+.rs-product-picker .rs-product { grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 0 8px; padding: 8px 8px 8px 0; }
+.rs-product-picker .rs-product + .rs-product { margin-top: 0; }
+.rs-product-picker .rs-pick-target { grid-row: auto; }
+.rs-product-picker .rs-product-copy { padding: 0; min-height: 44px; line-height: 1.35; font-size: 1rem; overflow-wrap: anywhere; }
+.rs-product-picker .rs-product-meta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; margin-top: 4px; font-size: .875rem; line-height: 1.4; }
+.rs-product-picker .rs-product-price { display: inline; grid-column: auto; min-height: 0; padding: 0; margin: 0; color: var(--rs-ink); font-size: .875rem; line-height: 1.4; font-weight: 600; white-space: nowrap; }
+.rs-product-picker .rs-picker-footer { padding: 10px 16px max(10px, env(safe-area-inset-bottom)); }
+.rs-product-picker .rs-picker-footer strong { font-size: 1rem; }
+.rs-product-picker .rs-picker-footer small { font-size: .75rem; }
+.rs-product-picker .rs-picker-footer .primary-button { min-height: 48px; min-width: 88px; }
+@media (max-width: 767px) {
+  dialog.rs-product-picker { inset: 0; width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; }
+  .rs-product-picker .rs-picker-header { padding-top: max(12px, env(safe-area-inset-top)); }
+  .rs-product-picker .rs-catalog-tools { grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); }
+  .rs-product-picker .rs-catalog-tools > select { padding-inline: 8px; }
+  .rs-product-picker .rs-search { padding-inline: 8px; gap: 6px; }
+  .rs-product-picker .rs-search svg { flex-shrink: 0; }
+  .rs-product-picker .rs-search input { font-size: 1rem; }
+  .rs-product-picker .rs-search input::placeholder { font-size: .875rem; }
+}
+@media (max-width: 359px) {
+  .rs-product-picker .rs-catalog-tools { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-height: 450px) and (max-width: 767px) {
+  .rs-product-picker .rs-picker-header p { display: none; }
+  .rs-product-picker .rs-picker-header { padding-block: 4px; }
+  .rs-product-picker .rs-catalog-count { padding-block: 0; }
+  .rs-product-picker .rs-catalog-tools { grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); }
+  .rs-product-picker .rs-picker-footer { padding-block: 4px; }
+}
+
+/* At enlarged text sizes, allow each filter its own full-width row. */
+.rs-product-picker .rs-picker-content { container-type: inline-size; }
+@container (max-width: 22rem) {
+  .rs-product-picker .rs-catalog-tools { grid-template-columns: minmax(0, 1fr); }
+}

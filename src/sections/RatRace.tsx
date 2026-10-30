@@ -1,8 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { formatMoney } from '../lib/currency';
+import { useState, useRef, useMemo } from 'react';
 
 interface GameState {
   year: number;
@@ -140,7 +137,7 @@ function getRandomEvent() {
 }
 
 function formatImpactAmount(value: number): string {
-  return `${value > 0 ? '+' : value < 0 ? '-' : ''}RM ${Math.abs(value).toFixed(0)}`;
+  return `${value > 0 ? '+' : value < 0 ? '-' : ''}RM ${formatMoney(Math.abs(value))}`;
 }
 
 function getImpactPreview(current: GameState, effect: Partial<GameState>): ImpactChip[] {
@@ -242,28 +239,14 @@ export default function RatRace() {
         rotationX: 255 + i * 3,
         rotationY: 50 + i * 2,
         duration: `${1 + (i % 4) * 0.2}s`,
-        color: ['#FFD700', '#10B981', '#E6F1FF'][i % 3],
+        color: ['var(--ledger-accent)', 'var(--ledger-positive)', 'var(--ledger-ink)'][i % 3],
       })),
     [],
   );
 
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const els = sectionRef.current.querySelectorAll('[data-reveal]');
-    gsap.fromTo(els, { opacity: 0, y: 40 }, {
-      opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-    });
-  }, []);
 
-  useEffect(() => {
-    if (game.completed) {
-      const summaryEl = document.getElementById('rat-race-summary');
-      if (summaryEl) {
-        gsap.fromTo(summaryEl, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' });
-      }
-    }
-  }, [game.completed]);
+
+
 
   const makeDecision = (decision: Decision) => {
     const effect = decision.effect(game);
@@ -327,15 +310,15 @@ export default function RatRace() {
   const wheelSpinDuration = `${Math.max(1.5, 8 - workHarderClicks * 0.2)}s`;
 
   return (
-    <section id="rat-race" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
+    <section id="rat-race" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
         <p data-reveal className="text-crimson text-xs font-medium tracking-[0.1em] uppercase mb-4">
           Module 05 / Rat Race Simulator
         </p>
-        <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
+        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
           Work Harder.{' '}
           <span className="text-crimson">Never Leave the Wheel.</span>
-        </h2>
+        </h1>
         <div data-reveal className="bg-navy-surface/50 border border-navy-light rounded-2xl p-5 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -371,7 +354,7 @@ export default function RatRace() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-slate text-sm">Monthly Salary</span>
-                    <span className="text-gold font-mono-data font-bold">RM {game.salary.toLocaleString()}</span>
+                    <span className="text-gold font-mono-data font-bold">RM {formatMoney(game.salary)}</span>
                   </div>
                   <div className="w-full bg-navy-light rounded-full h-2">
                     <div className="bg-gold h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, game.salary / 100)}%` }} />
@@ -379,7 +362,7 @@ export default function RatRace() {
 
                   <div className="flex justify-between items-center">
                     <span className="text-slate text-sm">Monthly Expenses</span>
-                    <span className="text-crimson font-mono-data font-bold">RM {game.expenses.toLocaleString()}</span>
+                    <span className="text-crimson font-mono-data font-bold">RM {formatMoney(game.expenses)}</span>
                   </div>
                   <div className="w-full bg-navy-light rounded-full h-2">
                     <div className="bg-crimson h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, game.expenses / 100)}%` }} />
@@ -387,7 +370,7 @@ export default function RatRace() {
 
                   <div className="flex justify-between items-center">
                     <span className="text-slate text-sm">Passive Income</span>
-                    <span className="text-emerald font-mono-data font-bold">RM {game.passiveIncome.toFixed(0)}</span>
+                    <span className="text-emerald font-mono-data font-bold">RM {formatMoney(game.passiveIncome)}</span>
                   </div>
                   <div className="w-full bg-navy-light rounded-full h-2">
                     <div className="bg-emerald h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, freedomPercent)}%` }} />
@@ -395,16 +378,16 @@ export default function RatRace() {
 
                   <div className="flex justify-between items-center pt-2 border-t border-navy-light">
                     <span className="text-slate text-sm">PTPTN Debt</span>
-                    <span className="text-crimson font-mono-data">RM {game.ptptnDebt.toLocaleString()}</span>
+                    <span className="text-crimson font-mono-data">RM {formatMoney(game.ptptnDebt)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate text-sm">ASB Balance</span>
-                    <span className="text-gold font-mono-data">RM {game.asbBalance.toLocaleString()}</span>
+                    <span className="text-gold font-mono-data">RM {formatMoney(game.asbBalance)}</span>
                   </div>
                   <div className="bg-navy/60 border border-navy-light rounded-xl p-4 mt-2">
                     <p className="text-slate text-xs uppercase mb-1">Monthly gap right now</p>
                     <p className={`font-mono-data text-xl font-bold ${monthlyGap >= 0 ? 'text-emerald' : 'text-crimson'}`}>
-                      {monthlyGap >= 0 ? '+' : '-'} RM {Math.abs(monthlyGap).toFixed(0)}
+                      {monthlyGap >= 0 ? '+' : '-'} RM {formatMoney(Math.abs(monthlyGap))}
                     </p>
                     <p className="text-slate text-xs mt-2">Positive means your passive income already covers your lifestyle.</p>
                   </div>
@@ -451,18 +434,18 @@ export default function RatRace() {
                 <svg width="280" height="280" viewBox="0 0 280 280">
                   <defs>
                     <radialGradient id="wheelSurface" cx="50%" cy="40%" r="65%">
-                      <stop offset="0%" stopColor="#1E467C" />
-                      <stop offset="55%" stopColor="#12365F" />
-                      <stop offset="100%" stopColor="#0A2446" />
+                      <stop offset="0%" stopColor={'var(--ledger-raised)'} />
+                      <stop offset="55%" stopColor={'var(--ledger-raised)'} />
+                      <stop offset="100%" stopColor={'var(--ledger-surface)'} />
                     </radialGradient>
                     <linearGradient id="wheelRim" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#FB7185" />
-                      <stop offset="45%" stopColor="#F43F5E" />
-                      <stop offset="100%" stopColor="#9F1239" />
+                      <stop offset="0%" stopColor={'var(--ledger-negative)'} />
+                      <stop offset="45%" stopColor={'var(--ledger-negative)'} />
+                      <stop offset="100%" stopColor={'var(--ledger-negative)'} />
                     </linearGradient>
                     <linearGradient id="wheelSpoke" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#FB7185" stopOpacity="0.95" />
-                      <stop offset="100%" stopColor="#881337" stopOpacity="0.35" />
+                      <stop offset="0%" stopColor={'var(--ledger-negative)'} stopOpacity="0.95" />
+                      <stop offset="100%" stopColor={'var(--ledger-negative)'} stopOpacity="0.35" />
                     </linearGradient>
                     <filter id="wheelGlow" x="-40%" y="-40%" width="180%" height="180%">
                       <feGaussianBlur stdDeviation="4" result="blur" />
@@ -479,18 +462,18 @@ export default function RatRace() {
                       </feMerge>
                     </filter>
                     <linearGradient id="ratBody" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#FFD54F" />
-                      <stop offset="100%" stopColor="#F59E0B" />
+                      <stop offset="0%" stopColor={'var(--ledger-accent)'} />
+                      <stop offset="100%" stopColor={'var(--ledger-warning)'} />
                     </linearGradient>
                   </defs>
 
-                  <circle cx="140" cy="140" r="120" fill="none" stroke="#F43F5E" strokeWidth="2" opacity="0.4" filter="url(#wheelGlow)" />
-                  <circle cx="140" cy="140" r="114" fill="none" stroke="#FB7185" strokeWidth="1.2" opacity="0.45" />
+                  <circle cx="140" cy="140" r="120" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="2" opacity="0.4" filter="url(#wheelGlow)" />
+                  <circle cx="140" cy="140" r="114" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="1.2" opacity="0.45" />
 
                   {/* Wheel */}
                   <g style={{ animation: game.completed && game.won ? 'none' : `wheelSpin ${wheelSpinDuration} linear infinite`, transformOrigin: '140px 140px' }}>
                     <circle cx="140" cy="140" r="110" fill="url(#wheelSurface)" stroke="url(#wheelRim)" strokeWidth="4" filter="url(#wheelGlow)" />
-                    <circle cx="140" cy="140" r="100" fill="none" stroke="#FB7185" strokeWidth="1.6" opacity="0.42" />
+                    <circle cx="140" cy="140" r="100" fill="none" stroke={'var(--ledger-negative)'} strokeWidth="1.6" opacity="0.42" />
                     {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, index) => {
                       const start = (deg * Math.PI) / 180;
                       const end = ((deg + 45) * Math.PI) / 180;
@@ -502,7 +485,7 @@ export default function RatRace() {
                         <path
                           key={`slice-${deg}`}
                           d={`M140 140 L${x1} ${y1} A106 106 0 0 1 ${x2} ${y2} Z`}
-                          fill={index % 2 === 0 ? '#183A63' : '#102F54'}
+                          fill={index % 2 === 0 ? 'var(--ledger-raised)' : 'var(--ledger-surface)'}
                           opacity="0.58"
                         />
                       );
@@ -533,7 +516,7 @@ export default function RatRace() {
                           y1={140 + Math.sin(rad) * (isMajor ? 101 : 105)}
                           x2={140 + Math.cos(rad) * 110}
                           y2={140 + Math.sin(rad) * 110}
-                          stroke="#FB7185"
+                          stroke={'var(--ledger-negative)'}
                           strokeWidth={isMajor ? 1.8 : 0.8}
                           opacity={isMajor ? 0.95 : 0.65}
                         />
@@ -541,44 +524,44 @@ export default function RatRace() {
                     })}
                   </g>
 
-                  <path d="M140 16 L148 32 L132 32 Z" fill="#FB7185" opacity="0.95" filter="url(#wheelGlow)" />
+                  <path d="M140 16 L148 32 L132 32 Z" fill={'var(--ledger-negative)'} opacity="0.95" filter="url(#wheelGlow)" />
 
                   {/* Rat runner */}
                   <g
                     opacity={game.completed && game.won ? 0.35 : 1}
                     style={{ animation: game.completed && game.won ? 'none' : 'ratRunBob 0.75s ease-in-out infinite', transformOrigin: '140px 56px' }}
                   >
-                    <ellipse cx="140" cy="63" rx="14" ry="8" fill="#0F172A" opacity="0.45" />
+                    <ellipse cx="140" cy="63" rx="14" ry="8" fill={'var(--ledger-surface)'} opacity="0.45" />
                     <ellipse cx="140" cy="54" rx="9.5" ry="7" fill="url(#ratBody)" />
                     <ellipse cx="150" cy="53" rx="4.8" ry="4" fill="url(#ratBody)" />
-                    <circle cx="147.2" cy="48.8" r="2.4" fill="#FCD34D" />
-                    <circle cx="143.2" cy="49.3" r="2.1" fill="#FCD34D" />
-                    <circle cx="151.8" cy="52.6" r="0.9" fill="#1E293B" />
-                    <line x1="154.3" y1="53.1" x2="158.8" y2="52.5" stroke="#FCD34D" strokeWidth="0.9" />
-                    <line x1="154.3" y1="53.8" x2="158.8" y2="54.1" stroke="#FCD34D" strokeWidth="0.9" />
-                    <path d="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" fill="none" stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round">
+                    <circle cx="147.2" cy="48.8" r="2.4" fill={'var(--ledger-accent)'} />
+                    <circle cx="143.2" cy="49.3" r="2.1" fill={'var(--ledger-accent)'} />
+                    <circle cx="151.8" cy="52.6" r="0.9" fill={'var(--ledger-raised)'} />
+                    <line x1="154.3" y1="53.1" x2="158.8" y2="52.5" stroke={'var(--ledger-accent)'} strokeWidth="0.9" />
+                    <line x1="154.3" y1="53.8" x2="158.8" y2="54.1" stroke={'var(--ledger-accent)'} strokeWidth="0.9" />
+                    <path d="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" fill="none" stroke={'var(--ledger-warning)'} strokeWidth="2.2" strokeLinecap="round">
                       {!game.completed && <animate attributeName="d" values="M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62;M132 57 Q123 61 120 67 Q119 70 122 70 Q126 68 128 65 Q132 61 136 62;M132 57 Q123 60 119 66 Q117 69 120 70 Q124 69 127 66 Q132 62 136 62" dur="0.65s" repeatCount="indefinite" />}
                     </path>
-                    <rect x="136.5" y="59.7" width="3.8" height="7" rx="1.2" fill="#FCD34D" />
-                    <rect x="142" y="59.7" width="3.8" height="7" rx="1.2" fill="#FCD34D" />
+                    <rect x="136.5" y="59.7" width="3.8" height="7" rx="1.2" fill={'var(--ledger-accent)'} />
+                    <rect x="142" y="59.7" width="3.8" height="7" rx="1.2" fill={'var(--ledger-accent)'} />
                   </g>
 
                   {/* Center hub */}
-                  <circle cx="140" cy="140" r="10" fill="#0F172A" opacity="0.75" />
-                  <circle cx="140" cy="140" r="6" fill="#DC2626" opacity="0.9" />
-                  {!game.completed && <circle cx="140" cy="140" r="14" fill="none" stroke="#F43F5E" opacity="0.3">
+                  <circle cx="140" cy="140" r="10" fill={'var(--ledger-surface)'} opacity="0.75" />
+                  <circle cx="140" cy="140" r="6" fill={'var(--ledger-negative)'} opacity="0.9" />
+                  {!game.completed && <circle cx="140" cy="140" r="14" fill="none" stroke={'var(--ledger-negative)'} opacity="0.3">
                     <animate attributeName="r" values="12;16;12" dur="1.8s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.35;0.1;0.35" dur="1.8s" repeatCount="indefinite" />
                   </circle>}
                   {/* Freedom bridge */}
                   {game.completed && game.won && (
                     <>
-                      <path d="M 220 140 Q 250 100 260 60" stroke="#FFD700" strokeWidth="4" fill="none" strokeLinecap="round">
+                      <path d="M 220 140 Q 250 100 260 60" stroke={'var(--ledger-accent)'} strokeWidth="4" fill="none" strokeLinecap="round">
                         <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="1.5s" fill="freeze" />
                       </path>
                       {/* Escaped avatar */}
-                      <circle cx="260" cy="55" r="8" fill="#10B981" />
-                      <rect x="254" y="63" width="12" height="16" rx="3" fill="#10B981" />
+                      <circle cx="260" cy="55" r="8" fill={'var(--ledger-positive)'} />
+                      <rect x="254" y="63" width="12" height="16" rx="3" fill={'var(--ledger-positive)'} />
                       {/* Confetti */}
                       {confettiPieces.map((piece, i) => (
                         <rect key={i} x={piece.x} y={piece.y}
@@ -591,9 +574,9 @@ export default function RatRace() {
                     </>
                   )}
                   {/* Labels */}
-                  <text x="140" y="242" textAnchor="middle" fill="#FDA4AF" fontSize="12" fontWeight="700" letterSpacing="2.1" opacity="1">RAT RACE</text>
+                  <text x="140" y="242" textAnchor="middle" fill={'var(--ledger-negative)'} fontSize="12" fontWeight="700" letterSpacing="2.1" opacity="1">RAT RACE</text>
                   {game.completed && game.won && (
-                    <text x="260" y="40" textAnchor="middle" fill="#10B981" fontSize="10" fontWeight="bold">FREEDOM!</text>
+                    <text x="260" y="40" textAnchor="middle" fill={'var(--ledger-positive)'} fontSize="10" fontWeight="bold">FREEDOM!</text>
                   )}
                 </svg>
               </div>
@@ -620,7 +603,7 @@ export default function RatRace() {
                         >
                           <span className="text-3xl mb-3 block">{d.icon}</span>
                           <span
-                            className={`inline-flex px-2.5 py-1 rounded-full text-[11px] font-semibold border mb-3 ${
+                            className={`inline-flex px-2.5 py-1 rounded-full text-sm font-semibold border mb-3 ${
                               coaching.tone === 'good'
                                 ? 'bg-emerald/10 text-emerald border-emerald/30'
                                 : coaching.tone === 'bad'
@@ -636,7 +619,7 @@ export default function RatRace() {
                             {impactChips.map(chip => (
                               <span
                                 key={`${d.text}-${chip.label}`}
-                                className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                                className={`px-2.5 py-1 rounded-full text-sm font-semibold border ${
                                   chip.tone === 'good'
                                     ? 'bg-emerald/10 text-emerald border-emerald/30'
                                     : chip.tone === 'bad'
@@ -678,7 +661,7 @@ export default function RatRace() {
                             {impactChips.map(chip => (
                               <span
                                 key={`${c.label}-${chip.label}`}
-                                className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                                className={`px-2.5 py-1 rounded-full text-sm font-semibold border ${
                                   chip.tone === 'good'
                                     ? 'bg-emerald/10 text-emerald border-emerald/30'
                                     : chip.tone === 'bad'
@@ -704,7 +687,7 @@ export default function RatRace() {
                     <>
                       <p className="text-emerald text-3xl font-bold mb-2">You Escaped the Rat Race!</p>
                       <p className="text-slate text-sm mb-4">
-                        At age {game.age}, your passive income of RM {game.passiveIncome.toFixed(0)}/month covers your expenses.
+                        At age {game.age}, your passive income of RM {formatMoney(game.passiveIncome)}/month covers your expenses.
                       </p>
                       <p className="text-gold text-lg italic">"You can balik kampung permanently."</p>
                     </>
@@ -715,7 +698,7 @@ export default function RatRace() {
                         43 years on the wheel. You worked hard. But you never left.
                       </p>
                       <p className="text-slate text-sm italic">
- Passive income: RM {game.passiveIncome.toFixed(0)} — still short of RM {game.expenses.toFixed(0)} expenses.
+ Passive income: RM {formatMoney(game.passiveIncome)} — still short of RM {formatMoney(game.expenses)} expenses.
                       </p>
                     </>
                   )}

@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated viewport captures and local design verification
+.impeccable/review/
+
+# Local alternative design sketches
+.impeccable/mocks/

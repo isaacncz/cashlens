@@ -1,12 +1,12 @@
 {
-  "name": "Cashflow Lens Malaysia",
-  "short_name": "Cashflow Lens",
+  "name": "CashflowLens.MY",
+  "short_name": "CashflowLens",
   "description": "A financial literacy web app that works offline once loaded.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0b1020",
-  "theme_color": "#0b1020",
+  "background_color": "#f7f9fc",
+  "theme_color": "#f7f9fc",
   "icons": [
     {
       "src": "./icons/icon-192.svg",

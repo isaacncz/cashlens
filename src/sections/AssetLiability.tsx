@@ -1,9 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface DraggableItem {
   id: string;
@@ -52,28 +48,11 @@ export default function AssetLiability() {
     [],
   );
 
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const els = sectionRef.current.querySelectorAll('[data-reveal]');
-    gsap.fromTo(els, { opacity: 0, y: 40 }, {
-      opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-    });
-  }, []);
+
 
   const completed = available.length === 0;
 
-  useEffect(() => {
-    if (!completed) return;
-    const timeoutId = window.setTimeout(() => {
-      const summary = document.getElementById('asset-summary');
-      if (summary) {
-        gsap.fromTo(summary, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' });
-      }
-    }, 100);
 
-    return () => window.clearTimeout(timeoutId);
-  }, [completed]);
 
   const currentItem = available[0] ?? null;
 
@@ -135,8 +114,8 @@ export default function AssetLiability() {
   const getCardStyle = (item: DraggableItem) => {
     if (feedback?.id === item.id) {
       return feedback.correct
-        ? 'border-emerald shadow-[0_0_16px_rgba(16,185,129,0.4)]'
-        : 'border-crimson shadow-[0_0_16px_rgba(220,38,38,0.4)] animate-shake';
+        ? 'border-emerald shadow-[0_0_16px_rgb(var(--ledger-positive-rgb) / .4)]'
+        : 'border-crimson shadow-[0_0_16px_rgb(var(--ledger-negative-rgb) / .4)] animate-shake';
     }
     return 'border-navy-light hover:border-gold/30';
   };
@@ -147,17 +126,14 @@ export default function AssetLiability() {
   const swipeHint = dragOffsetX < -30 ? 'Asset' : dragOffsetX > 30 ? 'Liability' : null;
 
   return (
-    <section id="asset-liability" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: '#0A192F' }}>
+    <section id="asset-liability" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <p data-reveal className="text-gold text-xs font-medium tracking-[0.1em] uppercase mb-4">
-          Module 02 / Asset vs Liability
-        </p>
-        <h2 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: '#E6F1FF' }}>
+        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
           Assets Put Money{' '}
           <span className="text-emerald">In.</span>{' '}
           Liabilities Take Money{' '}
           <span className="text-crimson">Out.</span>
-        </h2>
+        </h1>
         <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
           One card at a time. Swipe <span className="text-emerald">left for Asset</span>, <span className="text-crimson">right for Liability</span>.
         </p>
@@ -239,11 +215,11 @@ export default function AssetLiability() {
         <div data-reveal className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div
             className="min-h-[280px] bg-navy-surface/50 border-2 border-emerald/40 rounded-2xl p-6 transition-all duration-300"
-            style={{ boxShadow: assets.length > 0 ? '0 0 30px rgba(16,185,129,0.15)' : 'none' }}
+            style={{ boxShadow: assets.length > 0 ? '0 0 30px rgb(var(--ledger-positive-rgb) / .15)' : 'none' }}
           >
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-emerald" />
-              <h3 className="text-emerald font-bold text-lg uppercase tracking-wider">Assets</h3>
+              <h2 className="text-emerald font-bold text-lg uppercase tracking-wider">Assets</h2>
               <span className="text-slate text-sm ml-auto">{assets.length} items</span>
             </div>
             <div className="space-y-2">
@@ -263,7 +239,7 @@ export default function AssetLiability() {
               <svg width="100%" height="20" viewBox="0 0 400 20">
                 <path
                   d="M0,10 Q50,5 100,10 T200,10 T300,10 T400,10"
-                  stroke="#10B981"
+                  stroke={'var(--ledger-positive)'}
                   strokeWidth={riverWidth / 10}
                   fill="none"
                   strokeLinecap="round"
@@ -274,7 +250,7 @@ export default function AssetLiability() {
                     dur="3s" repeatCount="indefinite" />
                 </path>
                 {assetFlow > 0 && assetParticles.slice(0, assetFlow * 2).map((particle, i) => (
-                  <circle key={i} r="2" fill="#10B981" opacity="0.8">
+                  <circle key={i} r="2" fill={'var(--ledger-positive)'} opacity="0.8">
                     <animate attributeName="cx" values={`${particle.startX};${particle.endX}`} dur={particle.duration} repeatCount="indefinite" />
                     <animate attributeName="cy" values={`${particle.startY};${particle.endY}`} dur="2s" repeatCount="indefinite" />
                   </circle>
@@ -285,11 +261,11 @@ export default function AssetLiability() {
 
           <div
             className="min-h-[280px] bg-navy-surface/50 border-2 border-crimson/40 rounded-2xl p-6 transition-all duration-300"
-            style={{ boxShadow: liabilities.length > 0 ? '0 0 30px rgba(220,38,38,0.15)' : 'none' }}
+            style={{ boxShadow: liabilities.length > 0 ? '0 0 30px rgb(var(--ledger-negative-rgb) / .15)' : 'none' }}
           >
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-crimson" />
-              <h3 className="text-crimson font-bold text-lg uppercase tracking-wider">Liabilities</h3>
+              <h2 className="text-crimson font-bold text-lg uppercase tracking-wider">Liabilities</h2>
               <span className="text-slate text-sm ml-auto">{liabilities.length} items</span>
             </div>
             <div className="space-y-2">
@@ -306,7 +282,7 @@ export default function AssetLiability() {
               <svg width="100%" height="20" viewBox="0 0 400 20">
                 <path
                   d="M0,10 Q50,15 100,10 T200,10 T300,10 T400,10"
-                  stroke="#DC2626"
+                  stroke={'var(--ledger-negative)'}
                   strokeWidth={4 + liabilityLeak * 2}
                   fill="none"
                   strokeLinecap="round"
@@ -315,11 +291,11 @@ export default function AssetLiability() {
                 />
                 {leakGaps && (
                   <>
-                    <circle cx="120" cy="25" r="2" fill="#DC2626" opacity="0.6">
+                    <circle cx="120" cy="25" r="2" fill={'var(--ledger-negative)'} opacity="0.6">
                       <animate attributeName="cy" values="18;35" dur="1.5s" repeatCount="indefinite" />
                       <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite" />
                     </circle>
-                    <circle cx="280" cy="25" r="2" fill="#DC2626" opacity="0.6">
+                    <circle cx="280" cy="25" r="2" fill={'var(--ledger-negative)'} opacity="0.6">
                       <animate attributeName="cy" values="18;35" dur="1.8s" repeatCount="indefinite" />
                       <animate attributeName="opacity" values="0.8;0" dur="1.8s" repeatCount="indefinite" />
                     </circle>

@@ -1,0 +1,124 @@
+/* Pocket Coach: choose a task, then give the task the screen. */
+.workspace-header { display: none; }
+.dashboard .page-heading h1 { max-width: none; font-size: var(--text-title); }
+.dashboard .start-copy h2 { margin: 0 0 8px; font-size: var(--text-lead); line-height: 1.35; }
+.dashboard .tool-card { align-items: center; }
+.dashboard .tool-card h2 { margin: 0 0 4px; font-size: var(--text-body); font-weight: 600; line-height: 1.4; }
+.dashboard-browse { display: flex; align-items: center; gap: 12px; min-height: 56px; margin-top: 20px; padding-block: 12px; border-block: 1px solid var(--ledger-line); color: var(--ledger-accent); font-weight: 600; text-decoration: none; }
+.dashboard-browse > svg { flex-shrink: 0; }
+.dashboard-browse > svg:last-child { margin-left: auto; }
+.dashboard .local-note { text-align: center; }
+.library-filter { display: grid; gap: 8px; max-width: 420px; margin-bottom: 12px; }
+.library-filter label { font-weight: 500; }
+.library-filter select { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--ledger-surface); color: var(--ledger-ink); font-size: var(--text-body); }
+.learning-resume { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; margin-bottom: 20px; padding-block: 8px; color: var(--ledger-accent); font-weight: 500; text-decoration: none; }
+.learning-resume svg { flex-shrink: 0; }
+.library-page .learning-path > header { min-height: 0; margin: 0 0 12px; }
+.library-page .learning-path h2 { font-size: var(--text-body); }
+.library-page .library-heading { margin: 0 0 24px; }
+
+@media (max-width: 767px) {
+  :root { --header-height: 3.5rem; --bottom-nav-height: 4.5rem; --consultation-dock-height: 4.75rem; }
+  .site-header { padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); }
+  .site-brand { font-size: 1rem; gap: 8px; min-width: 0; }
+  .site-brand > span:last-child { overflow-wrap: normal; }
+  .brand-domain { display: inline-block; white-space: nowrap; }
+  .header-currency { display: none; }
+  .header-currency .currency-country, .header-currency > span:first-child { display: none; }
+  .app-navigation { gap: 8px; height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); padding: 4px max(12px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(12px, env(safe-area-inset-left)); }
+  .app-navigation > a { min-height: 0; padding: 4px 0; gap: 4px; line-height: 1.2; }
+  .app-navigation > a > span { white-space: nowrap; }
+  .app-navigation > a svg { box-sizing: border-box; width: 24px; height: 22px; padding: 0; border-radius: var(--radius-control); }
+  .app-navigation[data-wide-labels=true] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell:not([data-focus-mode=true]):has(.app-navigation[data-wide-labels=true]) { --bottom-nav-height: max(4.5rem, 128px); }
+  .app-navigation > a[aria-current] { background: var(--ledger-raised); }
+  .app-navigation > a[aria-current] svg { background: transparent; }
+  .app-page { padding: 20px 16px 24px; }
+  .page-heading { margin-bottom: 20px; }
+  .page-heading h1, .dashboard .page-heading h1 { margin-bottom: 8px; font-size: 1.5rem; line-height: 1.25; }
+  .dashboard-start { padding: 20px; }
+  .dashboard .dashboard-primary { justify-content: space-between; margin-top: 16px; min-height: 52px; }
+  .dashboard-tools { gap: 0; margin-top: 20px; }
+  .dashboard .tool-card { gap: 12px; padding: 16px 0; }
+  .dashboard-tools .tool-card + .tool-card { border-top: 0; }
+  .tool-card > div { min-width: 0; }
+  .tool-card > svg { flex-shrink: 0; }
+  .tool-card p { font-size: var(--text-body); line-height: 1.4; }
+  .dashboard-browse { margin-top: 0; }
+  .dashboard .local-note { display: block; margin: 16px 0 0; font-size: var(--text-small); }
+  .library-page .page-heading { margin-bottom: 16px; }
+  .library-page .learning-paths { gap: 24px; }
+  .library-page .lesson-link { align-items: center; padding: 16px; gap: 12px; }
+  .lesson-link > div { min-width: 0; }
+  .library-page .lesson-link p { line-height: 1.4; }
+
+  /* A back header replaces app navigation while a tool is open. */
+  .app-shell[data-focus-mode=true] { --bottom-nav-height: 0px; }
+  .app-shell[data-focus-mode=true] :is(.site-brand, .header-note, .header-currency, .app-navigation) { display: none; }
+  .workspace-header { display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; font-size: var(--text-body); font-weight: 600; line-height: 1.3; }
+  .workspace-header a { display: grid; place-items: center; min-width: 44px; min-height: 44px; margin-left: -8px; border-radius: var(--radius-control); color: var(--ledger-accent); }
+  .workspace-header > span { min-width: 0; overflow-wrap: anywhere; }
+  .workspace-header a:hover { background: var(--ledger-raised); }
+  .app-shell[data-focus-mode=true] #main-content { bottom: env(safe-area-inset-bottom); }
+  .app-shell[data-focus-mode=true] #main-content[data-route=compounding] { bottom: calc(var(--consultation-dock-height) + env(safe-area-inset-bottom)); }
+  .lesson-top { display: none; }
+  .lesson-screen > section { padding: 20px 16px 24px; }
+  .lesson-screen h1 { margin-bottom: 8px; font-size: 1.5rem; line-height: 1.25; }
+  .lesson-screen h1 + p { margin-bottom: 16px; }
+  .lesson-screen .wealth-form { padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .lesson-screen .lesson-action { position: static; margin-top: 20px; }
+  .lesson-screen #wealth-results .font-mono-data { overflow-wrap: anywhere; }
+  .lesson-screen #wealth-thermometer [data-result].grid-cols-3 > div { flex-wrap: wrap; }
+  .lesson-screen .form-group-heading:first-child { margin-top: 0; }
+  .optional-income { border-block: 1px solid var(--ledger-line); padding-block: 4px; }
+  .optional-income summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; color: var(--ledger-accent); font-weight: 500; }
+  .optional-income summary > span { color: var(--ledger-muted); font-size: var(--text-small); }
+  .optional-income > div { display: grid; gap: 20px; padding-block: 12px; }
+  .lesson-path-nav { padding-inline: 16px; }
+  .lesson-path-nav > span { display: none; }
+  .lesson-path-nav:not([data-expanded=true]) ol { display: none; }
+  .lesson-path-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 56px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--ledger-line); border-radius: var(--radius-control); background: var(--ledger-surface); color: var(--ledger-ink); text-align: left; font-size: var(--text-body); font-weight: 500; }
+  .lesson-path-toggle small { display: block; margin-top: 4px; color: var(--ledger-muted); font-size: var(--text-small); font-weight: 400; }
+  .lesson-path-toggle svg { flex-shrink: 0; color: var(--ledger-accent); }
+  .lesson-path-toggle[aria-expanded=true] svg { transform: rotate(180deg); }
+  .lesson-path-nav ol { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .lesson-path-nav a { min-height: 48px; padding: 10px 12px; font-size: var(--text-body); }
+  .lesson-pagination { flex-wrap: wrap; gap: 12px; padding-inline: 16px; }
+  .lesson-pagination a { flex-basis: 100%; }
+  .theme-options { gap: 8px; }
+  .switch-row { gap: 16px; }
+  .settings-value { flex-wrap: wrap; }
+  :is(.tool-card, .lesson-link, .dashboard-browse, .app-navigation > a):active { background: var(--ledger-raised); }
+  .primary-button:active { filter: brightness(.9); }
+}
+
+@media (max-width: 767px) and (max-height: 520px) {
+  :root { --header-height: 3rem; --bottom-nav-height: 3.5rem; }
+  .app-navigation > a { flex-direction: row; gap: 6px; }
+  .app-navigation > a svg { width: 22px; height: 22px; padding: 0; }
+}
+
+/* Compact numeric rows preserve label context without oversized empty fields. */
+@media (max-width: 767px) {
+  .lesson-screen .wealth-form { container-type: inline-size; }
+  .lesson-screen h1 { text-wrap: balance; }
+  @container (min-width: 18rem) {
+    .lesson-screen .wealth-form .number-field {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 7rem;
+      grid-template-rows: auto auto;
+      column-gap: 16px;
+      align-items: center;
+      padding-block: 8px;
+      border-bottom: 1px solid var(--ledger-line);
+    }
+    .lesson-screen .wealth-form .number-field > label { grid-column: 1; margin: 0; line-height: 1.4; align-self: end; }
+    .lesson-screen .wealth-form .number-field > input { grid-column: 2; grid-row: 1 / 3; text-align: right; padding-inline: 10px; }
+    .lesson-screen .wealth-form .number-field > div { grid-column: 1; align-self: start; }
+    .lesson-screen .wealth-form .number-field .field-hint { margin-top: 4px; font-size: var(--text-small); line-height: 1.4; }
+    .lesson-screen .wealth-form .number-field:has(input[aria-invalid=true]) > div { grid-column: 1 / -1; grid-row: 3; }
+    .lesson-screen .wealth-form .number-field:has(input[aria-invalid=true]) > label { align-self: center; }
+    .lesson-screen .wealth-form .number-field { margin-top: 0; }
+    .lesson-screen .optional-income > div { gap: 0; }
+  }
+}
