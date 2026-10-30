@@ -4,6 +4,7 @@ export interface RepeatSalesProduct {
   id: string;
   name: string;
   size: string;
+  imageUrl?: string;
   aboPrice: number;
   every: number;
   /** Business-calendar year when this product is introduced; scenario input. */
@@ -355,3 +356,4 @@ export const repeatSalesProducts: readonly RepeatSalesProduct[] = [
     "checked": false
   }
 ];
+

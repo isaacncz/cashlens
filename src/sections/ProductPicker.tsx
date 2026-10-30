@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { Search, ShoppingBasket, X } from 'lucide-react';
+import { ImageOff, Search, ShoppingBasket, X } from 'lucide-react';
 import type { RepeatSalesProduct } from '../data/repeatSalesProducts';
 import { formatRinggit } from '../lib/repeatSales';
 import './ProductPicker.css';
@@ -17,6 +17,15 @@ interface ProductPickerProps {
   onClose: () => void;
   onToggle: (id: string) => void;
   onChooseFirst: (id: string) => void;
+}
+
+function ProductImage({ product }: { product: RepeatSalesProduct }) {
+  const [failed, setFailed] = useState(false);
+  return <span className="rs-product-image" aria-hidden="true">
+    {product.imageUrl && !failed
+      ? <img src={product.imageUrl} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} />
+      : <ImageOff size={20} />}
+  </span>;
 }
 
 export default function ProductPicker({ open, mode, catalog, selectedIds, firstId, showSource, onClose, onToggle, onChooseFirst }: ProductPickerProps) {
@@ -62,6 +71,7 @@ export default function ProductPicker({ open, mode, catalog, selectedIds, firstI
           const checked = mode === 'first' ? firstId === product.id : selectedIds.includes(product.id);
           return <div key={product.id} className={`rs-product${checked ? ' rs-product-selected' : ''}`}>
             <label className="rs-pick-target"><input id={`rs-pick-${product.id}`} type={mode === 'first' ? 'radio' : 'checkbox'} name={mode === 'first' ? 'first-product' : undefined} checked={checked} onChange={() => { if (mode === 'first') onChooseFirst(product.id); else onToggle(product.id); if (selectedOnly && checked) requestAnimationFrame(() => selectedFilterRef.current?.focus({ preventScroll: true })); }} aria-label={`Select ${product.name}, ${product.size}`} /></label>
+            <label className="rs-product-image-target" htmlFor={`rs-pick-${product.id}`}><ProductImage product={product} /></label>
             <label className="rs-product-copy" htmlFor={`rs-pick-${product.id}`}>{product.name}<span className="rs-product-meta"><span>{product.size}{showSource && <> · {product.id} · p.{product.page}</>}</span><strong className="rs-product-price">RM {formatRinggit(product.aboPrice)}</strong></span></label>
           </div>;
         })}
@@ -71,3 +81,4 @@ export default function ProductPicker({ open, mode, catalog, selectedIds, firstI
     </div>
   </dialog>;
 }
+
