@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { Search, ShoppingBasket, X } from 'lucide-react';
 import type { RepeatSalesProduct } from '../data/repeatSalesProducts';
 import { formatRinggit } from '../lib/repeatSales';
+import ProductImage from './ProductImage';
 import './ProductPicker.css';
 
 interface ProductPickerProps {
@@ -11,15 +12,15 @@ interface ProductPickerProps {
   catalog: readonly RepeatSalesProduct[];
   selectedIds: readonly string[];
   firstId: string;
-  total: number;
-  months: number;
+  startYear: number;
+  lockedIds?: readonly string[];
   showSource: boolean;
   onClose: () => void;
   onToggle: (id: string) => void;
   onChooseFirst: (id: string) => void;
 }
 
-export default function ProductPicker({ open, mode, catalog, selectedIds, firstId, showSource, onClose, onToggle, onChooseFirst }: ProductPickerProps) {
+export default function ProductPicker({ open, mode, catalog, selectedIds, firstId, startYear, lockedIds = [], showSource, onClose, onToggle, onChooseFirst }: ProductPickerProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All categories');
@@ -54,15 +55,15 @@ export default function ProductPicker({ open, mode, catalog, selectedIds, firstI
     if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) onClose();
   }}>
     <div className="rs-picker-content">
-      <header className="rs-picker-header"><div><h2 id="rs-picker-title">{mode === 'first' ? 'Choose a product' : 'Choose products'}</h2><p id="rs-picker-description">{mode === 'first' ? 'Select one item for your first sale.' : 'New products start in year 2.'}</p></div><button className="rs-icon-button" type="button" aria-label="Close product picker" onClick={onClose} autoFocus><X size={20} aria-hidden="true" /></button></header>
+      <header className="rs-picker-header"><div><h2 id="rs-picker-title">{mode === 'first' ? 'Choose a product' : 'Choose products'}</h2><p id="rs-picker-description">{mode === 'first' ? 'Select one item for your first sale.' : `New selections start in year ${startYear}.`}</p></div><button className="rs-icon-button" type="button" aria-label="Close product picker" onClick={onClose} autoFocus><X size={20} aria-hidden="true" /></button></header>
       <div className="rs-catalog-tools"><div className="rs-search"><Search size={18} aria-hidden="true" /><input type="search" aria-label="Find a product" placeholder="Search products" value={search} onChange={event => setSearch(event.target.value)} /></div><select aria-label="Filter product category" value={category} onChange={event => setCategory(event.target.value)}><option>All categories</option>{categories.map(name => <option key={name}>{name}</option>)}</select></div>
       <div className="rs-catalog-count"><div className="rs-catalog-views" role="group" aria-label="Catalog view"><button type="button" aria-pressed={!selectedOnly} onClick={() => setSelectedOnly(false)}>All products</button><button ref={selectedFilterRef} type="button" aria-pressed={selectedOnly} onClick={() => setSelectedOnly(true)}>Selected ({selectedCount})</button></div><span role="status">{visible.length} shown</span></div>
       <div className="rs-products" tabIndex={0} role="region" aria-label="Product catalog">
         {visible.map(product => {
           const checked = mode === 'first' ? firstId === product.id : selectedIds.includes(product.id);
           return <div key={product.id} className={`rs-product${checked ? ' rs-product-selected' : ''}`}>
-            <label className="rs-pick-target"><input id={`rs-pick-${product.id}`} type={mode === 'first' ? 'radio' : 'checkbox'} name={mode === 'first' ? 'first-product' : undefined} checked={checked} onChange={() => { if (mode === 'first') onChooseFirst(product.id); else onToggle(product.id); if (selectedOnly && checked) requestAnimationFrame(() => selectedFilterRef.current?.focus({ preventScroll: true })); }} aria-label={`Select ${product.name}, ${product.size}`} /></label>
-            <label className="rs-product-copy" htmlFor={`rs-pick-${product.id}`}>{product.name}<span className="rs-product-meta"><span>{product.size}{showSource && <> · {product.id} · p.{product.page}</>}</span><strong className="rs-product-price">RM {formatRinggit(product.aboPrice)}</strong></span></label>
+            <label className="rs-pick-target"><input id={`rs-pick-${product.id}`} type={mode === 'first' ? 'radio' : 'checkbox'} name={mode === 'first' ? 'first-product' : undefined} checked={checked} disabled={lockedIds.includes(product.id)} onChange={() => { if (mode === 'first') onChooseFirst(product.id); else onToggle(product.id); if (selectedOnly && checked) requestAnimationFrame(() => selectedFilterRef.current?.focus({ preventScroll: true })); }} aria-label={`Select ${product.name}, ${product.size}`} /></label>
+            <label className="rs-product-copy" htmlFor={`rs-pick-${product.id}`}><ProductImage id={product.id} /><span className="rs-picker-product-name">{product.name}{lockedIds.includes(product.id) && <small className="rs-picker-locked">Continuing from an earlier year</small>}<span className="rs-product-meta"><span>{product.size}{showSource && <> · {product.id} · p.{product.page}</>}</span><strong className="rs-product-price">RM {formatRinggit(product.aboPrice)}</strong></span></span></label>
           </div>;
         })}
         {!visible.length && <div className="rs-no-results"><ShoppingBasket size={24} aria-hidden="true" /><p>No matching products.</p><button className="rs-text-button" type="button" onClick={resetSearch}>Clear filters</button></div>}

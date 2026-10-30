@@ -396,3 +396,10 @@ The user approved the mobile redesign proposal (`docs/mobile-ux-proposal.md`) an
 - **Type:** Inter only. H1 24–32px/600, section 18px/600, body 16px, metadata 14px. Bottom navigation labels remain 12px.
 - **Progress:** lessons opened in this session count as visited on Home, Learn and the path sheet. Visits are not stored and reset when the app closes.
 - **Destinations:** Home leads with Continue when a lesson was opened, then three quick questions and three path cards linking to each path's next unvisited lesson. Learn replaces the path dropdown with filter chips and shows per-path progress. Compound replaces the phone stage dropdown with a four-segment stepper; its contextual dock action is unchanged. Settings shows Reduce motion as a switch.
+
+
+## Compound story — 30 October 2026
+
+The approved four-screen preview becomes Year 1 / Year 2 / Year 3 / My plan. Preserve Ink Blue, Inter, existing financial logic and both themes. Story screens carry the basket forward, separating continuing products from new additions. Official product photos sit on white 64px thumbnail surfaces; names, sizes and Malaysia ABO prices remain text. A single new label marks introductions, with cadence shown on every row. Open a row to edit its interval.
+
+Annual revenue leads the story, with first/later purchases in year 1 and original-customer/new-customer contributions in year 3. Cumulative revenue stays secondary until My plan. The phone has one chapter action in the reserved bottom dock; desktop pairs the basket with a revenue receipt. My plan keeps Products / Settings / Results on phones, the full existing scenario controls, a selectable year basket including future products, a basket overview and an annual revenue table. Photo failure falls back to a package icon; images use empty alt text because adjacent product names identify them.
