@@ -195,11 +195,12 @@ try {
     await results();
     await page.getByRole('button', { name: 'Explore long term', exact: true }).click();
     await settings();
+    assert.equal(await page.getByRole('combobox', { name: 'Time period', exact: true }).inputValue(), '240', 'Long term defaults to 20 years');
+    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('36');
+    await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('48');
     await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('600');
-    assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 29,224.00');
     const growth = page.getByRole('checkbox', { name: 'Add customers each year', exact: true });
-    assert.equal(await growth.isChecked(), false, 'The consultation keeps one customer until growth is selected');
-    await growth.check();
+    assert.equal(await growth.isChecked(), true, 'Yearly customer acquisition defaults on in the long-term plan');
     assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 480,664.00');
     await growth.uncheck();
     await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('12');
