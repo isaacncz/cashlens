@@ -268,7 +268,7 @@
 }
 
 /* Separate editing from reading on phones; desktop can display both. */
-.rs-step-select, .rs-view-switch { display: none; }
+.rs-view-switch { display: none; }
 .rs-plan-panel { min-width: 0; }
 .rs-plan-panel > .rs-scenario { margin: 0 0 24px; padding-top: 0; border-top: 0; }
 .rs-plan-panel > .rs-basket + .rs-scenario { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--rs-line); }
@@ -283,10 +283,6 @@
   .rs-intro h1 br { display: none; }
   .rs-intro h1 br::after { content: ' '; }
   .rs-intro p { margin-top: 8px; }
-  .rs-steps { display: none; }
-  .rs-step-select { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-  .rs-step-select label { color: var(--rs-muted); font-size: var(--text-small); white-space: nowrap; }
-  .rs-step-select select { flex: 1; max-width: 70%; min-height: 44px; }
   .rs-view-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 20px; }
   .rs-view-switch button { min-height: 48px; padding: 10px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--rs-panel); color: var(--rs-ink); }
   .rs-view-switch button[aria-pressed=true] { background: var(--ledger-raised); border-color: var(--rs-gold); color: var(--rs-gold); font-weight: 600; }
@@ -304,7 +300,6 @@
   .rs-intro { margin-bottom: 12px; }
   .rs-intro h1 { font-size: 1.25rem; }
   .rs-intro p { font-size: var(--text-small); line-height: 1.4; margin-top: 4px; }
-  .rs-step-select { margin-bottom: 12px; }
   .rs-view-switch { gap: 0; margin-bottom: 16px; border-bottom: 1px solid var(--rs-line); }
   .rs-view-switch button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: transparent; }
   .rs-view-switch button[aria-pressed=true] { border-bottom-color: var(--rs-gold); background: transparent; }
@@ -319,7 +314,6 @@
 .rs-result-assumption { margin: 0 0 8px; color: var(--rs-ink); font-size: var(--text-small); font-weight: 500; }
 @media (max-width: 767px) {
   .rs-intro { margin-bottom: 8px; }
-  .rs-step-select { margin-bottom: 8px; }
   .rs-view-switch { margin-bottom: 12px; }
   .rs-result { padding: 0; border: 0; border-radius: 0; background: transparent; }
   .rs-result-top { min-height: 28px; }
@@ -342,4 +336,16 @@
   .rs-chart-heading h3 { flex: 1 1 11rem; }
   .rs-result-assumption { line-height: 1.4; }
   .rs-context { line-height: 1.4; }
+}
+
+/* Phones: a compact segmented stepper replaces the stage dropdown, so every stage stays one tap away. */
+.rs-step-short { display: none; }
+@media (max-width: 767px) {
+  .rs-steps { margin-bottom: 12px; }
+  .rs-steps ol { gap: 4px; padding: 4px; border-radius: 12px; background: var(--ledger-raised); }
+  .rs-steps button { flex-direction: row; justify-content: center; min-height: 44px; padding: 4px; color: var(--rs-muted); font-size: var(--text-small); font-weight: 500; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+  .rs-steps button > span:first-child, .rs-steps .rs-step-label { display: none; }
+  .rs-steps .rs-step-short { display: inline; }
+  .rs-steps button:hover { background: var(--rs-panel); }
+  .rs-steps button[aria-current=step] { background: var(--rs-panel); color: var(--rs-gold); font-weight: 600; box-shadow: 0 0 0 1px var(--rs-gold); }
 }

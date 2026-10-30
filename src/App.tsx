@@ -1,6 +1,6 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Navigation from './sections/Navigation';
 import { applyPreferences, readPreferences, savePreferences } from './app/preferences';
 import type { Preferences } from './app/preferences';
@@ -8,11 +8,12 @@ import { isLesson, lessons, learningOrder, pathForLesson, routeFromHash, routeHr
 import type { Destination, LessonId, Route } from './app/lessons';
 import './styles/app.css';
 import './styles/mobile.css';
+import './styles/lesson.css';
 
+const Dashboard = lazy(() => import('./app/Dashboard'));
 const LessonLibrary = lazy(() => import('./app/LessonLibrary'));
 const Settings = lazy(() => import('./app/Settings'));
 const screens = {
-  home: lazy(() => import('./app/Dashboard')),
   'money-mirror': lazy(() => import('./sections/MoneyMirror')),
   'asset-liability': lazy(() => import('./sections/AssetLiability')),
   'cashflow-quadrant': lazy(() => import('./sections/CashflowQuadrant')),
@@ -36,9 +37,10 @@ export default function App() {
   const [visited, setVisited] = useState<Route[]>(() => [routeFromHash()]);
   const [lastLesson, setLastLesson] = useState<LessonId | null>(() => { const initial = routeFromHash(); return isLesson(initial) ? initial : null; });
   const [preferences, setPreferences] = useState(readPreferences);
-  const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
   const mainRef = useRef<HTMLElement>(null);
   const destination: Destination = isLesson(route) ? 'learn' : route;
+  // Opened lessons count as visited for this session only, like calculator inputs.
+  const visitedLessons = visited.filter(isLesson);
   useEffect(() => {
     const navigate = () => {
       const next = routeFromHash();
@@ -77,9 +79,10 @@ export default function App() {
   }, [preferences.reduceMotion]);
   const changePreferences = (value: Preferences) => { savePreferences(value); setPreferences(value); };
   return <div className="app-shell" data-focus-mode={isLesson(route) || route === 'compounding'}>
-    <Navigation active={destination} route={route} />
+    <Navigation active={destination} route={route} visitedLessons={visitedLessons} />
     <main id="main-content" data-route={route} ref={mainRef} tabIndex={-1}>
-      {visited.includes('learn') && <div hidden={route !== 'learn'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening lessons…</div>}><LessonLibrary lastLesson={lastLesson} /></Suspense></ScreenBoundary></div>}
+      {visited.includes('home') && <div hidden={route !== 'home'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening home…</div>}><Dashboard lastLesson={lastLesson} visitedLessons={visitedLessons} /></Suspense></ScreenBoundary></div>}
+      {visited.includes('learn') && <div hidden={route !== 'learn'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening lessons…</div>}><LessonLibrary lastLesson={lastLesson} visitedLessons={visitedLessons} /></Suspense></ScreenBoundary></div>}
       {visited.includes('settings') && <div hidden={route !== 'settings'}><ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status">Opening settings…</div>}><Settings value={preferences} onChange={changePreferences} /></Suspense></ScreenBoundary></div>}
       {visited.map(key => {
         if (!(key in screens)) return null;
@@ -93,8 +96,12 @@ export default function App() {
         return <div key={key} hidden={route !== key} className={lesson ? 'lesson-screen' : 'compound-screen'}>
           {lesson && <header className="lesson-top"><a href={routeHref('learn')}><ArrowLeft size={18} aria-hidden="true" />All lessons</a><span>{position + 1} of 9</span></header>}
           <ScreenBoundary><Suspense fallback={<div className="screen-loading" role="status"><div className="loading-line" /><p>Opening your tool…</p></div>}><Screen /></Suspense></ScreenBoundary>
-          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`} data-expanded={!!expandedPaths[key]}><span>{path.title}</span><button className="lesson-path-toggle" type="button" aria-expanded={!!expandedPaths[key]} aria-controls={`lesson-path-${key}`} onClick={() => setExpandedPaths(previous => ({ ...previous, [key]: !previous[key] }))}><span>{path.title}<small>Lesson {path.lessonIds.findIndex(id => id === key) + 1} of 3 · View path</small></span><ChevronDown size={20} aria-hidden="true" /></button><ol id={`lesson-path-${key}`}>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined}><span>{step + 1}</span>{' '}{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
-          {lesson && <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a>{next ? <a href={routeHref(next.id)}>Next: {next.title}<ArrowRight size={18} aria-hidden="true" /></a> : <a href={routeHref('learn')}>Choose another path<ArrowRight size={18} aria-hidden="true" /></a>}</nav>}
+          {path && <nav className="lesson-path-nav" aria-label={`${path.title} lessons`}><span>{path.title}</span><ol>{path.lessonIds.map((id, step) => <li key={id}><a href={routeHref(id)} aria-current={id === key ? 'step' : undefined}><span>{step + 1}</span>{' '}{lessons.find(item => item.id === id)!.title}</a></li>)}</ol></nav>}
+          {/* On phones this dock stays at the bottom of the lesson; a lesson can portal a live result into its slot. */}
+          {lesson && <div className="lesson-dock">
+            <div className="lesson-dock-slot" id={`lesson-dock-${key}`} />
+            <nav className="lesson-pagination" aria-label="Lesson navigation"><a href={routeHref('learn')}>All lessons</a>{next ? <a href={routeHref(next.id)} aria-label={`Next lesson: ${next.title}`}><span>Next<span className="lesson-next-title">: {next.title}</span></span><ArrowRight size={18} aria-hidden="true" /></a> : <a href={routeHref('learn')}>Choose another path<ArrowRight size={18} aria-hidden="true" /></a>}</nav>
+          </div>}
         </div>;
       })}
     </main>

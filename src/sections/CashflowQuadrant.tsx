@@ -1,5 +1,6 @@
 import { formatMoney } from '../lib/currency';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 type Quadrant = 'E' | 'S' | 'B' | 'I';
 const TAX_OUT = 'var(--ledger-negative)';
@@ -102,198 +103,116 @@ function formatRinggit(amount: number) {
   return `RM ${formatMoney(amount)}`;
 }
 
+const quadrantName = (label: string) => label.replace(/ — (.*)/, (_, name: string) => ` — ${name.charAt(0)}${name.slice(1).toLowerCase()}`);
+
 export default function CashflowQuadrant() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [selected, setSelected] = useState<Quadrant | null>(null);
-  const [activeStep, setActiveStep] = useState<'income' | 'tax' | 'epf' | 'time' | 'net'>('income');
-
-
+  const [selected, setSelected] = useState<Quadrant>('E');
+  const q = quadrants.find(item => item.key === selected)!;
 
   return (
-    <section id="cashflow-quadrant" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          Your Quadrant{' '}
-          <span className="text-gold">Determines Your Flow.</span>
-        </h1>
-        <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
-          Select a quadrant. See how money and time move.
-        </p>
+    <section id="cashflow-quadrant" className="lesson" aria-labelledby="cashflow-quadrant-heading">
+      <header className="lesson-intro">
+        <h1 id="cashflow-quadrant-heading">Your quadrant determines your flow.</h1>
+        <p>Select a quadrant. See how money and time move.</p>
+      </header>
 
-        {/* Quadrant Grid */}
-        <div data-reveal className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
-          {quadrants.map(q => {
-            const isSelected = selected === q.key;
-            return (
-              <button
-                key={q.key}
-                aria-pressed={isSelected}
-                onClick={() => setSelected(isSelected ? null : q.key)}
-                className={`relative text-left bg-navy-surface border-2 rounded-2xl p-6 transition-all duration-500 cursor-pointer hover:scale-[1.02] ${
-                  isSelected ? `${q.borderColor} shadow-[0_0_30px_rgb(var(--ledger-accent-rgb) / .15)] scale-[1.02]` : 'border-navy-light hover:border-gold/30'
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span className={`text-sm font-bold px-3 py-1 rounded-full border ${q.borderColor} ${q.accent} bg-opacity-10`}>
-                    {q.key}
-                  </span>
-                  <span className="text-slate text-xs uppercase tracking-wider">{q.label}</span>
-                </div>
-                <h2 className="text-white font-bold text-xl mb-1">{q.name}</h2>
-                <p className="text-slate text-sm mb-2">{q.persona}</p>
-                <p className={`font-mono-data text-lg md:text-2xl font-bold ${q.accent}`}>{q.income}</p>
-                <p className="text-slate text-xs mt-1">Net usable flow: <span className="text-white font-semibold">{formatRinggit(q.netTakeHome)}</span></p>
-
-                {/* Mini Pipe Preview */}
-                <div className="mt-4 h-12 relative">
-                  <svg width="100%" height="48" viewBox="0 0 200 48" className="opacity-60">
-                    {/* Income pipe */}
-                    <rect x="20" y="4" width={q.pipeWidths.income} height="6" rx="3" fill={q.pipeColors.income} opacity="0.8" />
-                    {/* Tax pipe */}
-                    <rect x="20" y="14" width={q.pipeWidths.tax} height="6" rx="3" fill={q.pipeColors.tax} opacity="0.7" />
-                    {/* EPF pipe */}
-                    <rect x="20" y="24" width={q.pipeWidths.epf} height="6" rx="3" fill={q.pipeColors.epf} opacity="0.7" />
-                    {/* Time pipe */}
-                    {q.pipeWidths.time > 0 && (
-                      <rect x="20" y="34" width={q.pipeWidths.time} height="6" rx="3" fill={q.pipeColors.time} opacity="0.7" />
-                    )}
-                    {/* Labels */}
-                  </svg>
-                </div>
-
-                <p className={`text-sm mt-3 italic ${q.accent}`}>"{q.tagline}"</p>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Expanded Detail */}
-        {selected && (
-          <div className="bg-navy-surface border border-navy-light rounded-2xl p-6 md:p-8 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {quadrants.filter(q => q.key === selected).map(q => {
-              const stepInfo = {
-                income: { title: 'Income in', value: formatRinggit(q.monthlyIncome), note: 'This is the top of the pipeline before deductions.' },
-                tax: { title: 'Tax out', value: formatRinggit(q.taxAmount), note: 'Paid first to LHDN based on income band.' },
-                epf: { title: 'EPF out', value: formatRinggit(q.epfAmount), note: 'Forced savings that is useful later, but less liquid today.' },
-                time: { title: 'Time trade', value: q.timeHours === 0 ? 'No time trade' : `${q.timeHours} hrs/month`, note: q.timeHours === 0 ? 'Your income is no longer tied to working hours.' : 'These hours are the real cost behind the paycheck.' },
-                net: { title: 'Net left', value: formatRinggit(q.netTakeHome), note: 'The usable cashflow left after all outflows.' },
-              } as const;
-              const activeStepInfo = stepInfo[activeStep];
-              return (
-              <div key={q.key}>
-                <div className="flex items-center gap-3 mb-4">
-                  <h2 className={`text-2xl font-bold ${q.accent}`}>{q.name} — {q.persona}</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-gold font-mono-data text-3xl font-bold mb-4">{q.income}</p>
-                    <div className="rounded-xl border border-navy-light bg-navy p-4 mb-4">
-                      <p className="text-slate text-xs uppercase tracking-[0.12em] mb-3">Flow steps</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                        <button type="button" aria-pressed={activeStep === 'income'} onClick={() => setActiveStep('income')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'income' ? 'border-emerald/40 bg-emerald/15 text-emerald' : 'border-navy-light bg-navy-surface text-slate hover:border-emerald/20'}`}>1 Income</button>
-                        <button type="button" aria-pressed={activeStep === 'tax'} onClick={() => setActiveStep('tax')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'tax' ? 'border-crimson/40 bg-crimson/15 text-crimson' : 'border-navy-light bg-navy-surface text-slate hover:border-crimson/20'}`}>2 Tax</button>
-                        <button type="button" aria-pressed={activeStep === 'epf'} onClick={() => setActiveStep('epf')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'epf' ? 'border-gold/40 bg-gold/15 text-gold' : 'border-navy-light bg-navy-surface text-slate hover:border-gold/20'}`}>3 EPF</button>
-                        <button type="button" aria-pressed={activeStep === 'time'} onClick={() => setActiveStep('time')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'time' ? 'border-crimson/40 bg-crimson/15 text-crimson' : 'border-navy-light bg-navy-surface text-slate hover:border-crimson/20'}`}>4 Time</button>
-                        <button type="button" aria-pressed={activeStep === 'net'} onClick={() => setActiveStep('net')} className={`min-h-10 rounded-lg border text-xs font-semibold transition-all ${activeStep === 'net' ? 'border-emerald/40 bg-emerald/15 text-emerald' : 'border-navy-light bg-navy-surface text-slate hover:border-emerald/20'}`}>5 Net</button>
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-gold/25 bg-navy-surface p-4 mb-5">
-                      <p className="text-slate text-xs uppercase mb-1">Focused step</p>
-                      <p className={`text-lg font-bold mb-1 ${activeStep === 'tax' || activeStep === 'time' ? 'text-crimson' : activeStep === 'epf' ? 'text-gold' : 'text-emerald'}`}>{activeStepInfo.title}</p>
-                      <p className="text-white font-mono-data text-xl font-bold">{activeStepInfo.value}</p>
-                      <p className="text-slate text-sm mt-2">{activeStepInfo.note}</p>
-                    </div>
-                    <ul className="space-y-2">
-                      {q.details.map((d, i) => (
-                        <li key={i} className="flex items-start gap-2 text-slate text-sm">
-                          <span className={`mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0`} style={{ backgroundColor: q.pipeColors.income }} />
-                          {d}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="relative">
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald/10 text-emerald border border-emerald/25" title="Income entering the system">Income in</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-crimson/10 text-crimson border border-crimson/25" title="Time and lifestyle drain">Deduction / time out</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: 'rgb(var(--ledger-negative-rgb) / .12)', color: TAX_OUT, borderColor: 'rgb(var(--ledger-negative-rgb) / .35)' }} title="Tax flow">Tax out</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gold/10 text-gold border border-gold/25" title="Locked or retained wealth">Savings / net</span>
-                    </div>
-                    <svg width="100%" height="260" viewBox="0 0 300 260">
-                      {/* Income source */}
-                      <circle cx="150" cy="24" r="12" fill={q.pipeColors.income} opacity="0.3" />
-                      <title>{`${q.name} monthly income: ${formatRinggit(q.monthlyIncome)}`}</title>
-                      <text x="150" y="28" textAnchor="middle" fill={q.pipeColors.income} fontSize="12" fontWeight="bold">IN</text>
-                      <text x="150" y="48" textAnchor="middle" fill={'var(--ledger-ink)'} fontSize="14" fontWeight="bold">{formatRinggit(q.monthlyIncome)}</text>
-                      <text x="150" y="63" textAnchor="middle" fill={'var(--ledger-muted)'} fontSize="14">Income enters</text>
-                      {/* Main flow down */}
-                      <line x1="150" y1="36" x2="150" y2="212" stroke={q.pipeColors.income} strokeWidth="3" opacity="0.5" />
-                      <text x="160" y="86" fill={'var(--ledger-muted)'} fontSize="14">↓ Cashflow</text>
-                      {/* Tax branch */}
-                      <line x1="150" y1="92" x2="60" y2="92" stroke={q.pipeColors.tax} strokeWidth={Math.max(2, q.pipeWidths.tax / 8)} opacity={activeStep === 'tax' ? '1' : '0.55'} />
-                      <polygon points="60,92 68,88 68,96" fill={q.pipeColors.tax} opacity="0.8" />
-                      <text x="26" y="88" fill={q.pipeColors.tax} fontSize="14" fontWeight="bold">Tax</text>
-                      <text x="26" y="102" fill={'var(--ledger-ink)'} fontSize="14">{formatRinggit(q.taxAmount)}</text>
-                      {/* EPF branch */}
-                      <line x1="150" y1="136" x2="60" y2="136" stroke={q.pipeColors.epf} strokeWidth={Math.max(2, q.pipeWidths.epf / 8)} opacity={activeStep === 'epf' ? '1' : '0.55'} />
-                      <polygon points="60,136 68,132 68,140" fill={q.pipeColors.epf} opacity="0.8" />
-                      <text x="26" y="132" fill={q.pipeColors.epf} fontSize="14" fontWeight="bold">EPF</text>
-                      <text x="26" y="146" fill={'var(--ledger-ink)'} fontSize="14">{formatRinggit(q.epfAmount)}</text>
-                      {/* Time branch */}
-                      {q.pipeWidths.time > 0 && (
-                        <>
-                          <line x1="150" y1="178" x2="240" y2="178" stroke={q.pipeColors.time} strokeWidth={Math.max(2, q.pipeWidths.time / 8)} opacity={activeStep === 'time' ? '1' : '0.55'} />
-                          <text x="250" y="174" fill={q.pipeColors.time} fontSize="14" fontWeight="bold">Time</text>
-                          <text x="250" y="188" fill={'var(--ledger-ink)'} fontSize="14">{q.timeHours} hrs</text>
-                          <polygon points="240,178 232,174 232,182" fill={q.pipeColors.time} opacity="0.8" />
-                        </>
-                      )}
-                      {q.pipeWidths.time === 0 && (
-                        <>
-                          <rect x="168" y="164" width="96" height="28" rx="14" fill={'var(--ledger-positive)'} opacity="0.14" />
-                          <text x="216" y="182" textAnchor="middle" fill={'var(--ledger-positive)'} fontSize="13" fontWeight="bold">NO TIME TRADE</text>
-                        </>
-                      )}
-                      {/* Net flow */}
-                      <circle cx="150" cy="214" r="8" fill={q.pipeColors.income} opacity={activeStep === 'net' ? '0.85' : '0.4'} />
-                      <text x="150" y="232" textAnchor="middle" fill={'var(--ledger-accent)'} fontSize="13" fontWeight="bold">NET LEFT</text>
-                      <text x="150" y="248" textAnchor="middle" fill={'var(--ledger-ink)'} fontSize="14" fontWeight="bold">{formatRinggit(q.netTakeHome)}</text>
-                      {/* Flowing particles */}
-                      <circle r="2" fill={q.pipeColors.income}>
-                        <animate attributeName="cy" values="42;208" dur="2s" repeatCount="indefinite" />
-                        <animate attributeName="cx" values="150;150" dur="2s" repeatCount="indefinite" />
-                      </circle>
-                      {q.pipeWidths.tax > 10 && (
-                        <circle r="1.5" fill={q.pipeColors.tax}>
-                          <animate attributeName="cx" values="150;65" dur="1.5s" repeatCount="indefinite" />
-                          <animate attributeName="cy" values="92;92" dur="1.5s" repeatCount="indefinite" />
-                        </circle>
-                      )}
-                      {q.pipeWidths.time > 10 && (
-                        <circle r="1.5" fill={q.pipeColors.time}>
-                          <animate attributeName="cx" values="150;235" dur="1.5s" repeatCount="indefinite" />
-                          <animate attributeName="cy" values="178;178" dur="1.5s" repeatCount="indefinite" />
-                        </circle>
-                      )}
-                    </svg>
-                    <p className="text-slate text-sm leading-relaxed mt-3">
-                      Tap step chips to focus each part of the flow.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )})}
+      <div className="lesson-stack">
+        <fieldset className="segmented-field">
+          <legend>Quadrant</legend>
+          <div className="segmented">
+            {quadrants.map(item => (
+              <label key={item.key}>
+                <input type="radio" name="cashflow-quadrant" value={item.key} checked={selected === item.key} onChange={() => setSelected(item.key)} aria-label={quadrantName(item.label)} />
+                <span aria-hidden="true">{item.key}</span>
+              </label>
+            ))}
           </div>
-        )}
+          <p className="segmented-caption">{quadrantName(q.label)}</p>
+        </fieldset>
 
-        {/* Key Insight */}
-        <div data-reveal className="mt-8 text-center">
-          <p className="text-slate text-lg italic max-w-2xl mx-auto">
-            "{quadrants[0].name} and {quadrants[3].name} both 'make' RM 8,000. But {quadrants[0].name} trades 160 hours. {quadrants[3].name} trades <span className="text-emerald font-bold">zero.</span>"
-          </p>
+        <section className="lesson-card cq-person" aria-live="polite" aria-labelledby="cq-person-name">
+          <div className="sw-person-head">
+            <div><h2 id="cq-person-name">{q.name}</h2><p className="lesson-muted">{q.persona}</p></div>
+            <strong>{q.income}</strong>
+          </div>
+          <dl className="lesson-rows">
+            <div><dt>Income in <small>This is the top of the pipeline before deductions.</small></dt><dd>{formatRinggit(q.monthlyIncome)}</dd></div>
+            <div><dt>Tax out <small>Paid first to LHDN based on income band.</small></dt><dd className="tone-bad">{formatRinggit(q.taxAmount)}</dd></div>
+            <div><dt>EPF out <small>Forced savings that is useful later, but less liquid today.</small></dt><dd className="tone-warn">{formatRinggit(q.epfAmount)}</dd></div>
+            <div><dt>Time trade <small>{q.timeHours === 0 ? 'Your income is no longer tied to working hours.' : 'These hours are the real cost behind the paycheck.'}</small></dt><dd className={q.timeHours === 0 ? 'tone-good' : 'tone-bad'}>{q.timeHours === 0 ? 'No time trade' : `${q.timeHours} hrs/month`}</dd></div>
+          </dl>
+          <div className="lesson-total"><span>Net usable flow</span><strong>{formatRinggit(q.netTakeHome)}</strong></div>
+          <p className="lesson-quote">"{q.tagline}"</p>
+        </section>
+
+        <div className="lesson-disclosures">
+          <details className="lesson-disclosure">
+            <summary><span><span>How {q.name}'s money moves</span><span>Flow diagram and details</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <ul className="rr-log">{q.details.map(detail => <li key={detail}>{detail}</li>)}</ul>
+              <svg width="100%" height="260" viewBox="0 0 300 260" role="img" aria-label={`${q.name}: income, tax, EPF, time and net flow`}>
+                {/* Income source */}
+                <circle cx="150" cy="24" r="12" fill={q.pipeColors.income} opacity="0.3" />
+                <title>{`${q.name} monthly income: ${formatRinggit(q.monthlyIncome)}`}</title>
+                <text x="150" y="28" textAnchor="middle" fill={q.pipeColors.income} fontSize="12" fontWeight="bold">IN</text>
+                <text x="150" y="48" textAnchor="middle" fill={'var(--ledger-ink)'} fontSize="14" fontWeight="bold">{formatRinggit(q.monthlyIncome)}</text>
+                <text x="150" y="63" textAnchor="middle" fill={'var(--ledger-muted)'} fontSize="14">Income enters</text>
+                {/* Main flow down */}
+                <line x1="150" y1="36" x2="150" y2="212" stroke={q.pipeColors.income} strokeWidth="3" opacity="0.5" />
+                <text x="160" y="86" fill={'var(--ledger-muted)'} fontSize="14">↓ Cashflow</text>
+                {/* Tax branch */}
+                <line x1="150" y1="92" x2="60" y2="92" stroke={q.pipeColors.tax} strokeWidth={Math.max(2, q.pipeWidths.tax / 8)} opacity="0.8" />
+                <polygon points="60,92 68,88 68,96" fill={q.pipeColors.tax} opacity="0.8" />
+                <text x="26" y="88" fill={q.pipeColors.tax} fontSize="14" fontWeight="bold">Tax</text>
+                <text x="26" y="102" fill={'var(--ledger-ink)'} fontSize="14">{formatRinggit(q.taxAmount)}</text>
+                {/* EPF branch */}
+                <line x1="150" y1="136" x2="60" y2="136" stroke={q.pipeColors.epf} strokeWidth={Math.max(2, q.pipeWidths.epf / 8)} opacity="0.8" />
+                <polygon points="60,136 68,132 68,140" fill={q.pipeColors.epf} opacity="0.8" />
+                <text x="26" y="132" fill={q.pipeColors.epf} fontSize="14" fontWeight="bold">EPF</text>
+                <text x="26" y="146" fill={'var(--ledger-ink)'} fontSize="14">{formatRinggit(q.epfAmount)}</text>
+                {/* Time branch */}
+                {q.pipeWidths.time > 0 && (
+                  <>
+                    <line x1="150" y1="178" x2="240" y2="178" stroke={q.pipeColors.time} strokeWidth={Math.max(2, q.pipeWidths.time / 8)} opacity="0.8" />
+                    <text x="250" y="174" fill={q.pipeColors.time} fontSize="14" fontWeight="bold">Time</text>
+                    <text x="250" y="188" fill={'var(--ledger-ink)'} fontSize="14">{q.timeHours} hrs</text>
+                    <polygon points="240,178 232,174 232,182" fill={q.pipeColors.time} opacity="0.8" />
+                  </>
+                )}
+                {q.pipeWidths.time === 0 && (
+                  <>
+                    <rect x="168" y="164" width="96" height="28" rx="14" fill={'var(--ledger-positive)'} opacity="0.14" />
+                    <text x="216" y="182" textAnchor="middle" fill={'var(--ledger-positive)'} fontSize="13" fontWeight="bold">NO TIME TRADE</text>
+                  </>
+                )}
+                {/* Net flow */}
+                <circle cx="150" cy="214" r="8" fill={q.pipeColors.income} opacity="0.6" />
+                <text x="150" y="232" textAnchor="middle" fill={'var(--ledger-accent)'} fontSize="13" fontWeight="bold">NET LEFT</text>
+                <text x="150" y="248" textAnchor="middle" fill={'var(--ledger-ink)'} fontSize="14" fontWeight="bold">{formatRinggit(q.netTakeHome)}</text>
+                {/* Flowing particles */}
+                <circle r="2" fill={q.pipeColors.income}>
+                  <animate attributeName="cy" values="42;208" dur="2s" repeatCount="indefinite" />
+                  <animate attributeName="cx" values="150;150" dur="2s" repeatCount="indefinite" />
+                </circle>
+                {q.pipeWidths.tax > 10 && (
+                  <circle r="1.5" fill={q.pipeColors.tax}>
+                    <animate attributeName="cx" values="150;65" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="92;92" dur="1.5s" repeatCount="indefinite" />
+                  </circle>
+                )}
+                {q.pipeWidths.time > 10 && (
+                  <circle r="1.5" fill={q.pipeColors.time}>
+                    <animate attributeName="cx" values="150;235" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="178;178" dur="1.5s" repeatCount="indefinite" />
+                  </circle>
+                )}
+              </svg>
+            </div>
+          </details>
         </div>
       </div>
+
+      <p className="lesson-quote">"{quadrants[0].name} and {quadrants[3].name} both 'make' RM 8,000. But {quadrants[0].name} trades 160 hours. {quadrants[3].name} trades <strong>zero.</strong>"</p>
     </section>
   );
 }
-

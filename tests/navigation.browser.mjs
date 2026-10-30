@@ -62,9 +62,20 @@ try {
     }
     assert.equal(await page.getByRole('button', { name: 'Try an example', exact: true }).evaluate(element => element === document.activeElement), true, 'Choosing an example returns focus to the disclosure control');
     await page.locator('#mm-salary').fill('');
-    if (width < 768) await page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle').click();
+    if (width < 768) {
+      assert.match(await page.locator('.workspace-progress').innerText(), /^1 of 3/, 'Phone header shows path progress');
+      await page.getByRole('button', { name: 'Understand your money, lesson 1 of 3. Show path', exact: true }).click();
+      await page.getByRole('dialog', { name: 'Understand your money' }).waitFor();
+    }
     assert.equal(await page.getByRole('navigation', { name: 'Understand your money lessons' }).getByRole('link', { name: '1 Money Mirror', exact: true }).getAttribute('aria-current'), 'step', 'Lesson navigation uses its visible label as the accessible name');
-    if (width < 768) await page.locator('.lesson-screen:not([hidden]) .lesson-path-toggle').click();
+    if (width < 768) {
+      await page.getByRole('button', { name: 'Close path', exact: true }).click();
+      await page.getByRole('dialog').waitFor({ state: 'hidden' });
+      const dock = await page.locator('.lesson-screen:not([hidden]) .lesson-dock').boundingBox();
+      const scroller = await page.locator('#main-content').boundingBox();
+      assert.ok(Math.abs(dock.y + dock.height - (scroller.y + scroller.height)) <= 1, 'The lesson dock stays at the bottom of the phone workspace');
+      assert.ok(await page.getByRole('link', { name: 'Next lesson: Assets & liabilities', exact: true }).isVisible(), 'Next lesson is always one tap away');
+    }
     await page.getByRole('button', { name: 'View my results', exact: true }).click();
     await page.locator('#mm-salary[aria-invalid=true]').waitFor();
     assert.ok(await page.locator('.money-form .inline-error').count());
@@ -96,14 +107,16 @@ try {
     assert.equal(await page.locator('.lesson-list a').count(), 9);
     assert.equal(await page.locator('.learning-path').count(), 3);
     assert.equal(await page.locator('.lesson-link[data-resume] h3').innerText(), 'Money Mirror');
-    assert.equal(await page.locator('.lesson-resume-badge').innerText(), 'Last opened');
-    await page.getByLabel('Learning path', { exact: true }).focus();
-    await page.getByLabel('Learning path', { exact: true }).selectOption('build');
+    assert.equal(await page.locator('.continue-card strong').innerText(), 'Money Mirror', 'Learn offers to continue the last lesson');
+    assert.equal(await page.locator('.learning-path').first().locator('.path-count').innerText(), '1 of 3 visited', 'Visited lessons show session progress');
+    assert.equal(await page.locator('.lesson-link[href$="#money-mirror"] .lesson-marker').getAttribute('data-visited'), 'true');
+    const pathFilter = page.getByRole('group', { name: 'Learning path', exact: true });
+    await pathFilter.getByRole('button', { name: 'Breathing room', exact: true }).click();
     assert.equal(await page.locator('.lesson-list a').count(), 3, 'Path filters limit choices');
-    assert.equal(await page.locator('.library-heading [role=status]').innerText(), '3 lessons · Build breathing room');
-    assert.equal(await page.getByLabel('Learning path', { exact: true }).evaluate(element => element === document.activeElement), true, 'Filtering announces results without moving focus');
-    await page.getByLabel('Learning path', { exact: true }).selectOption('all');
-    assert.equal(await page.locator('.library-heading [role=status]').innerText(), '9 lessons · explore in any order');
+    assert.equal(await page.locator('.library-status').innerText(), '3 lessons · Build breathing room');
+    assert.equal(await pathFilter.getByRole('button', { name: 'Breathing room', exact: true }).evaluate(element => element === document.activeElement), true, 'Filtering announces results without moving focus');
+    await pathFilter.getByRole('button', { name: 'All', exact: true }).click();
+    assert.equal(await page.locator('.library-status').innerText(), '9 lessons · explore in any order');
     for (const id of lessonIds) {
       await page.locator(`.lesson-list a[href$="#${id}"]`).click();
       await page.locator(`section#${id}`).waitFor();
@@ -241,11 +254,11 @@ try {
     await open('Settings');
     await page.getByRole('radio', { name: 'Dark', exact: true }).check();
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
-    await page.getByRole('checkbox', { name: /Reduce motion/ }).check();
+    await page.getByRole('switch', { name: /Reduce motion/ }).check();
     assert.equal(await page.locator('html').getAttribute('data-reduce-motion'), 'true');
     await page.reload({ waitUntil: 'networkidle' });
     assert.ok(await page.getByRole('radio', { name: 'Dark', exact: true }).isChecked());
-    assert.ok(await page.getByRole('checkbox', { name: /Reduce motion/ }).isChecked());
+    assert.ok(await page.getByRole('switch', { name: /Reduce motion/ }).isChecked());
     await page.getByRole('radio', { name: 'Device', exact: true }).check();
     await page.emulateMedia({ colorScheme: 'light' });
     await page.locator('html[data-theme=light]').waitFor();

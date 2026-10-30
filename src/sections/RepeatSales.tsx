@@ -13,6 +13,7 @@ const FIRST_PRODUCT_ID = '124106';
 const presets = [1, 12, 24, 60, 120, 300, 600];
 const startYears = Array.from({ length: 50 }, (_, index) => index + 1);
 const steps = ['First sale', 'Repeat sales', 'More products', 'Long term'];
+const shortSteps = ['First sale', 'Repeat', 'Basket', 'Long term'];
 const titles = ['One product. One customer.', 'One sale becomes repeat sales.', 'Grow the basket in year 2.', 'See what time can build.'];
 const descriptions = ['Start with a simple first sale.', 'See what the same customer could buy again.', 'Keep the customer. Add another product.', 'Explore your plan over the next 50 years.'];
 const cycleLabel = (interval: number) => interval === 0 ? 'One-time purchase' : interval === 1 ? 'Every month' : interval === 12 ? 'Every year' : `Every ${durationLabel(interval)}`;
@@ -135,8 +136,7 @@ export default function RepeatSales() {
 
   return <section id="repeat-sales" className={`repeat-sales${step === 0 ? ' rs-opening' : ''}`} aria-labelledby="repeat-sales-heading">
     <header className="rs-intro"><div><h1 id="repeat-sales-heading" ref={headingRef} tabIndex={-1}>{isPhone ? ['Start with one sale', 'Turn sales into a habit', 'Build your basket', 'Plan your growth'][step] : titles[step]}</h1><p>{isPhone ? ['One product. One customer.', 'See what repeat purchases can add up to.', 'Add products from year 2.', 'Adjust your customers, timing and repeat rate.'][step] : descriptions[step]}</p></div><button type="button" className="rs-text-button rs-reset" aria-label="Reset" title="Restart consultation" onClick={reset}><RotateCcw size={16} aria-hidden="true" />Reset</button></header>
-    <div className="rs-step-select"><label htmlFor="rs-step">Step {step + 1} of 4</label><select id="rs-step" value={step} onChange={event => goToStep(Number(event.target.value), false)}>{steps.map((label, index) => <option key={label} value={index}>{label}</option>)}</select></div>
-    <nav className="rs-steps" aria-label="Consultation steps"><ol>{steps.map((label, index) => <li key={label}><button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => goToStep(index)}><span aria-hidden="true">{index + 1}</span><span className="rs-step-label">{label}</span></button></li>)}</ol></nav>
+    <nav className="rs-steps" aria-label={`Consultation steps, step ${step + 1} of 4`}><ol>{steps.map((label, index) => <li key={label}><button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => goToStep(index, !isPhone)}><span aria-hidden="true">{index + 1}</span><span className="rs-step-label">{label}</span><span className="rs-step-short">{shortSteps[index]}</span></button></li>)}</ol></nav>
 
     {step === 0 ? <div className="rs-first-sale rs-basket" id="rs-basket" ref={basketRef} tabIndex={-1}>
       <div className="rs-sale-story">

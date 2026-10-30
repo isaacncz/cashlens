@@ -292,7 +292,7 @@ The forest Home task uses coach feature colors and 16px corners and contains its
 
 Home tools are quiet link rows with horizontal rules, outline icons, and an arrow. They use no resting panel fill or rounded card shell. Grouped learning cards use a surface background, thin outer boundary, panel corners, and internal dividers. Their lesson rows use 16px padding on phones and 20px vertical / 16px horizontal padding on wider screens, with a raised hover surface. Focus draws inside the clipped group so it remains visible.
 
-Money Mirror has its own user-selected Quick Worksheet page design; see the page override below. Wealth Thermometer retains compact label-and-value rows on phones, stacking for enlarged text. Phone Compound retains concise stage introductions and an underlined Edit plan / Results switch.
+Money Mirror follows the shared lesson template (30 October 2026); its earlier Quick Worksheet override below is superseded except where noted. Wealth Thermometer retains compact label-and-value rows on phones, stacking for enlarged text. Phone Compound retains concise stage introductions and an underlined Edit plan / Results switch.
 
 Wealth Thermometer's empty result is one useful sentence prompting monthly expenses; zone labels use text and semantic color.
 
@@ -341,7 +341,9 @@ State changes use color, boundary, or brightness rather than layout movement. Sh
 - **Don't** persist calculator inputs alongside appearance preferences.
 
 
-## Page override: Money Mirror — Quick Worksheet
+## Page override: Money Mirror — Quick Worksheet (superseded 30 October 2026)
+
+The mobile lesson template below replaces this page's Georgia title, underlined fields and in-flow-only actions. Its calculations, empty starting fields, examples, live results and disclosures remain as described.
 
 The user selected proposal 2 for a complete Money Mirror rewrite on 29 October 2026. This override supersedes its earlier Pocket Coach form layout; other screens retain the shared system above. Implementation lives in `src/sections/MoneyMirror.tsx` and `src/sections/MoneyMirror.css`.
 
@@ -380,3 +382,17 @@ Products, Settings and Results give each task a separate phone section. Selected
 ## Light-theme control repair
 
 Lesson range controls use explicit WebKit/Firefox tracks and thumb styling, with a 44px interaction area and shared control/accent colors. This avoids mixing a custom thumb with an unspecified native track. Money Mirror places its optional Use slider disclosure beside the work-hours field, with an accessible hour-value description. The empty result uses one concise prompt; supporting disclosures/privacy use tighter spacing. Numeric entry, calculations and Ink Blue are unchanged.
+
+
+## Mobile lesson template — 30 October 2026
+
+The user approved the mobile redesign proposal (`docs/mobile-ux-proposal.md`) and its canvas mockup. All nine lessons share one phone template; desktop keeps the sidebar, lesson top bar and in-page path list.
+
+- **Header:** back link, lesson title and a path progress button ("1 of 3" plus three 18×4px segments). It opens a native `<dialog>` bottom sheet listing the path's lessons with visited ticks and an All lessons link. It replaces the in-page path accordion on phones.
+- **Dock:** a sticky surface bar at the bottom of the lesson with one full-width primary Next button. A lesson may portal a live result into the dock's slot; Money Mirror shows "An hour of work is worth RM x" beside a compact Next. On short lessons the dock pins to the bottom of the workspace.
+- **Order:** sentence-case H1 and one-line lead, then the interactive core on the first screen, then a result card, then explanations in disclosures (56px summaries with a secondary line).
+- **Shared parts (`src/styles/lesson.css`):** segmented control (radio or pressed buttons, 44px segments on a raised track), one-level cards, label/value rows, total row, disclosures, choice cards, stat strip and 4–6px meters. Semantic red/green colours numbers and status text only, never whole panels. Icons are Lucide outlines; emoji are not used.
+- **Inputs:** label above a boxed 52px field with an `RM` prefix or unit suffix (`NumberField` `prefix`/`suffix`), right-aligned tabular digits and a focus/error ring on the box.
+- **Type:** Inter only. H1 24–32px/600, section 18px/600, body 16px, metadata 14px. Bottom navigation labels remain 12px.
+- **Progress:** lessons opened in this session count as visited on Home, Learn and the path sheet. Visits are not stored and reset when the app closes.
+- **Destinations:** Home leads with Continue when a lesson was opened, then three quick questions and three path cards linking to each path's next unvisited lesson. Learn replaces the path dropdown with filter chips and shows per-path progress. Compound replaces the phone stage dropdown with a four-segment stepper; its contextual dock action is unchanged. Settings shows Reduce motion as a switch.

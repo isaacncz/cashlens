@@ -54,7 +54,7 @@ try {
     await layout();
     if (textSize === 16 && width >= 375 && height >= 812) {
       for (const href of ['money-mirror', 'wealth-thermometer', 'compounding', 'learn']) {
-        assert.ok(await inScrollport(page.locator(`.dashboard a[href$="#${href}"]`)), `Every Home task is available without scrolling: ${label} ${href}`);
+        assert.ok(await inScrollport(page.locator(`.dashboard a[href$="#${href}"]`).first()), `Every Home task is available without scrolling: ${label} ${href}`);
       }
     }
     await page.getByRole('link', { name: 'Check my cashflow', exact: true }).click();
@@ -89,14 +89,15 @@ try {
     assert.equal(await page.locator('#money-mirror-results').evaluate(element => element === document.activeElement), true);
     await layout();
     await page.getByRole('link', { name: 'Back to lessons', exact: true }).click();
-    await page.locator('.library-filter').waitFor();
+    await page.locator('.path-filter').waitFor();
     assert.equal(await page.locator('.lesson-list a').count(), 9);
-    await page.getByLabel('Learning path', { exact: true }).focus();
-    await page.getByLabel('Learning path', { exact: true }).selectOption('practice');
+    const pathFilter = page.getByRole('group', { name: 'Learning path', exact: true });
+    for (const chip of await pathFilter.getByRole('button').all()) assert.ok((await chip.boundingBox()).height >= 44, `Path filter touch target: ${label}`);
+    await pathFilter.getByRole('button', { name: 'Practice', exact: true }).click();
     assert.equal(await page.locator('.lesson-list a').count(), 3);
-    assert.equal(await page.locator('.library-heading [role=status]').innerText(), '3 lessons · Put it into practice');
-    assert.equal(await page.getByLabel('Learning path', { exact: true }).evaluate(element => element === document.activeElement), true);
-    await page.getByLabel('Learning path', { exact: true }).selectOption('all');
+    assert.equal(await page.locator('.library-status').innerText(), '3 lessons · Put it into practice');
+    assert.equal(await pathFilter.getByRole('button', { name: 'Practice', exact: true }).evaluate(element => element === document.activeElement), true);
+    await pathFilter.getByRole('button', { name: 'All', exact: true }).click();
     await layout();
     await nav.getByRole('link', { name: 'Compound', exact: true }).click();
     await page.locator('.rs-first-receipt').waitFor();
@@ -124,7 +125,7 @@ try {
       await directPicker.getByRole('button', { name: 'Selected (2)', exact: true }).click();
       assert.equal(await directPicker.locator('.rs-product').count(), 2);
       await directPicker.getByRole('button', { name: 'Done', exact: true }).click();
-      assert.equal(await page.locator('#rs-step').inputValue(), '3', 'Direct plan opens the full planner');
+      assert.equal(await page.locator('.rs-steps [aria-current=step]').innerText(), 'Long term', 'Direct plan opens the full planner');
       assert.ok(await page.locator('#rs-plan-panel').isVisible());
       await page.getByRole('button', { name: 'Reset', exact: true }).click();
     }
@@ -165,9 +166,10 @@ try {
     assert.equal(await page.locator('#rs-plan-panel').evaluate(element => element === document.activeElement), true, 'Selection returns focus to the product list');
     assert.equal(await page.locator('details.rs-compact-product[open]').count(), 0, 'Product controls remain collapsed until requested');
     await results();
-    await page.getByLabel('Step 3 of 4', { exact: true }).focus();
-    await page.getByLabel('Step 3 of 4', { exact: true }).selectOption('3');
-    assert.equal(await page.locator('#rs-step').evaluate(element => element === document.activeElement), true, 'Changing consultation stages preserves selector focus');
+    const stepper = page.getByRole('navigation', { name: 'Consultation steps, step 3 of 4', exact: true });
+    for (const stage of await stepper.getByRole('button').all()) assert.ok((await stage.boundingBox()).height >= 44, `Stage touch target: ${label}`);
+    await stepper.getByRole('button', { name: 'Long term', exact: true }).click();
+    assert.equal(await page.locator('.rs-steps button[aria-current=step]').evaluate(element => element === document.activeElement), true, 'Changing consultation stages preserves stepper focus');
     await settings();
     if (height >= 812 && textSize === 16) assert.ok(await inScrollport(page.locator('#rs-customers')), 'Customer input is immediately accessible in its own settings section');
     await page.getByRole('combobox', { name: 'Time period', exact: true }).selectOption('12');

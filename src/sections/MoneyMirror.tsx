@@ -2,7 +2,8 @@ import NumberField from '../app/NumberField';
 import { numberError } from '../lib/numericInput';
 import { scrollToContent } from '../lib/pageNavigation';
 import { formatMoney } from '../lib/currency';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowRight, ArrowUp, ChevronDown } from 'lucide-react';
 import './MoneyMirror.css';
 
@@ -124,6 +125,8 @@ const presets: MoneyMirrorPreset[] = [
   },
 ];
 
+const findDockSlot = () => document.getElementById('lesson-dock-money-mirror');
+
 function computeMoneyMirrorResults(salary: number, hours: number, commute: number, expenses: number): MoneyMirrorResult {
   const epf = calculateEPF(salary);
   const socsoEmployee = calculateSOCSOEmployee(salary);
@@ -160,6 +163,15 @@ export default function MoneyMirror() {
   const [submitted, setSubmitted] = useState(false);
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+  const [isPhone, setIsPhone] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  // The app shell renders this lesson's dock slot; a result only exists after typing, by which point the slot is mounted.
+  const dockSlot = findDockSlot();
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsPhone(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   const salaryIsValid = salary.trim() !== '' && !numberError(salary, SALARY_MIN, SALARY_MAX, true);
   const calculated = salaryIsValid && !numberError(hours, HOURS_MIN, HOURS_MAX) && !numberError(commute, 0, 24) && !numberError(expenses);
@@ -194,6 +206,9 @@ export default function MoneyMirror() {
     }
     if (resultsRef.current) scrollToContent(resultsRef.current);
   };
+  const showResults = () => {
+    if (resultsRef.current) scrollToContent(resultsRef.current);
+  };
   const editNumbers = () => {
     const salaryInput = document.getElementById('mm-salary');
     if (salaryInput) scrollToContent(salaryInput);
@@ -209,24 +224,24 @@ export default function MoneyMirror() {
   return <section id="money-mirror" className="mm-worksheet" aria-labelledby="mm-heading">
     <div className="mm-page">
       <header className="mm-intro">
-        <h1 id="mm-heading">Your pay,<br />minus the guesswork.</h1>
+        <h1 id="mm-heading">Your pay, minus the guesswork.</h1>
         <p>Four numbers. The full picture.</p>
       </header>
       <div className="mm-workspace">
         <div className="mm-entry">
           <form className="money-form" noValidate onSubmit={viewResults} aria-label="Your pay and working time">
             <div className="mm-fields">
-              <NumberField validationMode="change" id="mm-salary" label="Monthly salary · RM" value={salary} onChange={edit(setSalary)} min={SALARY_MIN} max={SALARY_MAX} required placeholder="e.g. 8000" submitted={submitted} />
-              <NumberField validationMode="change" id="mm-expenses" label="Work costs · RM/month" value={expenses} onChange={edit(setExpenses)} placeholder="0" submitted={submitted} />
+              <NumberField validationMode="change" id="mm-salary" label="Monthly salary" prefix="RM" value={salary} onChange={edit(setSalary)} min={SALARY_MIN} max={SALARY_MAX} required placeholder="e.g. 8000" submitted={submitted} />
+              <NumberField validationMode="change" id="mm-expenses" label="Work costs per month" prefix="RM" value={expenses} onChange={edit(setExpenses)} placeholder="0" submitted={submitted} />
               <div className="mm-hours-field">
-                <NumberField validationMode="change" id="mm-hours" label="Work hours / week" value={hours} onChange={edit(setHours)} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" inputMode="numeric" submitted={submitted} />
+                <NumberField validationMode="change" id="mm-hours" label="Work hours / week" value={hours} onChange={edit(setHours)} min={HOURS_MIN} max={HOURS_MAX} placeholder="44" inputMode="numeric" suffix="hrs" submitted={submitted} />
                 <details className="hours-slider">
                   <summary>Use slider<ChevronDown size={17} aria-hidden="true" /></summary>
                   <input type="range" min={HOURS_MIN} max={HOURS_MAX} step="1" value={hoursValue} onChange={event => edit(setHours)(event.target.value)} aria-label="Hours worked per week" aria-valuetext={`${hoursValue} hours per week`} className="lesson-range" />
                   <p>{hoursValue} hours / week</p>
                 </details>
               </div>
-              <NumberField validationMode="change" id="mm-commute" label="Commute hours / day" value={commute} onChange={edit(setCommute)} max={24} placeholder="0" submitted={submitted} />
+              <NumberField validationMode="change" id="mm-commute" label="Commute hours / day" value={commute} onChange={edit(setCommute)} max={24} placeholder="0" suffix="hrs" submitted={submitted} />
             </div>
             <p className="mm-defaults">Use salary before deductions. Blank fields use 44 work hours and zero costs or commute.</p>
             <div className="mm-form-actions">
@@ -268,9 +283,9 @@ export default function MoneyMirror() {
             <dl className="mm-breakdown-list"><div><dt>Annual hours traded</dt><dd>{results.annualHours.toFixed(0)} hours</dd></div><div><dt>Equivalent full days</dt><dd>{Math.round(results.annualHours / 24)} days</dd></div><div><dt>Modelled survival without work</dt><dd>{results.monthsSurvival.toFixed(1)} months</dd></div></dl>
             <p>The survival illustration assumes six months of net income set aside, with monthly spending at 70% of gross salary. It is not based on your actual savings. When work costs are zero, this illustration returns zero.</p>
           </details>}
-          <p className="mm-privacy">Your numbers stay in this session.</p>
         </div>
       </div>
     </div>
+    {isPhone && calculated && dockSlot && createPortal(<button type="button" className="mm-dock-result" onClick={showResults}><span>An hour of work is worth</span><strong>RM {formatMoney(results.trueHourly)}</strong><span className="sr-only">Show the breakdown</span></button>, dockSlot)}
   </section>;
 }

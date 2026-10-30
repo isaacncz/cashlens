@@ -175,15 +175,12 @@ export default function WealthThermometer() {
   };
 
   return (
-    <section id="wealth-thermometer" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
+    <section id="wealth-thermometer" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }} aria-labelledby="wealth-thermometer-heading">
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          Wealth Is Not A Number.{' '}
-          <span className="text-gold">It Is A Countdown.</span>
-        </h1>
-        <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
-          How many months could you survive without working? Let's find out.
-        </p>
+        <header className="lesson-intro">
+          <h1 id="wealth-thermometer-heading">Wealth is not a number. It is a countdown.</h1>
+          <p>How many months could you survive without working? Let's find out.</p>
+        </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calculator Form */}

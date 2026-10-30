@@ -1,5 +1,6 @@
 import { formatMoney } from '../lib/currency';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 interface Character {
   name: string;
@@ -83,160 +84,67 @@ const characters: Character[] = [
 ];
 
 export default function SalaryWealth() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const thermometerRef = useRef<HTMLDivElement>(null);
   const [limSalary, setLimSalary] = useState(25000);
-
-
-
-
-
+  const [selected, setSelected] = useState(0);
   const adjustedLimFreedom = Math.max(1, 8 * (25000 / Math.max(limSalary, 1000)));
+  const c = characters[selected];
+  const isInfinite = c.freedom === Infinity;
+  const displayFreedom = selected === 0 ? adjustedLimFreedom : c.freedom;
+  const fill = isInfinite ? 100 : Math.min(100, (displayFreedom / 60) * 100);
+  const freedomTone = isInfinite ? 'tone-good' : selected === 0 ? (adjustedLimFreedom < 12 ? 'tone-bad' : '') : c.freedom < 12 ? 'tone-bad' : '';
 
   return (
-    <section id="salary-wealth" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          High Salary.{' '}
-          <span className="text-gold">Zero Freedom.</span>
-        </h1>
-        <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-xl">
-          Three Malaysians. Three incomes. One truth.
-        </p>
+    <section id="salary-wealth" className="lesson" aria-labelledby="salary-wealth-heading">
+      <header className="lesson-intro">
+        <h1 id="salary-wealth-heading">High salary. Zero freedom.</h1>
+        <p>Three Malaysians. Three incomes. One truth.</p>
+      </header>
 
-        {/* Character Cards */}
-        <div data-reveal ref={thermometerRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {characters.map((c, i) => {
-            const isInfinite = c.freedom === Infinity;
-            const displayFreedom = i === 0 ? adjustedLimFreedom : c.freedom;
-            const fillHeight = isInfinite ? 100 : Math.min(100, (displayFreedom / 60) * 100);
-            const showFreedom = isInfinite ? 'INFINITE' : `${displayFreedom.toFixed(0)} months`;
-
-            return (
-              <div
-                key={c.name}
-                className={`relative bg-navy-surface rounded-2xl p-6 border-2 ${c.borderColor} transition-all duration-300 hover:shadow-elevated ${
-                  c.isWinner ? 'shadow-[0_0_30px_rgb(var(--ledger-positive-rgb) / .15)]' : ''
-                }`}
-                style={c.isWinner ? { animation: 'winnerPulse 3s ease-in-out infinite' } : {}}
-              >
-                {c.isWinner && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald text-navy text-xs font-bold px-3 py-1 rounded-full">
-                    FINANCIALLY FREE
-                  </div>
-                )}
-
-                <h2 className={`text-xl font-bold mb-1 ${c.accent}`}>{c.name}</h2>
-                <p className="text-slate text-sm mb-4">{c.title}</p>
-
-                <p className={`font-mono-data text-2xl md:text-3xl font-bold mb-4 ${c.accent}`}>
-                  {i === 0 ? `RM ${formatMoney(limSalary)}/month` : c.salaryLabel}
-                </p>
-
-                {/* Income Sources */}
-                <div className="space-y-2 mb-6">
-                  {c.sourceLabels.map((s, j) => (
-                    <div key={j} className="flex justify-between text-sm">
-                      <span className="text-slate">{s.label}</span>
-                      <span className="text-white font-mono-data">
-                        {i === 0 && s.label === 'Salary' ? `RM ${formatMoney(limSalary)}` : `RM ${formatMoney(s.amount)}`}
-                      </span>
-                    </div>
-                  ))}
-                  <div className="flex justify-between text-sm pt-2 border-t border-navy-light">
-                    <span className="text-slate">Expenses</span>
-                    <span className="text-crimson font-mono-data">
-                      RM {i === 0 ? formatMoney(limSalary * 0.88) : formatMoney(c.expenses)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Wealth Thermometer */}
-                <div className="flex items-center gap-4">
-                  <div className="relative w-10 h-[160px] bg-navy-light rounded-full overflow-hidden flex-shrink-0">
-                    <div
-                      className="thermo-fill absolute bottom-0 left-0 right-0 rounded-full transition-all"
-                      style={{
-                        height: i === 0 ? `${Math.min(100, (adjustedLimFreedom / 60) * 100)}%` : `${fillHeight}%`,
-                        background: isInfinite
-                          ? 'linear-gradient(to top, var(--ledger-positive), var(--ledger-accent))'
-                          : 'linear-gradient(to top, var(--ledger-negative), var(--ledger-accent), var(--ledger-positive))',
-                      }}
-                    />
-                    {isInfinite && (
-                      <div className="absolute inset-0 bg-emerald/20 animate-pulse rounded-full" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-slate text-xs uppercase mb-1">Freedom</p>
-                    <p className="font-mono-data text-xl font-bold" style={{ color: i === 0 ? (adjustedLimFreedom < 12 ? 'var(--ledger-negative)' : 'var(--ledger-accent)') : c.freedomColor }}>
-                      {showFreedom}
-                    </p>
-                    {isInfinite && <p className="text-emerald text-xs">Financially Free!</p>}
-                  </div>
-                </div>
-
-                <p className={`text-sm italic mt-4 ${c.accent}`}>"{c.tagline}"</p>
-
-                {/* Dr. Lim salary slider */}
-                {i === 0 && (
-                  <div className="mt-4 pt-4 border-t border-navy-light">
-                    <label className="text-slate text-xs uppercase mb-2 block">Adjust Dr. Lim's salary</label>
-                    <input
-                      type="range"
-                      aria-label="Dr. Lim monthly salary"
-                      min="25000"
-                      max="100000"
-                      step="1000"
-                      value={limSalary}
-                      onChange={e => setLimSalary(parseInt(e.target.value))}
-                      className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                      style={{ background: `linear-gradient(to right, var(--ledger-accent) ${((limSalary - 25000) / 75000) * 100}%, var(--ledger-control) ${((limSalary - 25000) / 75000) * 100}%)` }}
-                    />
-                    <p className="text-slate text-xs mt-1">Notice: More salary ≠ More freedom</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+      <div className="lesson-stack">
+        <div className="segmented" role="group" aria-label="Choose a person">
+          {characters.map((person, i) => <button key={person.name} type="button" aria-pressed={selected === i} onClick={() => setSelected(i)}>{person.name.split(' ').pop()}</button>)}
         </div>
 
-        {/* EPF Illusion */}
-        <div data-reveal className="bg-navy-surface border border-navy-light rounded-2xl p-6 md:p-8">
-          <h2 className="text-white text-lg font-bold mb-3">The EPF Illusion</h2>
-          <p className="text-slate text-sm leading-relaxed mb-4">
-            "Dr. Lim has RM 800K in EPF. He thinks he's rich. But he cannot touch it until 55. And Account 1 is 70% locked.
-            <span className="text-gold"> Is this wealth or a government-managed allowance?</span>")
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-navy/50 rounded-lg p-4 border border-navy-light">
-              <p className="text-slate text-xs uppercase mb-1">EPF Account 1</p>
-              <p className="text-gold font-mono-data text-lg font-bold">70%</p>
-              <p className="text-slate text-xs">Locked until 55/60</p>
-            </div>
-            <div className="bg-navy/50 rounded-lg p-4 border border-navy-light">
-              <p className="text-slate text-xs uppercase mb-1">EPF Account 2</p>
-              <p className="text-gold font-mono-data text-lg font-bold">30%</p>
-              <p className="text-slate text-xs">Accessible (limited)</p>
-            </div>
-            <div className="bg-navy/50 rounded-lg p-4 border border-crimson/30">
-              <p className="text-slate text-xs uppercase mb-1">True Liquidity</p>
-              <p className="text-crimson font-mono-data text-lg font-bold">~30%</p>
-              <p className="text-slate text-xs">EPF is not wealth. It's forced savings.</p>
-            </div>
+        <section className="lesson-card sw-person" aria-live="polite" aria-labelledby="sw-person-name">
+          <div className="sw-person-head">
+            <div><h2 id="sw-person-name">{c.name}</h2><p className="lesson-muted">{c.title}{c.isWinner ? ' · Financially free' : ''}</p></div>
+            <strong className={c.isWinner ? 'tone-good' : ''}>{selected === 0 ? `RM ${formatMoney(limSalary)}/month` : c.salaryLabel}</strong>
           </div>
-        </div>
+          <dl className="lesson-rows">
+            {c.sourceLabels.filter(source => source.label !== 'Expenses').map(source => <div key={source.label}><dt>{source.label}</dt><dd>{selected === 0 && source.label === 'Salary' ? `RM ${formatMoney(limSalary)}` : `RM ${formatMoney(source.amount)}`}</dd></div>)}
+            <div><dt>Expenses</dt><dd className="tone-bad">RM {selected === 0 ? formatMoney(limSalary * 0.88) : formatMoney(c.expenses)}</dd></div>
+          </dl>
+          <div className="lesson-total"><span>Freedom</span><strong className={freedomTone}>{isInfinite ? 'INFINITE' : `${displayFreedom.toFixed(0)} months`}</strong></div>
+          <div className="meter meter-freedom" aria-hidden="true"><span style={{ width: `${fill}%` }} /></div>
+          <p className="lesson-quote">"{c.tagline}"</p>
+          {selected === 0 && <div className="sw-slider">
+            <div className="sw-slider-label"><label htmlFor="sw-lim-salary">Adjust Dr. Lim's salary</label><strong>RM {formatMoney(limSalary)}</strong></div>
+            <input id="sw-lim-salary" type="range" className="lesson-range" aria-label="Dr. Lim monthly salary" min="25000" max="100000" step="1000" value={limSalary} onChange={e => setLimSalary(parseInt(e.target.value))} />
+            <div className="sw-slider-ends" aria-hidden="true"><span>RM 25,000</span><span>RM 100,000</span></div>
+            <p className="lesson-muted">Notice: More salary ≠ More freedom</p>
+          </div>}
+        </section>
 
-        {/* Key Insight */}
-        <div data-reveal className="mt-10 text-center">
-          <p className="text-slate text-lg italic max-w-2xl mx-auto">
-            "{characters[0].name} makes 5x more than {characters[2].name}. But {characters[2].name} can stop working{' '}
-            <span className="text-emerald font-bold">forever.</span>"
-          </p>
+        <div className="lesson-disclosures">
+          <details className="lesson-disclosure">
+            <summary><span><span>About {c.name}</span><span>Tax, savings and lifestyle</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div><ul className="rr-log">{c.details.map(detail => <li key={detail}>{detail}</li>)}</ul></div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>The EPF Illusion</span><span>Why EPF is not liquid wealth</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <p>"Dr. Lim has RM 800K in EPF. He thinks he's rich. But he cannot touch it until 55. And Account 1 is 70% locked. Is this wealth or a government-managed allowance?"</p>
+              <dl className="lesson-rows">
+                <div><dt>EPF Account 1 <small>Locked until 55/60</small></dt><dd>70%</dd></div>
+                <div><dt>EPF Account 2 <small>Accessible (limited)</small></dt><dd>30%</dd></div>
+                <div><dt>True Liquidity <small>EPF is not wealth. It's forced savings.</small></dt><dd className="tone-bad">~30%</dd></div>
+              </dl>
+            </div>
+          </details>
         </div>
       </div>
 
+      <p className="lesson-quote">"{characters[0].name} makes 5x more than {characters[2].name}. But {characters[2].name} can stop working <strong>forever.</strong>"</p>
     </section>
   );
 }
-

@@ -1,19 +1,34 @@
 /* Pocket Coach: choose a task, then give the task the screen. */
+.start-eyebrow { margin: 0 0 4px; color: var(--coach-feature-muted); font-size: var(--text-small); }
+.dashboard-section { margin-top: 24px; }
+.dashboard-section > h2 { margin: 0 0 4px; font-size: var(--text-subtitle); font-weight: 600; letter-spacing: -.02em; }
+.dashboard .section-heading { align-items: center; margin: 0 0 8px; }
+.dashboard .dashboard-tools .tool-card { min-height: 60px; padding: 8px 0; border-top: 0; }
+.dashboard-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5rem), 1fr)); gap: 8px; }
+.path-card { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; min-height: 104px; padding: 12px; border: 1px solid var(--ledger-line); border-radius: 12px; background: var(--ledger-surface); color: var(--ledger-ink); text-decoration: none; transition: border-color 160ms ease-out, background-color 160ms ease-out; }
+.path-card strong { font-size: var(--text-small); font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.path-card > span { display: grid; gap: 6px; color: var(--ledger-muted); font-size: var(--text-small); }
+.path-card:hover { border-color: var(--ledger-accent); background: var(--ledger-raised); }
+.meter-positive > span { background: var(--ledger-positive); }
+.continue-card { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 16px; border-radius: var(--radius-panel); background: var(--coach-feature); color: var(--coach-on-feature); text-decoration: none; }
+.continue-card > span { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.continue-card small { color: var(--coach-feature-muted); font-size: var(--text-small); }
+.continue-card strong { font-size: var(--text-subtitle); font-weight: 600; }
+.continue-card > svg { flex-shrink: 0; }
+.path-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.path-filter button { min-height: 44px; padding: 0 16px; border: 1px solid var(--ledger-line); border-radius: 22px; background: var(--ledger-surface); color: var(--ledger-ink); font-size: var(--text-body); font-weight: 500; }
+.path-filter button[aria-pressed=true] { border-color: var(--ledger-accent); background: var(--ledger-raised); color: var(--ledger-accent); font-weight: 600; }
+.library-status { margin: 0 0 20px; color: var(--ledger-muted); font-size: var(--text-small); }
+.library-page .learning-path > header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px 12px; min-height: 0; margin: 0 0 12px; }
+.library-page .learning-path > header h2 { margin: 0; font-size: var(--text-subtitle); }
+.library-page .learning-path > header .meter { grid-column: 1 / -1; height: 4px; }
+.path-count { color: var(--ledger-muted); font-size: var(--text-small); white-space: nowrap; }
+.library-page .lesson-link { align-items: center; }
 .workspace-header { display: none; }
 .dashboard .page-heading h1 { max-width: none; font-size: var(--text-title); }
 .dashboard .start-copy h2 { margin: 0 0 8px; font-size: var(--text-lead); line-height: 1.35; }
 .dashboard .tool-card { align-items: center; }
-.dashboard .tool-card h2 { margin: 0 0 4px; font-size: var(--text-body); font-weight: 600; line-height: 1.4; }
-.dashboard-browse { display: flex; align-items: center; gap: 12px; min-height: 56px; margin-top: 20px; padding-block: 12px; border-block: 1px solid var(--ledger-line); color: var(--ledger-accent); font-weight: 600; text-decoration: none; }
-.dashboard-browse > svg { flex-shrink: 0; }
-.dashboard-browse > svg:last-child { margin-left: auto; }
-.dashboard .local-note { text-align: center; }
-.library-filter { display: grid; gap: 8px; max-width: 420px; margin-bottom: 12px; }
-.library-filter label { font-weight: 500; }
-.library-filter select { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--ledger-control); border-radius: var(--radius-control); background: var(--ledger-surface); color: var(--ledger-ink); font-size: var(--text-body); }
-.learning-resume { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; margin-bottom: 20px; padding-block: 8px; color: var(--ledger-accent); font-weight: 500; text-decoration: none; }
-.learning-resume svg { flex-shrink: 0; }
-.library-page .learning-path > header { min-height: 0; margin: 0 0 12px; }
+.dashboard .tool-card h3 { margin: 0; font-size: var(--text-body); font-weight: 500; line-height: 1.4; }
 .library-page .learning-path h2 { font-size: var(--text-body); }
 .library-page .library-heading { margin: 0 0 24px; }
 
@@ -44,9 +59,7 @@
   .tool-card > div { min-width: 0; }
   .tool-card > svg { flex-shrink: 0; }
   .tool-card p { font-size: var(--text-body); line-height: 1.4; }
-  .dashboard-browse { margin-top: 0; }
-  .dashboard .local-note { display: block; margin: 16px 0 0; font-size: var(--text-small); }
-  .library-page .page-heading { margin-bottom: 16px; }
+      .library-page .page-heading { margin-bottom: 16px; }
   .library-page .learning-paths { gap: 24px; }
   .library-page .lesson-link { align-items: center; padding: 16px; gap: 12px; }
   .lesson-link > div { min-width: 0; }
@@ -74,17 +87,6 @@
   .optional-income summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; color: var(--ledger-accent); font-weight: 500; }
   .optional-income summary > span { color: var(--ledger-muted); font-size: var(--text-small); }
   .optional-income > div { display: grid; gap: 20px; padding-block: 12px; }
-  .lesson-path-nav { padding-inline: 16px; }
-  .lesson-path-nav > span { display: none; }
-  .lesson-path-nav:not([data-expanded=true]) ol { display: none; }
-  .lesson-path-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 56px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--ledger-line); border-radius: var(--radius-control); background: var(--ledger-surface); color: var(--ledger-ink); text-align: left; font-size: var(--text-body); font-weight: 500; }
-  .lesson-path-toggle small { display: block; margin-top: 4px; color: var(--ledger-muted); font-size: var(--text-small); font-weight: 400; }
-  .lesson-path-toggle svg { flex-shrink: 0; color: var(--ledger-accent); }
-  .lesson-path-toggle[aria-expanded=true] svg { transform: rotate(180deg); }
-  .lesson-path-nav ol { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .lesson-path-nav a { min-height: 48px; padding: 10px 12px; font-size: var(--text-body); }
-  .lesson-pagination { flex-wrap: wrap; gap: 12px; padding-inline: 16px; }
-  .lesson-pagination a { flex-basis: 100%; }
   .theme-options { gap: 8px; }
   .switch-row { gap: 16px; }
   .settings-value { flex-wrap: wrap; }
@@ -122,3 +124,9 @@
     .lesson-screen .optional-income > div { gap: 0; }
   }
 }
+
+/* Settings: reduce motion reads as an on/off switch. */
+.switch-row > input[role=switch] { appearance: none; position: relative; width: 52px; height: 32px; margin: 0; border: 1px solid var(--ledger-control); border-radius: 16px; background: var(--ledger-raised); cursor: pointer; transition: background-color 160ms ease-out, border-color 160ms ease-out; }
+.switch-row > input[role=switch]::before { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--ledger-surface); box-shadow: 0 0 0 1px var(--ledger-control); transition: transform 160ms ease-out; }
+.switch-row > input[role=switch]:checked { border-color: var(--ledger-accent); background: var(--ledger-accent); }
+.switch-row > input[role=switch]:checked::before { transform: translateX(20px); box-shadow: none; }

@@ -15,44 +15,38 @@
 #money-mirror .mm-intro { margin-bottom: 24px; }
 #money-mirror .mm-intro h1 {
   margin: 0;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(2rem, 4vw, 2.75rem);
-  font-weight: 400;
-  letter-spacing: -.035em;
-  line-height: 1.08;
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.25;
   text-wrap: balance;
   color: var(--mm-ink);
 }
-#money-mirror .mm-intro p { margin: 12px 0 0; font-size: 1rem; line-height: 1.5; color: var(--mm-muted); }
+#money-mirror .mm-intro p { margin: 6px 0 0; font-size: 1rem; line-height: 1.5; color: var(--mm-muted); }
 #money-mirror .mm-workspace { display: grid; gap: 24px; min-width: 0; }
 #money-mirror :is(.mm-entry, .mm-output) { min-width: 0; }
 #money-mirror .money-form { padding: 0; margin: 0; border: 0; border-radius: 0; background: transparent; container-type: inline-size; }
-#money-mirror .mm-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+#money-mirror .mm-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; align-items: start; }
+#money-mirror .mm-fields > .number-field:nth-child(-n+2) { grid-column: 1 / -1; }
 #money-mirror .number-field { display: grid; grid-template-rows: auto auto auto; gap: 0; min-width: 0; padding: 0; border: 0; margin: 0; }
-#money-mirror .number-field label { display: block; margin: 0 0 4px; color: var(--mm-ink); font-size: .875rem; font-weight: 600; line-height: 1.45; min-height: 0; }
-#money-mirror .number-field input {
-  width: 100%; min-width: 0; min-height: 48px;
-  padding: 6px 0;
-  border: 0; border-bottom: 1px solid var(--mm-control); border-radius: 0;
-  color: var(--mm-ink); background: transparent;
-  font-size: 1.375rem; line-height: 1.5; font-variant-numeric: tabular-nums;
-  text-align: left;
-}
-#money-mirror .number-field input::placeholder { color: var(--mm-muted); opacity: 1; font-size: 1rem; }
-#money-mirror .number-field input[aria-invalid=true] { border-bottom-color: var(--mm-error); }
+#money-mirror .number-field label { display: block; margin: 0 0 6px; color: var(--mm-ink); font-size: 1rem; font-weight: 500; line-height: 1.4; min-height: 0; }
+#money-mirror .number-field input { font-size: 1rem; font-variant-numeric: tabular-nums; }
+#money-mirror .number-field input::placeholder { color: var(--mm-muted); opacity: 1; }
 #money-mirror .inline-error { color: var(--mm-error); font-size: .875rem; line-height: 1.45; margin: 6px 0 0; }
-#money-mirror .mm-defaults { margin: 12px 0 0; color: var(--mm-muted); font-size: .8125rem; line-height: 1.5; }
-#money-mirror .mm-form-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; }
-#money-mirror .mm-text-action { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--mm-ink); font-size: .875rem; font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
+#money-mirror .mm-defaults { margin: 12px 0 0; color: var(--mm-muted); font-size: .875rem; line-height: 1.5; }
+#money-mirror .mm-form-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+#money-mirror .mm-text-action { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; border: 1px solid var(--mm-line); border-radius: 22px; background: var(--ledger-surface); color: var(--mm-highlight); font-size: 1rem; font-weight: 500; }
+#money-mirror .mm-text-action[type=submit] { border-color: var(--mm-highlight); background: var(--mm-highlight); color: var(--mm-on-highlight); font-weight: 600; }
+#money-mirror .mm-text-action[type=submit] svg { color: currentColor; }
 #money-mirror .mm-text-action svg { flex-shrink: 0; }
 #money-mirror .mm-examples { padding: 12px 0; border-top: 1px solid var(--mm-line); }
 #money-mirror .mm-examples > p { color: var(--mm-muted); font-size: .875rem; margin-bottom: 8px; }
 #money-mirror .mm-examples > div { display: grid; gap: 8px; }
-#money-mirror .mm-examples button { min-height: 48px; padding: 10px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; border: 1px solid var(--mm-control); border-radius: 0; color: var(--mm-ink); text-align: left; }
+#money-mirror .mm-examples button { min-height: 48px; padding: 10px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; border: 1px solid var(--mm-control); border-radius: var(--radius-control); background: var(--ledger-surface); color: var(--mm-ink); text-align: left; }
 #money-mirror .mm-examples button[aria-pressed=true] { background: var(--mm-highlight); color: var(--mm-on-highlight); }
-#money-mirror .mm-examples small { font-size: .8125rem; }
-#money-mirror .mm-output { border-top: 2px solid var(--mm-ink); padding-top: 16px; }
-#money-mirror .mm-status { display: inline-block; max-width: 100%; margin: 0 0 16px; padding: 4px 8px; color: var(--mm-ink); background: var(--mm-tint); font-size: .75rem; line-height: 1.5; }
+#money-mirror .mm-examples small { font-size: .875rem; }
+#money-mirror .mm-output { border-top: 1px solid var(--mm-line); padding-top: 16px; }
+#money-mirror .mm-status { display: inline-block; max-width: 100%; margin: 0 0 16px; padding: 4px 8px; border-radius: var(--radius-control); color: var(--mm-ink); background: var(--mm-tint); font-size: .875rem; line-height: 1.5; }
 #money-mirror .mm-rate { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
 #money-mirror .mm-rate h2 { margin: 0; font-size: .875rem; font-weight: 400; line-height: 1.5; color: var(--mm-muted); }
 #money-mirror .mm-amount { margin: 0; color: var(--mm-ink); font-size: clamp(2rem, 5vw, 2.5rem); font-weight: 600; line-height: 1.1; letter-spacing: -.035em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -61,30 +55,27 @@
 #money-mirror :is(.mm-receipt, .mm-breakdown-list) > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; padding: 9px 0; border-bottom: 1px solid var(--mm-line); font-size: .875rem; }
 #money-mirror :is(.mm-receipt, .mm-breakdown-list) dt { color: var(--mm-muted); }
 #money-mirror :is(.mm-receipt, .mm-breakdown-list) dd { margin: 0; color: var(--mm-ink); font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-#money-mirror .mm-footnote { margin: 8px 0 0; color: var(--mm-muted); font-size: .75rem; line-height: 1.5; }
-#money-mirror .mm-edit-action { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; min-height: 52px; margin-top: 20px; padding: 12px 16px; border: 0; border-radius: 0; color: var(--mm-on-highlight); background: var(--mm-highlight); font-size: 1rem; font-weight: 600; text-align: left; }
+#money-mirror .mm-footnote { margin: 8px 0 0; color: var(--mm-muted); font-size: .875rem; line-height: 1.5; }
+#money-mirror .mm-edit-action { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; min-height: 52px; margin-top: 20px; padding: 12px 16px; border: 0; border-radius: var(--radius-control); color: var(--mm-on-highlight); background: var(--mm-highlight); font-size: 1rem; font-weight: 600; text-align: left; }
 #money-mirror .mm-edit-action svg { flex-shrink: 0; }
 #money-mirror .mm-example-note { color: var(--mm-muted); font-size: .875rem; line-height: 1.5; margin: 12px 0 0; }
 #money-mirror .mm-empty h2 { margin: 0 0 8px; font-size: 1.125rem; font-weight: 500; line-height: 1.4; }
 #money-mirror .mm-empty p { color: var(--mm-muted); font-size: .875rem; line-height: 1.6; margin: 0; max-width: 42ch; }
 #money-mirror details { margin: 20px 0 0; border: 0; border-top: 1px solid var(--mm-line); border-radius: 0; background: transparent; }
-#money-mirror summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; padding: 12px 0; color: var(--mm-ink); font-size: .875rem; line-height: 1.5; font-weight: 500; cursor: pointer; list-style: none; }
+#money-mirror summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 12px 0; color: var(--mm-ink); font-size: 1rem; line-height: 1.5; font-weight: 500; cursor: pointer; list-style: none; }
 #money-mirror summary::-webkit-details-marker { display: none; }
 #money-mirror summary svg { flex-shrink: 0; }
 #money-mirror details[open] > summary svg { transform: rotate(180deg); }
 #money-mirror details p { color: var(--mm-muted); font-size: .875rem; line-height: 1.6; margin: 12px 0; }
 #money-mirror .mm-breakdown-list { margin-top: 0; }
-#money-mirror .mm-breakdown-list dt small { display: block; font-size: .75rem; font-weight: 400; margin-top: 3px; max-width: 28ch; }
+#money-mirror .mm-breakdown-list dt small { display: block; font-size: .875rem; font-weight: 400; margin-top: 3px; max-width: 28ch; }
 #money-mirror .mm-breakdown-list .mm-total { border-top: 1px solid var(--mm-ink); }
 #money-mirror .mm-breakdown-list .mm-total dt { color: var(--mm-ink); font-weight: 600; }
-#money-mirror .mm-privacy { margin: 20px 0 0; font-size: .75rem; line-height: 1.5; text-align: center; color: var(--mm-muted); }
 #money-mirror :is(button, input, summary):focus-visible { outline: 3px solid var(--mm-highlight); outline-offset: 4px; }
 #money-mirror button:active { filter: brightness(.9); }
-#money-mirror .mm-text-action:hover { text-decoration-thickness: 2px; }
+#money-mirror .mm-text-action:hover { background: var(--mm-tint); }
+#money-mirror .mm-text-action[type=submit]:hover { background: var(--mm-highlight); filter: brightness(.92); }
 #money-mirror .mm-examples button:hover { background: var(--mm-highlight); color: var(--mm-on-highlight); }
-@container (max-width: 20rem) {
-  #money-mirror .number-field label { min-height: 2.9em; }
-}
 @container (max-width: 17.99rem) {
   #money-mirror .mm-fields { grid-template-columns: minmax(0, 1fr); }
   #money-mirror .number-field label { min-height: 0; }
@@ -105,7 +96,7 @@
   #money-mirror .mm-fields { gap: 24px; }
 }
 
-#money-mirror :is(.mm-text-action, .mm-amount, summary svg) { color: var(--mm-highlight); }
+#money-mirror :is(.mm-amount, summary svg) { color: var(--mm-highlight); }
 
 #money-mirror .mm-hours-field { min-width: 0; }
 #money-mirror .mm-hours-field .hours-slider { margin-top: 0; border-top: 0; }
@@ -113,4 +104,8 @@
 #money-mirror .hours-slider p { margin: 0 0 8px; }
 #money-mirror .mm-empty h2 { margin-bottom: 0; font-size: 1rem; }
 #money-mirror .mm-output > details { margin-top: 12px; }
-#money-mirror .mm-privacy { margin-top: 12px; }
+
+/* Phone dock: the live hourly result sits beside Next. */
+.mm-dock-result { display: grid; width: 100%; min-height: 52px; padding: 0; border: 0; background: transparent; color: var(--ledger-ink); text-align: left; line-height: 1.2; }
+.mm-dock-result > span:first-child { color: var(--ledger-muted); font-size: var(--text-small); }
+.mm-dock-result > strong { font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }

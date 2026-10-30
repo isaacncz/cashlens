@@ -24,9 +24,9 @@ export const routeHref = (route: string) => `${window.location.pathname}${window
 
 
 export const learningPaths = [
-  { id: 'understand', title: 'Understand your money', description: 'Start with what comes in, what goes out, and why.', lessonIds: ['money-mirror', 'asset-liability', 'cashflow-quadrant'] },
-  { id: 'build', title: 'Build breathing room', description: 'Look at debt, spending, and the buffer you have.', lessonIds: ['debt', 'salary-wealth', 'wealth-thermometer'] },
-  { id: 'practice', title: 'Put it into practice', description: 'Explore income streams, try decisions, and choose a habit.', lessonIds: ['income-engine', 'rat-race', 'literacy-playbook'] },
+  { id: 'understand', title: 'Understand your money', short: 'Understand', description: 'Start with what comes in, what goes out, and why.', lessonIds: ['money-mirror', 'asset-liability', 'cashflow-quadrant'] },
+  { id: 'build', title: 'Build breathing room', short: 'Breathing room', description: 'Look at debt, spending, and the buffer you have.', lessonIds: ['debt', 'salary-wealth', 'wealth-thermometer'] },
+  { id: 'practice', title: 'Put it into practice', short: 'Practice', description: 'Explore income streams, try decisions, and choose a habit.', lessonIds: ['income-engine', 'rat-race', 'literacy-playbook'] },
 ] as const;
 export const learningOrder = learningPaths.flatMap(path => [...path.lessonIds]);
 export const pathForLesson = (id: LessonId) => learningPaths.find(path => path.lessonIds.some(lessonId => lessonId === id))!;

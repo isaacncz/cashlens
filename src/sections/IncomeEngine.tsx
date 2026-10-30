@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 const companyStreams = [
   { label: 'Cloud', amount: '35%', color: 'var(--ledger-info)', note: 'High-margin recurring revenue' },
@@ -18,17 +19,14 @@ const reasons = [
   {
     title: 'Resilience',
     body: 'If one stream slows down, your whole life does not collapse with it.',
-    tone: 'text-emerald',
   },
   {
     title: 'Optionality',
     body: 'A second and third stream buy negotiating power, career flexibility, and time.',
-    tone: 'text-gold',
   },
   {
     title: 'Compounding',
     body: 'Small streams stacked together can outperform one big salary over time.',
-    tone: 'text-[var(--ledger-info)]',
   },
 ];
 
@@ -39,171 +37,61 @@ const steps = [
   'Repeat until one payer no longer controls your life.',
 ];
 
+const models = {
+  company: { label: 'Company', eyebrow: 'Company model', title: 'How big companies think', profileLabel: 'Risk profile', profile: 'Diversified revenue', streams: companyStreams, noteLabel: 'Lesson', note: 'A company becomes stronger when one line does not have to carry the whole machine.' },
+  personal: { label: 'Personal', eyebrow: 'Personal model', title: 'How an individual can copy it', profileLabel: 'Target profile', profile: 'One person, four streams', streams: personalStreams, noteLabel: 'Reality check', note: 'You do not need to build all four at once. The goal is to stop relying on exactly one payer forever.' },
+} as const;
+
 export default function IncomeEngine() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-
+  const [view, setView] = useState<keyof typeof models>('company');
+  const model = models[view];
 
   return (
-    <section id="income-engine" ref={sectionRef} className="w-full py-24 md:py-32" style={{ background: 'var(--ledger-ground)' }}>
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <h1 data-reveal className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4" style={{ color: 'var(--ledger-ink)' }}>
-          Build income beyond <span className="text-gold">your salary.</span>
-        </h1>
-        <p data-reveal className="text-slate text-base md:text-lg mb-10 max-w-3xl">
-          Compare a business with a personal income mix. See how several streams can reduce reliance on a single payer.
-        </p>
+    <section id="income-engine" className="lesson" aria-labelledby="income-engine-heading">
+      <header className="lesson-intro">
+        <h1 id="income-engine-heading">Build income beyond your salary.</h1>
+        <p>Compare a business with a personal income mix. See how several streams can reduce reliance on a single payer.</p>
+      </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-6 items-stretch mb-8">
-          <div data-reveal className="bg-navy-surface border border-navy-light rounded-3xl p-6 md:p-8">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div>
-                <p className="text-[var(--ledger-info)] text-xs font-semibold uppercase tracking-[0.12em] mb-2">Company model</p>
-                <h2 className="text-white text-2xl font-bold">How big companies think</h2>
-              </div>
-              <div className="rounded-2xl border border-navy-light bg-navy px-4 py-3 text-right">
-                <p className="text-slate text-sm uppercase tracking-[0.12em] mb-1">Risk profile</p>
-                <p className="text-[var(--ledger-info)] font-bold">Diversified revenue</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {companyStreams.map((stream, index) => (
-                <div key={stream.label} className="rounded-2xl border border-navy-light bg-navy/60 p-4">
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <div>
-                      <p className="text-white font-semibold">{stream.label}</p>
-                      <p className="text-slate text-sm">{stream.note}</p>
-                    </div>
-                    <p className="font-mono-data text-xl font-bold" style={{ color: stream.color }}>
-                      {stream.amount}
-                    </p>
-                  </div>
-                  <div className="h-2 rounded-full bg-navy-light overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: stream.amount,
-                        background: stream.color,
-                        animationDelay: `${index * 120}ms`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-emerald/20 bg-emerald/10 p-4">
-              <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-2">Lesson</p>
-              <p className="text-slate text-sm leading-relaxed">
-                A company becomes stronger when one line does not have to carry the whole machine.
-              </p>
-            </div>
-          </div>
-
-          <div data-reveal className="hidden xl:flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-16 h-16 rounded-full border border-gold/25 bg-gold/10 flex items-center justify-center">
-                <span className="text-gold text-2xl">→</span>
-              </div>
-              <p className="text-slate text-sm text-center max-w-[140px]">
-                Same principle.
-                <br />
-                Different scale.
-              </p>
-            </div>
-          </div>
-
-          <div data-reveal className="bg-navy-surface border border-gold/20 rounded-3xl p-6 md:p-8">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div>
-                <p className="text-gold text-xs font-semibold uppercase tracking-[0.12em] mb-2">Personal model</p>
-                <h2 className="text-white text-2xl font-bold">How an individual can copy it</h2>
-              </div>
-              <div className="rounded-2xl border border-gold/20 bg-gold/10 px-4 py-3 text-right">
-                <p className="text-slate text-sm uppercase tracking-[0.12em] mb-1">Target profile</p>
-                <p className="text-gold font-bold">One person, four streams</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {personalStreams.map((stream, index) => (
-                <div key={stream.label} className="rounded-2xl border border-navy-light bg-navy/60 p-4">
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <div>
-                      <p className="text-white font-semibold">{stream.label}</p>
-                      <p className="text-slate text-sm">{stream.note}</p>
-                    </div>
-                    <p className="font-mono-data text-xl font-bold" style={{ color: stream.color }}>
-                      {stream.amount}
-                    </p>
-                  </div>
-                  <div className="h-2 rounded-full bg-navy-light overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${Math.min(100, ((index + 1) / personalStreams.length) * 100)}%`,
-                        background: stream.color,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-gold/20 bg-gold/10 p-4">
-              <p className="text-gold text-xs uppercase tracking-[0.12em] mb-2">Reality check</p>
-              <p className="text-slate text-sm leading-relaxed">
-                You do not need to build all four at once. The goal is to stop relying on exactly one payer forever.
-              </p>
-            </div>
-          </div>
+      <div className="lesson-stack">
+        <div className="segmented" role="group" aria-label="Income model">
+          {(Object.keys(models) as (keyof typeof models)[]).map(key => <button key={key} type="button" aria-pressed={view === key} onClick={() => setView(key)}>{models[key].label}</button>)}
         </div>
+        <p className="segmented-caption">Same principle. Different scale.</p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {reasons.map((reason) => (
-            <div key={reason.title} data-reveal className="bg-navy-surface border border-navy-light rounded-2xl p-6">
-              <p className={`text-sm font-semibold uppercase tracking-[0.12em] mb-3 ${reason.tone}`}>{reason.title}</p>
-              <p className="text-slate text-sm leading-relaxed">{reason.body}</p>
-            </div>
-          ))}
-        </div>
+        <section className="lesson-card ie-model" aria-live="polite" aria-labelledby="ie-model-title">
+          <p className="lesson-muted">{model.eyebrow} · {model.profileLabel}: <strong>{model.profile}</strong></p>
+          <h2 id="ie-model-title">{model.title}</h2>
+          <ul className="ie-streams">
+            {model.streams.map((stream, index) => (
+              <li key={stream.label}>
+                <div><span><strong>{stream.label}</strong><small>{stream.note}</small></span><span className="ie-amount">{stream.amount}</span></div>
+                <span className="meter" aria-hidden="true"><span style={{ width: view === 'company' ? stream.amount : `${Math.min(100, ((index + 1) / personalStreams.length) * 100)}%`, background: stream.color }} /></span>
+              </li>
+            ))}
+          </ul>
+          <p className="lesson-muted"><strong>{model.noteLabel}:</strong> {model.note}</p>
+        </section>
 
-        <div data-reveal className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6">
-          <div className="rounded-3xl border border-navy-light bg-navy-surface p-6 md:p-8">
-            <p className="text-crimson text-xs font-semibold uppercase tracking-[0.12em] mb-3">One stream = one point of failure</p>
-            <p className="text-white text-xl font-bold mb-4">When your salary is your only engine, job loss feels like total shutdown.</p>
-            <p className="text-slate text-sm leading-relaxed mb-6">
-              The goal of side income is not just “extra money.” It is to reduce fragility. A second stream gives breathing room.
-              A third starts creating real freedom.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-crimson/20 bg-crimson/10 p-4">
-                <p className="text-crimson text-xs uppercase tracking-[0.12em] mb-2">Fragile setup</p>
-                <p className="text-white font-semibold mb-1">1 income stream</p>
-                <p className="text-slate text-sm">One boss, one paycheck, one disruption away from pressure.</p>
-              </div>
-              <div className="rounded-2xl border border-emerald/20 bg-emerald/10 p-4">
-                <p className="text-emerald text-xs uppercase tracking-[0.12em] mb-2">Resilient setup</p>
-                <p className="text-white font-semibold mb-1">3 to 4 income streams</p>
-                <p className="text-slate text-sm">More margin, more options, and less fear around one source slowing down.</p>
-              </div>
+        <div className="lesson-disclosures">
+          <details className="lesson-disclosure">
+            <summary><span><span>Why more than one stream</span><span>Resilience · Optionality · Compounding</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>{reasons.map(reason => <div key={reason.title}><h3>{reason.title}</h3><p>{reason.body}</p></div>)}</div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>One stream = one point of failure</span><span>Fragile vs resilient setups</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div>
+              <p><strong>When your salary is your only engine, job loss feels like total shutdown.</strong> The goal of side income is not just “extra money.” It is to reduce fragility. A second stream gives breathing room. A third starts creating real freedom.</p>
+              <dl className="lesson-rows">
+                <div><dt>Fragile setup <small>One boss, one paycheck, one disruption away from pressure.</small></dt><dd className="tone-bad">1 income stream</dd></div>
+                <div><dt>Resilient setup <small>More margin, more options, and less fear around one source slowing down.</small></dt><dd className="tone-good">3 to 4 income streams</dd></div>
+              </dl>
             </div>
-          </div>
-
-          <div className="rounded-3xl border border-gold/20 bg-gold/5 p-6 md:p-8">
-            <p className="text-gold text-xs font-semibold uppercase tracking-[0.12em] mb-4">Simple path to start</p>
-            <div className="space-y-3">
-              {steps.map((step, index) => (
-                <div key={step} className="flex items-start gap-3 rounded-2xl border border-navy-light bg-navy/50 p-4">
-                  <div className="w-8 h-8 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0">
-                    <span className="text-gold text-sm font-bold">{index + 1}</span>
-                  </div>
-                  <p className="text-slate text-sm leading-relaxed">{step}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </details>
+          <details className="lesson-disclosure">
+            <summary><span><span>Simple path to start</span><span>Four steps</span></span><ChevronDown size={20} aria-hidden="true" /></summary>
+            <div><ol className="lesson-steps">{steps.map(step => <li key={step}>{step}</li>)}</ol></div>
+          </details>
         </div>
       </div>
     </section>
