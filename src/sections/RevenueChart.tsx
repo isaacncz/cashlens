@@ -41,7 +41,11 @@ export default function RevenueChart({ projection, months, model, rate, showCate
   const totals = sampleMonths.map(month => projection.categories.reduce((sum, group) => sum + group.cumulative[month], 0));
   const inspectedTotal = totals[selectedMonth];
   const totalLine = `M${totals.map((value, month) => `${x(month)},${y(value)}`).join(' L')}`;
-  const tickCount = Math.min(months + 1, compact ? 4 : 6);
+  // Round ticks: whole years in steps of 1, 2, 5 or 10 for multi-year plans, evenly spaced months below five years.
+  const shortTicks = Math.min(months + 1, compact ? 4 : 6), years = months / 12, yearStep = years <= 5 ? 1 : years <= 12 ? 2 : years <= 30 ? 5 : 10;
+  const tickMonths = months < 60
+    ? [...new Set(Array.from({ length: shortTicks }, (_, index) => Math.round(months * index / (shortTicks - 1))))]
+    : Array.from({ length: Math.floor(years / yearStep) + 1 }, (_, index) => index * yearStep * 12);
   const areas = showCategories ? projection.categories.map((group, groupIndex) => {
     const lower = sampleMonths.map(month => projection.categories.slice(0, groupIndex).reduce((sum, previous) => sum + previous.cumulative[month], 0));
     const upper = sampleMonths.map((month, index) => `${x(month)},${y(lower[index] + group.cumulative[month])}`);
@@ -67,10 +71,9 @@ export default function RevenueChart({ projection, months, model, rate, showCate
         {areas.map(group => <g key={group.name} data-category={group.name}><path d={group.area} fill={group.color} fillOpacity=".16" /><path d={group.line} fill="none" stroke={group.color} strokeWidth="1.5" /></g>)}
         {markers.map(year => <g key={year} className="rs-year-marker"><line x1={x((year - 1) * 12)} x2={x((year - 1) * 12)} y1={top + 18} y2={height - bottom} /><text x={Math.min(x((year - 1) * 12) + 4, width - 50)} y={top + 8}>Year {year}</text></g>)}
         <path data-series="total" d={totalLine} fill="none" stroke={showCategories ? 'var(--rs-ink)' : 'var(--rs-gold)'} strokeWidth="2.5" strokeLinejoin="round" />
-        {Array.from({ length: tickCount }, (_, index) => {
-          const fraction = index / (tickCount - 1), month = Math.round(months * fraction);
-          const label = month === 0 ? 'Today' : months < 60 ? `${month}m` : `${Number((month / 12).toFixed(1))}y`;
-          return <text key={index} x={left + plotWidth * fraction} y={height - 10} textAnchor={index === 0 ? 'start' : index === tickCount - 1 ? 'end' : 'middle'}>{label}</text>;
+        {tickMonths.map((month, index) => {
+          const label = month === 0 ? 'Today' : months < 60 ? `${month}m` : `${month / 12}y`;
+          return <text key={month} x={x(month)} y={height - 10} textAnchor={index === 0 ? 'start' : month === months ? 'end' : 'middle'}>{label}</text>;
         })}
         {inspectedMonth !== null && <><line x1={x(selectedMonth)} x2={x(selectedMonth)} y1={top} y2={height - bottom} className="rs-crosshair" /><circle cx={x(selectedMonth)} cy={y(inspectedTotal)} r="4" className="rs-chart-dot" /></>}
       </svg>

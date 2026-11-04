@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cashlens-compound-story-v15';
+const CACHE_NAME = 'cashlens-compound-layers-v16';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

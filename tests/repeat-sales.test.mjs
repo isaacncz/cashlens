@@ -9,7 +9,7 @@ async function loadTypeScript(relativePath) {
   const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } });
   return import('data:text/javascript;base64,' + Buffer.from(outputText).toString('base64'));
 }
-const { projectRepeatSales: projectWithAcquisition, durationLabel, DEFAULT_REPEAT_RATE } = await loadTypeScript('../src/lib/repeatSales.ts');
+const { projectRepeatSales: projectWithAcquisition, durationLabel, DEFAULT_REPEAT_RATE, annualLayers } = await loadTypeScript('../src/lib/repeatSales.ts');
 const { repeatSalesProducts } = await loadTypeScript('../src/data/repeatSalesProducts.ts');
 // Reference cases isolate the fixed starting group; acquisition has separate tests below.
 const projectRepeatSales = (products, months, customers, rate, model) => projectWithAcquisition(products, months, customers, rate, model, false);
@@ -228,4 +228,17 @@ test('default and non-finite repeat rates use full 100% purchasing', () => {
   close(projectWithAcquisition([toothpaste], 12, 1, NaN, undefined, false).total, 118);
   close(projectWithAcquisition(plan, 24, 1, undefined, undefined, false).total, 712);
   close(projectWithAcquisition([toothpaste], 12, 1, 50, undefined, false).total, 73.75);
+});
+test('annual layers split the Compound example into the starting customer and added customers', () => {
+  const years = { '124106': 1, '110488': 2, '126449': 2, '000100': 3 };
+  const plan = repeatSalesProducts.filter(product => years[product.id]).map(product => ({ ...product, startYear: years[product.id] }));
+  const full = projectWithAcquisition(plan, 240, 1, 100, 'repeat-purchases', true, 1);
+  const base = projectWithAcquisition(plan, 240, 1, 100, 'repeat-purchases', false, 1);
+  const layers = annualLayers(full, base, 240);
+  assert.equal(layers.length, 20);
+  assert.deepEqual(layers.slice(0, 3).map(({ original, added }) => [original, added]), [[118, 0], [594, 594], [714, 1428]]);
+  close(layers[19].original + layers[19].added, 14280);
+  close(layers.reduce((sum, layer) => sum + layer.original + layer.added, 0), full.total);
+  const partial = annualLayers(projectWithAcquisition(plan, 13, 1, 100, 'repeat-purchases', true, 1), projectWithAcquisition(plan, 13, 1, 100, 'repeat-purchases', false, 1), 13);
+  assert.deepEqual(partial.map(layer => layer.months), [12, 1]);
 });

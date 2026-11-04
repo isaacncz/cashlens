@@ -99,3 +99,24 @@ export function durationLabel(months: number): string {
 export const formatRinggit = (amount: number) => new Intl.NumberFormat('en-MY', {
   minimumFractionDigits: 2, maximumFractionDigits: 2,
 }).format(amount);
+
+/** Headline totals: whole ringgit from RM 1,000, where sen add noise; cents below that. */
+export const formatTotal = (amount: number) => Math.abs(amount) >= 1000
+  ? new Intl.NumberFormat('en-MY', { maximumFractionDigits: 0 }).format(Math.round(amount))
+  : formatRinggit(amount);
+
+export interface YearLayer { year: number; months: number; original: number; added: number }
+const cumulativeAt = (projection: Projection, month: number) => projection.categories.reduce((sum, group) => sum + (group.cumulative[month] ?? group.cumulative.at(-1) ?? 0), 0);
+
+/** Splits each business year's revenue into the starting customers' basket and
+ * revenue from customers added later. `startingGroup` must be the same scenario
+ * projected without annual acquisition. The final year may be partial. */
+export function annualLayers(projection: Projection, startingGroup: Projection, requestedMonths: number): YearLayer[] {
+  const months = Math.min(MAX_MONTHS, Math.max(1, Math.round(requestedMonths)));
+  return Array.from({ length: Math.ceil(months / 12) }, (_, index) => {
+    const start = index * 12, end = Math.min(months, start + 12);
+    const total = cumulativeAt(projection, end) - cumulativeAt(projection, start);
+    const original = cumulativeAt(startingGroup, end) - cumulativeAt(startingGroup, start);
+    return { year: index + 1, months: end - start, original, added: Math.max(0, total - original) };
+  });
+}
