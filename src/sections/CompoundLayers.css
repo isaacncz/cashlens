@@ -123,3 +123,6 @@
   .rs-sheet-content { padding: 24px; }
   .rs-narrative .rs-chapters button { font-size: var(--text-small); }
 }
+
+/* Phase 3: a plain-language reading of the yearly bars. */
+.rs-insight { margin: 12px 0 0; padding: 12px 14px; border-radius: var(--radius-control); background: var(--ledger-raised); color: var(--rs-ink); font-size: var(--text-small); line-height: 1.5; }

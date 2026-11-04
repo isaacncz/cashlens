@@ -20,7 +20,7 @@ const destinations = [
 export default function Navigation({ active, route, visitedLessons }: { active: Destination; route: Route; visitedLessons: LessonId[] }) {
   const inLesson = isLesson(route);
   const focused = inLesson || route === 'compounding';
-  const title = inLesson ? lessons.find(lesson => lesson.id === route)!.title : 'Repeat sales';
+  const title = inLesson ? lessons.find(lesson => lesson.id === route)!.title : 'Compound';
   const path = inLesson ? pathForLesson(route) : null;
   const step = path ? path.lessonIds.findIndex(id => id === route) + 1 : 0;
   const navigationRef = useRef<HTMLElement>(null);

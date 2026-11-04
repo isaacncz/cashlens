@@ -100,6 +100,11 @@ export const formatRinggit = (amount: number) => new Intl.NumberFormat('en-MY', 
   minimumFractionDigits: 2, maximumFractionDigits: 2,
 }).format(amount);
 
+/** Headline totals: whole ringgit from RM 1,000, where sen add noise; cents below that. */
+export const formatTotal = (amount: number) => Math.abs(amount) >= 1000
+  ? new Intl.NumberFormat('en-MY', { maximumFractionDigits: 0 }).format(Math.round(amount))
+  : formatRinggit(amount);
+
 export interface YearLayer { year: number; months: number; original: number; added: number }
 const cumulativeAt = (projection: Projection, month: number) => projection.categories.reduce((sum, group) => sum + (group.cumulative[month] ?? group.cumulative.at(-1) ?? 0), 0);
 

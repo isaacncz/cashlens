@@ -49,7 +49,7 @@ export async function checkCompoundFlow(page, width) {
   await chapter('Year 3').click();
   assert.equal(await page.locator('.rs-story-product').count(), 4);
   assert.equal(await page.locator('.rs-new-label').count(), 1);
-  assert.equal(await page.locator('.rs-story-amount').innerText(), 'RM 2,142.00');
+  assert.equal(await page.locator('.rs-story-amount').innerText(), 'RM 2,142');
   const growthStory = page.getByRole('switch', { name: /Now add one new customer a year/ });
   await growthStory.uncheck();
   assert.equal(await page.locator('.rs-story-amount').innerText(), 'RM 714.00', 'Basket and customer growth are independently visible');
@@ -64,9 +64,10 @@ export async function checkCompoundFlow(page, width) {
   assert.ok(await period('20 years').isChecked());
   assert.equal(await page.locator('#rs-customers-per-year').inputValue(), '1');
   assert.match(await page.locator('#rs-growth-help').innerText(), /reach 20 customers in year 20/);
-  assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 149,104.00');
+  assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 149,104', 'Totals from RM 1,000 show whole ringgit');
+  assert.equal(await page.locator('.rs-insight').innerText(), 'From year 3, your starting customer’s basket holds at RM 714 a year. After that, new customers add about RM 714 more each year. Growth stops at the 20-customer cap in year 20.');
   await customMonths(36);
-  assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 3,448.00');
+  assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 3,448');
   await customMonths(48);
   assert.deepEqual(await page.locator('.rs-plan-year').evaluateAll(groups => groups.map(group => group.dataset.year)), ['1', '2', '3'], 'The basket is grouped by start year');
   await edit('126449');
@@ -97,6 +98,8 @@ export async function checkCompoundFlow(page, width) {
   assert.equal(await page.locator('.rs-result [data-year]').count(), 2, 'A 13-month plan has a partial second year');
   await page.getByRole('button', { name: 'Running total', exact: true }).click();
   await page.locator('.rs-chart').waitFor();
+  const ticks = await page.locator('.rs-chart > text').allTextContents();
+  assert.ok(ticks.includes('Today') && ticks.includes('13m'), `Short plans keep month ticks: ${ticks}`);
   await page.getByRole('checkbox', { name: 'By category', exact: true }).check();
   assert.ok(await page.locator('.rs-chart [data-category]').count());
   await page.locator('.rs-year-revenue > summary').click();
