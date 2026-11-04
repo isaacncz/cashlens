@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 
 export async function checkCompoundFlow(page, width) {
   const chapter = name => page.getByRole('navigation', { name: 'Consultation chapters' }).getByRole('button', { name, exact: true });
-  const switchView = async name => { if (width < 768) await page.getByRole('group', { name: 'Consultation view' }).getByRole('button', { name: new RegExp(`^${name}`) }).click(); };
   const expand = async id => { const row = page.locator(`.rs-story-product[data-product-id="${id}"]`); if (!await row.evaluate(element => element.open)) await row.locator('summary').click(); return row; };
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
   assert.equal(await page.locator('.rs-story-amount').innerText(), 'RM 118.00');
@@ -48,15 +47,19 @@ export async function checkCompoundFlow(page, width) {
   await growthStory.uncheck();
   assert.equal(await page.locator('.rs-story-amount').innerText(), 'RM 714.00', 'Basket and customer growth are independently visible');
   await growthStory.check();
+  assert.deepEqual(await page.locator('.rs-story-receipt [data-state=reached]').evaluateAll(bars => bars.map(bar => bar.dataset.year)), ['1', '2', '3'], 'Year 3 lights three yearly bars');
+  assert.equal(await page.locator('.rs-story-receipt [data-state=later]').count(), 2, 'Later years stay faint');
+  assert.equal(await page.locator('.rs-story-delta').innerText(), '+RM 954.00 vs year 2 · 1.8×');
+  if (width < 768) assert.ok((await page.locator('.rs-story-receipt').boundingBox()).y < (await page.locator('.rs-story-product').first().boundingBox()).y, 'The result comes before the basket on phones');
   await chapter('My plan').click();
-  await switchView('Settings');
+  assert.equal(await page.getByRole('group', { name: 'Consultation view' }).count(), 0, 'Inputs and results share one view');
+  assert.equal(await page.locator('.rs-result [data-year]').count(), 20, 'My plan shows one bar per year');
   assert.equal(await page.locator('#rs-duration').inputValue(), '240');
   assert.ok(await page.locator('#rs-add-customers').isChecked());
   assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 149,104.00');
   await page.locator('#rs-duration').selectOption('36');
   assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 3,448.00');
   await page.locator('#rs-duration').selectOption('48');
-  await switchView('Products');
   await page.locator('#rs-review-year').selectOption('4');
   assert.equal(await page.locator('.rs-new-label').count(), 0, 'Year 4 carries the full basket forward');
   const shampoo = await expand('126449');
@@ -64,7 +67,6 @@ export async function checkCompoundFlow(page, width) {
   assert.equal(await page.locator('.rs-new-label').count(), 1, 'A rescheduled product is new in its selected year');
   await page.locator('#rs-review-year').selectOption('3');
   assert.equal(await page.locator('.rs-story-future .rs-story-product').count(), 1);
-  await switchView('Settings');
   await page.locator('#rs-duration').selectOption('12');
   assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 118.00', 'Future products cannot change year-one revenue');
   await page.locator('#rs-customers').fill('100');
@@ -78,14 +80,14 @@ export async function checkCompoundFlow(page, width) {
   await page.getByRole('spinbutton', { name: 'Annual customer retention percent', exact: true }).fill('50');
   await page.locator('.rs-time-controls > summary').click();
   await page.locator('#rs-months').fill('13');
-  await switchView('Results');
+  assert.equal(await page.locator('.rs-result [data-year]').count(), 2, 'A 13-month plan has a partial second year');
+  await page.getByRole('button', { name: 'Running total', exact: true }).click();
   await page.locator('.rs-chart').waitFor();
   await page.getByRole('checkbox', { name: 'By category', exact: true }).check();
   assert.ok(await page.locator('.rs-chart [data-category]').count());
   await page.locator('.rs-year-revenue > summary').click();
   assert.equal(await page.locator('.rs-year-revenue tbody tr').count(), 2);
   assert.match(await page.locator('.rs-year-revenue tbody tr').last().innerText(), /2 \(1 mo\)/);
-  await switchView('Products');
   await page.getByRole('button', { name: 'Clear basket', exact: true }).click();
   assert.equal(await page.locator('.rs-revenue').innerText(), 'RM 0.00');
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
