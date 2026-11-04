@@ -62,7 +62,7 @@ export default function LayerChart({ layers, reached, current, variant, label }:
               {layer.added > 0 && <rect className="rs-layer-added" x={x} y={y(total)} width={barWidth} height={Math.max(0, y(layer.original) - y(total))} rx={radius} />}
             </> : <rect className="rs-layer-later" x={x} y={y(total)} width={barWidth} height={Math.max(0, y(0) - y(total))} rx={radius} />}
             {(current === layer.year || inspected === index) && <rect className="rs-layer-focus" x={x - 2} y={y(total) - 3} width={barWidth + 4} height={Math.max(0, y(0) - y(total)) + 3} rx={radius + 1} />}
-            {story && lit && <text className="rs-layer-value" x={x + barWidth / 2} y={y(total) - 6} textAnchor="middle">{wholeMoney(total)}</text>}
+            {story && lit && <text className="rs-layer-value" x={x + barWidth / 2} y={y(total) - (current === layer.year ? 9 : 6)} textAnchor="middle">{wholeMoney(total)}</text>}
             {ticks.has(layer.year) && <text className={current === layer.year ? 'rs-layer-current' : undefined} x={x + barWidth / 2} y={height - 6} textAnchor="middle">{story ? `Year ${layer.year}` : layer.year === 1 ? 'Year 1' : layer.year}</text>}
           </g>;
         })}
